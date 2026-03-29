@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="RodData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/rod_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "gold_rod"
+display_name = "Gold Rod"
+description = "A masterwork gold rod forged for the deepest waters. Unmatched depth and control."
+cast_depth_range = 3500.0
+reel_speed = 1.4
+tension_resistance = 2.0
+cast_depth_per_level = 50.0
+reel_speed_per_level = 0.04
+tension_resistance_per_level = 0.035

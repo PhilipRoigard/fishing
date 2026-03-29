@@ -1,5 +1,19 @@
 extends UIStateNode
 
+const QUALITY_BG_COLORS: Dictionary = {
+	Enums.ItemQuality.COMMON: Color(0.3, 0.3, 0.3),
+	Enums.ItemQuality.UNCOMMON: Color(0.15, 0.4, 0.15),
+	Enums.ItemQuality.RARE: Color(0.15, 0.25, 0.5),
+	Enums.ItemQuality.EPIC: Color(0.35, 0.15, 0.45),
+	Enums.ItemQuality.LEGENDARY: Color(0.5, 0.4, 0.1),
+}
+
+var _bait_worm_texture: Texture2D = preload("res://assets/sprites/items/Bait_01.png")
+var _bait_shrimp_texture: Texture2D = preload("res://assets/sprites/items/Bait_01_blue.png")
+var _bait_squid_texture: Texture2D = preload("res://assets/sprites/items/Bait_01_pink.png")
+var _bait_green_texture: Texture2D = preload("res://assets/sprites/items/Bait_01_green.png")
+var _rod_sheet_texture: Texture2D = preload("res://assets/sprites/character/fishing_rod_sheet.png")
+
 var selected_uuid: String = ""
 var item_name_label: Label
 var quality_label: Label
@@ -8,6 +22,8 @@ var stats_label: Label
 var equip_button: Button
 var level_up_button: Button
 var merge_button: Button
+var icon_rect: TextureRect
+var detail_panel_style: StyleBoxFlat
 
 
 func enter(meta: Variant = null) -> void:
@@ -26,7 +42,7 @@ func exit() -> void:
 func _build_layout() -> void:
 	var bg: ColorRect = ColorRect.new()
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.color = Color(0.03, 0.06, 0.12, 1.0)
+	bg.color = Color(0.02, 0.04, 0.08, 0.95)
 	add_child(bg)
 
 	var margin: MarginContainer = MarginContainer.new()
@@ -38,68 +54,117 @@ func _build_layout() -> void:
 	add_child(margin)
 
 	var vbox: VBoxContainer = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 16)
+	vbox.add_theme_constant_override("separation", 12)
 	margin.add_child(vbox)
+
+	var detail_panel: PanelContainer = PanelContainer.new()
+	detail_panel_style = StyleBoxFlat.new()
+	detail_panel_style.bg_color = Color(0.15, 0.15, 0.15, 0.8)
+	detail_panel_style.corner_radius_top_left = 10
+	detail_panel_style.corner_radius_top_right = 10
+	detail_panel_style.corner_radius_bottom_left = 10
+	detail_panel_style.corner_radius_bottom_right = 10
+	detail_panel_style.border_width_bottom = 2
+	detail_panel_style.border_width_top = 2
+	detail_panel_style.border_width_left = 2
+	detail_panel_style.border_width_right = 2
+	detail_panel_style.border_color = Color(0.3, 0.3, 0.3)
+	detail_panel_style.content_margin_top = 16
+	detail_panel_style.content_margin_bottom = 16
+	detail_panel_style.content_margin_left = 16
+	detail_panel_style.content_margin_right = 16
+	detail_panel.add_theme_stylebox_override("panel", detail_panel_style)
+	vbox.add_child(detail_panel)
+
+	var panel_vbox: VBoxContainer = VBoxContainer.new()
+	panel_vbox.add_theme_constant_override("separation", 8)
+	detail_panel.add_child(panel_vbox)
+
+	var icon_center: CenterContainer = CenterContainer.new()
+	icon_center.custom_minimum_size = Vector2(0, 72)
+	panel_vbox.add_child(icon_center)
+
+	icon_rect = TextureRect.new()
+	icon_rect.custom_minimum_size = Vector2(64, 64)
+	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon_center.add_child(icon_rect)
 
 	item_name_label = Label.new()
 	item_name_label.text = ""
 	item_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	item_name_label.add_theme_font_size_override("font_size", 24)
-	vbox.add_child(item_name_label)
+	item_name_label.add_theme_font_size_override("font_size", 22)
+	panel_vbox.add_child(item_name_label)
 
 	quality_label = Label.new()
 	quality_label.text = ""
 	quality_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vbox.add_child(quality_label)
+	quality_label.add_theme_font_size_override("font_size", 14)
+	panel_vbox.add_child(quality_label)
 
 	level_label = Label.new()
 	level_label.text = ""
 	level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vbox.add_child(level_label)
+	level_label.add_theme_font_size_override("font_size", 14)
+	panel_vbox.add_child(level_label)
 
 	var separator: HSeparator = HSeparator.new()
-	vbox.add_child(separator)
+	panel_vbox.add_child(separator)
 
 	stats_label = Label.new()
 	stats_label.text = ""
 	stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	stats_label.add_theme_font_size_override("font_size", 14)
-	vbox.add_child(stats_label)
+	stats_label.add_theme_color_override("font_color", Color(0.8, 0.85, 0.9))
+	panel_vbox.add_child(stats_label)
 
-	var separator2: HSeparator = HSeparator.new()
-	vbox.add_child(separator2)
+	var button_container: VBoxContainer = VBoxContainer.new()
+	button_container.add_theme_constant_override("separation", 8)
+	vbox.add_child(button_container)
 
-	equip_button = Button.new()
-	equip_button.text = "Equip"
-	equip_button.custom_minimum_size = Vector2(200, 50)
-	equip_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	equip_button = _create_action_button("Equip", Color(0.15, 0.35, 0.15))
 	equip_button.pressed.connect(_on_equip_pressed)
-	vbox.add_child(equip_button)
+	button_container.add_child(equip_button)
 
-	level_up_button = Button.new()
-	level_up_button.text = "Level Up"
-	level_up_button.custom_minimum_size = Vector2(200, 50)
-	level_up_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	level_up_button = _create_action_button("Level Up", Color(0.15, 0.25, 0.4))
 	level_up_button.pressed.connect(_on_level_up_pressed)
-	vbox.add_child(level_up_button)
+	button_container.add_child(level_up_button)
 
-	merge_button = Button.new()
-	merge_button.text = "Merge"
-	merge_button.custom_minimum_size = Vector2(200, 50)
-	merge_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	merge_button = _create_action_button("Merge", Color(0.3, 0.15, 0.35))
 	merge_button.pressed.connect(_on_merge_pressed)
-	vbox.add_child(merge_button)
+	button_container.add_child(merge_button)
 
 	var spacer: Control = Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	vbox.add_child(spacer)
 
-	var back_button: Button = Button.new()
-	back_button.text = "Back"
-	back_button.custom_minimum_size = Vector2(140, 44)
-	back_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var back_button: Button = _create_action_button("Back", Color(0.2, 0.2, 0.25))
 	back_button.pressed.connect(_back)
 	vbox.add_child(back_button)
+
+
+func _create_action_button(text: String, bg_color: Color) -> Button:
+	var btn: Button = Button.new()
+	btn.text = text
+	btn.custom_minimum_size = Vector2(200, 48)
+	btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+	var btn_style: StyleBoxFlat = StyleBoxFlat.new()
+	btn_style.bg_color = bg_color
+	btn_style.corner_radius_top_left = 6
+	btn_style.corner_radius_top_right = 6
+	btn_style.corner_radius_bottom_left = 6
+	btn_style.corner_radius_bottom_right = 6
+	btn.add_theme_stylebox_override("normal", btn_style)
+
+	var hover_style: StyleBoxFlat = btn_style.duplicate()
+	hover_style.bg_color = bg_color.lightened(0.15)
+	btn.add_theme_stylebox_override("hover", hover_style)
+
+	var pressed_style: StyleBoxFlat = btn_style.duplicate()
+	pressed_style.bg_color = bg_color.darkened(0.15)
+	btn.add_theme_stylebox_override("pressed", pressed_style)
+
+	return btn
 
 
 func _populate_data() -> void:
@@ -108,6 +173,15 @@ func _populate_data() -> void:
 		return
 
 	var quality_color: Color = Enums.QUALITY_COLORS.get(entry.quality, Color.WHITE)
+	var quality_bg: Color = QUALITY_BG_COLORS.get(entry.quality, Color(0.2, 0.2, 0.2))
+
+	if detail_panel_style:
+		detail_panel_style.bg_color = quality_bg.darkened(0.5)
+		detail_panel_style.bg_color.a = 0.85
+		detail_panel_style.border_color = quality_color
+
+	if icon_rect:
+		icon_rect.texture = _get_item_icon(entry.item_id, entry.equipment_type)
 
 	if item_name_label:
 		var display_name: String = _get_display_name(entry)
@@ -121,6 +195,7 @@ func _populate_data() -> void:
 
 	if level_label:
 		level_label.text = "Level " + str(entry.level)
+		level_label.add_theme_color_override("font_color", Color(0.8, 0.85, 0.9))
 
 	if stats_label:
 		stats_label.text = _get_stats_text(entry)
@@ -149,6 +224,45 @@ func _update_level_up_cost(entry: EquipmentManager.EquipmentEntry) -> void:
 			level_up_button.disabled = false
 	else:
 		level_up_button.text = "Level Up"
+
+
+func _get_item_icon(item_id: String, equipment_type: String) -> Texture2D:
+	match equipment_type:
+		"rod":
+			var atlas: AtlasTexture = AtlasTexture.new()
+			atlas.atlas = _rod_sheet_texture
+			atlas.region = Rect2(0, 0, 64, 64)
+			return atlas
+		"bait":
+			match item_id:
+				"worm", "worm_bait":
+					return _bait_worm_texture
+				"shrimp", "shrimp_bait":
+					return _bait_shrimp_texture
+				"squid", "squid_bait":
+					return _bait_squid_texture
+				_:
+					return _bait_green_texture
+		"hook":
+			return _create_circle_texture(Color(0.7, 0.7, 0.75), 48)
+		"lure":
+			return _create_circle_texture(Color(0.3, 0.7, 1.0), 48)
+	return _create_circle_texture(Color(0.5, 0.5, 0.5), 48)
+
+
+func _create_circle_texture(color: Color, tex_size: int) -> ImageTexture:
+	var img: Image = Image.create(tex_size, tex_size, false, Image.FORMAT_RGBA8)
+	var center: Vector2 = Vector2(tex_size / 2.0, tex_size / 2.0)
+	var radius: float = tex_size / 2.0 - 2.0
+	for x: int in tex_size:
+		for y: int in tex_size:
+			var dist: float = Vector2(x, y).distance_to(center)
+			if dist <= radius:
+				var alpha: float = clampf(1.0 - (dist - radius + 2.0) / 2.0, 0.0, 1.0)
+				img.set_pixel(x, y, Color(color.r, color.g, color.b, alpha))
+			else:
+				img.set_pixel(x, y, Color(0, 0, 0, 0))
+	return ImageTexture.create_from_image(img)
 
 
 func _get_display_name(entry: EquipmentManager.EquipmentEntry) -> String:
@@ -217,6 +331,8 @@ func _get_slot_for_type(equipment_type: String) -> Enums.EquipmentSlot:
 			return Enums.EquipmentSlot.HOOK
 		"lure":
 			return Enums.EquipmentSlot.LURE
+		"bait":
+			return Enums.EquipmentSlot.BAIT
 	return Enums.EquipmentSlot.ROD
 
 

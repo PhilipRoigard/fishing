@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="EquipmentCatalogue" load_steps=14 format=3]
+[gd_resource type="Resource" script_class="EquipmentCatalogue" load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scripts/config/equipment_catalogue.gd" id="1"]
 [ext_resource type="Resource" path="res://data/equipment/rods/starter_rod.tres" id="2"]
 [ext_resource type="Resource" path="res://data/equipment/rods/bronze_rod.tres" id="3"]
 [ext_resource type="Resource" path="res://data/equipment/rods/silver_rod.tres" id="4"]
+[ext_resource type="Resource" path="res://data/equipment/rods/gold_rod.tres" id="4b"]
 [ext_resource type="Resource" path="res://data/equipment/hooks/basic_hook.tres" id="5"]
 [ext_resource type="Resource" path="res://data/equipment/hooks/barbed_hook.tres" id="6"]
 [ext_resource type="Resource" path="res://data/equipment/hooks/titanium_hook.tres" id="7"]
@@ -17,7 +18,7 @@
 
 [resource]
 script = ExtResource("1")
-rods = [ExtResource("2"), ExtResource("3"), ExtResource("4")]
+rods = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("4b")]
 hooks = [ExtResource("5"), ExtResource("6"), ExtResource("7")]
 lures = [ExtResource("8"), ExtResource("9"), ExtResource("10")]
 baits = [ExtResource("11"), ExtResource("12"), ExtResource("13"), ExtResource("14")]

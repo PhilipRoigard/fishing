@@ -6,6 +6,10 @@ const BAIT_SQUID: String = "squid_bait"
 const FISH_REQUIRED_PER_CRAFT: int = 3
 const BAIT_REQUIRED_PER_UPGRADE: int = 3
 
+var _bait_worm_texture: Texture2D = preload("res://assets/sprites/items/Bait_01.png")
+var _bait_shrimp_texture: Texture2D = preload("res://assets/sprites/items/Bait_01_blue.png")
+var _bait_squid_texture: Texture2D = preload("res://assets/sprites/items/Bait_01_pink.png")
+
 var kept_fish_label: Label
 var worm_count_label: Label
 var shrimp_count_label: Label
@@ -54,6 +58,7 @@ func _build_layout() -> void:
 	title.text = "Craft Bait"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 22)
+	title.add_theme_color_override("font_color", Color(0.9, 0.85, 0.7))
 	vbox.add_child(title)
 
 	var separator_top: HSeparator = HSeparator.new()
@@ -66,23 +71,17 @@ func _build_layout() -> void:
 	bait_title.add_theme_color_override("font_color", Color(0.4, 0.8, 1.0))
 	vbox.add_child(bait_title)
 
-	worm_count_label = Label.new()
-	worm_count_label.text = "Worm Bait: 0"
-	worm_count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	worm_count_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
-	vbox.add_child(worm_count_label)
+	var worm_row: HBoxContainer = _create_bait_inventory_row(_bait_worm_texture, "Worm Bait", Color(0.6, 0.6, 0.6))
+	vbox.add_child(worm_row)
+	worm_count_label = worm_row.get_child(2) as Label
 
-	shrimp_count_label = Label.new()
-	shrimp_count_label.text = "Shrimp Bait: 0"
-	shrimp_count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	shrimp_count_label.add_theme_color_override("font_color", Color(0.2, 0.8, 0.2))
-	vbox.add_child(shrimp_count_label)
+	var shrimp_row: HBoxContainer = _create_bait_inventory_row(_bait_shrimp_texture, "Shrimp Bait", Color(0.2, 0.8, 0.2))
+	vbox.add_child(shrimp_row)
+	shrimp_count_label = shrimp_row.get_child(2) as Label
 
-	squid_count_label = Label.new()
-	squid_count_label.text = "Squid Bait: 0"
-	squid_count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	squid_count_label.add_theme_color_override("font_color", Color(0.2, 0.6, 1.0))
-	vbox.add_child(squid_count_label)
+	var squid_row: HBoxContainer = _create_bait_inventory_row(_bait_squid_texture, "Squid Bait", Color(0.2, 0.6, 1.0))
+	vbox.add_child(squid_row)
+	squid_count_label = squid_row.get_child(2) as Label
 
 	var separator_mid: HSeparator = HSeparator.new()
 	vbox.add_child(separator_mid)
@@ -94,24 +93,15 @@ func _build_layout() -> void:
 	craft_title.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0))
 	vbox.add_child(craft_title)
 
-	craft_worm_button = Button.new()
-	craft_worm_button.text = "Craft Worm Bait (3 fish)"
-	craft_worm_button.custom_minimum_size = Vector2(260, 50)
-	craft_worm_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	craft_worm_button = _create_craft_button(_bait_worm_texture, "Craft Worm Bait (3 fish)", Color(0.15, 0.2, 0.15))
 	craft_worm_button.pressed.connect(_on_craft_worm)
 	vbox.add_child(craft_worm_button)
 
-	craft_shrimp_button = Button.new()
-	craft_shrimp_button.text = "Craft Shrimp Bait (3 Worm)"
-	craft_shrimp_button.custom_minimum_size = Vector2(260, 50)
-	craft_shrimp_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	craft_shrimp_button = _create_craft_button(_bait_shrimp_texture, "Craft Shrimp Bait (3 Worm)", Color(0.1, 0.2, 0.1))
 	craft_shrimp_button.pressed.connect(_on_craft_shrimp)
 	vbox.add_child(craft_shrimp_button)
 
-	craft_squid_button = Button.new()
-	craft_squid_button.text = "Craft Squid Bait (3 Shrimp)"
-	craft_squid_button.custom_minimum_size = Vector2(260, 50)
-	craft_squid_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	craft_squid_button = _create_craft_button(_bait_squid_texture, "Craft Squid Bait (3 Shrimp)", Color(0.1, 0.15, 0.25))
 	craft_squid_button.pressed.connect(_on_craft_squid)
 	vbox.add_child(craft_squid_button)
 
@@ -142,6 +132,55 @@ func _build_layout() -> void:
 	vbox.add_child(back_button)
 
 
+func _create_bait_inventory_row(texture: Texture2D, bait_name: String, label_color: Color) -> HBoxContainer:
+	var row: HBoxContainer = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+
+	var icon: TextureRect = TextureRect.new()
+	icon.custom_minimum_size = Vector2(32, 32)
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.texture = texture
+	row.add_child(icon)
+
+	var name_lbl: Label = Label.new()
+	name_lbl.text = bait_name + ":"
+	name_lbl.add_theme_font_size_override("font_size", 14)
+	name_lbl.add_theme_color_override("font_color", label_color)
+	name_lbl.custom_minimum_size = Vector2(120, 0)
+	row.add_child(name_lbl)
+
+	var count_lbl: Label = Label.new()
+	count_lbl.text = "0"
+	count_lbl.add_theme_font_size_override("font_size", 14)
+	count_lbl.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))
+	row.add_child(count_lbl)
+
+	return row
+
+
+func _create_craft_button(texture: Texture2D, text: String, bg_color: Color) -> Button:
+	var btn: Button = Button.new()
+	btn.custom_minimum_size = Vector2(260, 54)
+	btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	btn.text = "   " + text
+	btn.icon = texture
+	btn.expand_icon = true
+	btn.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
+
+	var btn_style: StyleBoxFlat = StyleBoxFlat.new()
+	btn_style.bg_color = bg_color
+	btn_style.corner_radius_top_left = 6
+	btn_style.corner_radius_top_right = 6
+	btn_style.corner_radius_bottom_left = 6
+	btn_style.corner_radius_bottom_right = 6
+	btn_style.content_margin_left = 8
+	btn_style.content_margin_right = 8
+	btn.add_theme_stylebox_override("normal", btn_style)
+
+	return btn
+
+
 func _refresh_display() -> void:
 	var state: PlayerState = _get_player_state()
 	if not state:
@@ -154,21 +193,21 @@ func _refresh_display() -> void:
 	var squid_count: int = state.bait_inventory.get(BAIT_SQUID, 0)
 
 	if worm_count_label:
-		worm_count_label.text = "Worm Bait: " + str(worm_count)
+		worm_count_label.text = str(worm_count)
 	if shrimp_count_label:
-		shrimp_count_label.text = "Shrimp Bait: " + str(shrimp_count)
+		shrimp_count_label.text = str(shrimp_count)
 	if squid_count_label:
-		squid_count_label.text = "Squid Bait: " + str(squid_count)
+		squid_count_label.text = str(squid_count)
 
 	if craft_worm_button:
 		craft_worm_button.disabled = total_kept_fish < FISH_REQUIRED_PER_CRAFT
-		craft_worm_button.text = "Craft Worm Bait (3 fish) [" + str(total_kept_fish) + " available]"
+		craft_worm_button.text = "   Craft Worm (" + str(total_kept_fish) + "/3 fish)"
 	if craft_shrimp_button:
 		craft_shrimp_button.disabled = worm_count < BAIT_REQUIRED_PER_UPGRADE
-		craft_shrimp_button.text = "Craft Shrimp Bait (3 Worm) [" + str(worm_count) + " available]"
+		craft_shrimp_button.text = "   Craft Shrimp (" + str(worm_count) + "/3 worm)"
 	if craft_squid_button:
 		craft_squid_button.disabled = shrimp_count < BAIT_REQUIRED_PER_UPGRADE
-		craft_squid_button.text = "Craft Squid Bait (3 Shrimp) [" + str(shrimp_count) + " available]"
+		craft_squid_button.text = "   Craft Squid (" + str(shrimp_count) + "/3 shrimp)"
 
 	_refresh_fish_list(state)
 

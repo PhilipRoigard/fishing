@@ -6,7 +6,7 @@ const ReelZoneScript: GDScript = preload("res://scripts/ui/components/reel_zone.
 
 var depth_label: Label
 var bait_label: Label
-var return_button: Button
+var back_button: Button
 var cast_power_label: Label
 var cast_power_bar: ProgressBar
 var bite_flash_label: Label
@@ -106,42 +106,33 @@ func _cleanup_connections() -> void:
 
 
 func _build_layout() -> void:
-	var top_bar: PanelContainer = PanelContainer.new()
-	top_bar.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	top_bar.offset_bottom = 100
-	var top_style: StyleBoxFlat = StyleBoxFlat.new()
-	top_style.bg_color = Color(0.0, 0.0, 0.0, 0.5)
-	top_bar.add_theme_stylebox_override("panel", top_style)
-	top_bar.mouse_filter = Control.MOUSE_FILTER_STOP
-	add_child(top_bar)
-
-	var top_margin: MarginContainer = MarginContainer.new()
-	top_margin.add_theme_constant_override("margin_top", 8)
-	top_margin.add_theme_constant_override("margin_left", 12)
-	top_margin.add_theme_constant_override("margin_right", 12)
-	top_bar.add_child(top_margin)
-
-	var top_hbox: HBoxContainer = HBoxContainer.new()
-	top_hbox.add_theme_constant_override("separation", 8)
-	top_margin.add_child(top_hbox)
-
-	var info_vbox: VBoxContainer = VBoxContainer.new()
-	info_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	top_hbox.add_child(info_vbox)
+	var back_button: Button = Button.new()
+	back_button.text = "<"
+	back_button.custom_minimum_size = Vector2(36, 36)
+	back_button.position = Vector2(8, 8)
+	back_button.pressed.connect(_on_return_pressed)
+	back_button.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(back_button)
 
 	depth_label = Label.new()
 	depth_label.text = "Hold to cast!"
-	info_vbox.add_child(depth_label)
-
-	bait_label = Label.new()
-	bait_label.text = ""
-	bait_label.add_theme_font_size_override("font_size", 12)
-	info_vbox.add_child(bait_label)
+	depth_label.position = Vector2(50, 10)
+	depth_label.add_theme_font_size_override("font_size", 14)
+	depth_label.add_theme_color_override("font_color", Color.WHITE)
+	add_child(depth_label)
 
 	cast_power_label = Label.new()
 	cast_power_label.text = ""
+	cast_power_label.position = Vector2(50, 30)
 	cast_power_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3))
-	info_vbox.add_child(cast_power_label)
+	cast_power_label.add_theme_font_size_override("font_size", 12)
+	add_child(cast_power_label)
+
+	bait_label = Label.new()
+	bait_label.text = ""
+	bait_label.position = Vector2(50, 48)
+	bait_label.add_theme_font_size_override("font_size", 10)
+	add_child(bait_label)
 
 	cast_power_bar = ProgressBar.new()
 	cast_power_bar.custom_minimum_size = Vector2(0, 18)
@@ -163,20 +154,20 @@ func _build_layout() -> void:
 	bar_bg.corner_radius_bottom_left = 4
 	bar_bg.corner_radius_bottom_right = 4
 	cast_power_bar.add_theme_stylebox_override("background", bar_bg)
-	info_vbox.add_child(cast_power_bar)
+	cast_power_bar.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	cast_power_bar.offset_top = 66
+	cast_power_bar.offset_bottom = 84
+	cast_power_bar.offset_left = 50
+	cast_power_bar.offset_right = -16
+	add_child(cast_power_bar)
 
 	cast_depth_preview_label = Label.new()
 	cast_depth_preview_label.text = ""
 	cast_depth_preview_label.add_theme_font_size_override("font_size", 11)
 	cast_depth_preview_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
 	cast_depth_preview_label.visible = false
-	info_vbox.add_child(cast_depth_preview_label)
-
-	return_button = Button.new()
-	return_button.text = "Return"
-	return_button.custom_minimum_size = Vector2(100, 44)
-	return_button.pressed.connect(_on_return_pressed)
-	top_hbox.add_child(return_button)
+	cast_depth_preview_label.position = Vector2(50, 86)
+	add_child(cast_depth_preview_label)
 
 	screen_flash = ColorRect.new()
 	screen_flash.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -463,8 +454,8 @@ func _on_fight_started(fish_id: String) -> void:
 		fight_container.visible = true
 	if reel_zone:
 		reel_zone.visible = true
-	if return_button:
-		return_button.visible = false
+	if back_button:
+		back_button.visible = false
 	if cast_power_label:
 		cast_power_label.text = "Hold to reel!"
 	_show_fish_name(fish_id)
@@ -587,8 +578,8 @@ func _hide_fight_ui() -> void:
 		fight_container.visible = false
 	if reel_zone:
 		reel_zone.visible = false
-	if return_button:
-		return_button.visible = true
+	if back_button:
+		back_button.visible = true
 	if cast_power_label:
 		cast_power_label.text = ""
 	if cast_power_bar:
