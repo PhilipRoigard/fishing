@@ -26,8 +26,6 @@ func _grant_rewards() -> void:
 	if not fish_data:
 		return
 
-	CurrencyManager.add_coins(fish_data.sell_value_coins)
-
 	var reward_cfg: RewardConfig = null
 	if GameResources.config:
 		reward_cfg = GameResources.config.reward_config

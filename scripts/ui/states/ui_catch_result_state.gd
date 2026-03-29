@@ -29,7 +29,8 @@ var rarity_label: Label
 var coins_label: Label
 var xp_label: Label
 var discovery_label: Label
-var continue_button: Button
+var sell_button: Button
+var keep_button: Button
 var fish_sprite: TextureRect
 var caught_fish_id: String = ""
 var discovery_tween: Tween
@@ -111,12 +112,22 @@ func _build_layout() -> void:
 	discovery_label.visible = false
 	vbox.add_child(discovery_label)
 
-	continue_button = Button.new()
-	continue_button.text = "Continue"
-	continue_button.custom_minimum_size = Vector2(160, 50)
-	continue_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	continue_button.pressed.connect(_on_continue_pressed)
-	vbox.add_child(continue_button)
+	var button_row: HBoxContainer = HBoxContainer.new()
+	button_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	button_row.add_theme_constant_override("separation", 12)
+	vbox.add_child(button_row)
+
+	sell_button = Button.new()
+	sell_button.text = "Sell"
+	sell_button.custom_minimum_size = Vector2(130, 50)
+	sell_button.pressed.connect(_on_sell_pressed)
+	button_row.add_child(sell_button)
+
+	keep_button = Button.new()
+	keep_button.text = "Keep for Bait"
+	keep_button.custom_minimum_size = Vector2(130, 50)
+	keep_button.pressed.connect(_on_keep_pressed)
+	button_row.add_child(keep_button)
 
 
 func _populate_data() -> void:
@@ -146,6 +157,9 @@ func _populate_data() -> void:
 	if coins_label:
 		coins_label.text = "Coins: +" + str(fish_data.sell_value_coins)
 		coins_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0))
+
+	if sell_button:
+		sell_button.text = "Sell (+" + str(fish_data.sell_value_coins) + ")"
 
 	var reward_cfg: RewardConfig = null
 	if GameResources.config:
@@ -196,8 +210,23 @@ func _get_rarity_color(rarity: Enums.Rarity) -> Color:
 	return Color.WHITE
 
 
-func _on_continue_pressed() -> void:
+func _on_sell_pressed() -> void:
 	HapticManager.light_tap()
+	var fish_data: FishData = null
+	if Main.instance and Main.instance.database_system:
+		fish_data = Main.instance.database_system.get_fish_by_id(caught_fish_id)
+	if fish_data:
+		CurrencyManager.add_coins(fish_data.sell_value_coins)
+	_back()
+
+
+func _on_keep_pressed() -> void:
+	HapticManager.light_tap()
+	if Main.instance and Main.instance.player_state_system:
+		var state: PlayerState = Main.instance.player_state_system.get_state()
+		if state:
+			var current_count: int = state.kept_fish.get(caught_fish_id, 0)
+			state.kept_fish[caught_fish_id] = current_count + 1
 	_back()
 
 

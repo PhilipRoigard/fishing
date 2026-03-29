@@ -1,5 +1,29 @@
 extends UIStateNode
 
+const FISH_ATLAS: Texture2D = preload("res://assets/sprites/fish/FishGame_Fish_Sprite_Sheet.png")
+const FISH_ATLAS_REGIONS: Dictionary = {
+	"sardine": Rect2(0, 0, 16, 16),
+	"snapper": Rect2(16, 0, 16, 16),
+	"anchovy": Rect2(0, 16, 16, 16),
+	"herring": Rect2(16, 16, 16, 16),
+	"pufferfish": Rect2(32, 16, 16, 16),
+	"clownfish": Rect2(48, 16, 16, 16),
+	"flounder": Rect2(0, 32, 16, 16),
+	"tuna": Rect2(16, 32, 16, 16),
+	"trevally": Rect2(32, 32, 16, 16),
+	"mackerel": Rect2(64, 16, 16, 16),
+	"perch": Rect2(80, 0, 16, 16),
+	"barramundi": Rect2(96, 0, 16, 16),
+	"marlin": Rect2(96, 32, 16, 16),
+	"swordfish": Rect2(80, 16, 16, 16),
+	"napoleon_wrasse": Rect2(96, 16, 16, 16),
+	"giant_trevally": Rect2(48, 0, 16, 16),
+	"manta_ray": Rect2(112, 16, 16, 16),
+	"great_white_shark": Rect2(112, 32, 16, 16),
+	"sunfish": Rect2(80, 32, 16, 16),
+	"whale_shark": Rect2(64, 32, 16, 16),
+}
+
 var grid: GridContainer
 var completion_label: Label
 
@@ -89,7 +113,7 @@ func _refresh_grid() -> void:
 		if times_caught > 0:
 			caught_count += 1
 
-		var cell: Button = _create_fish_cell(fish_data, times_caught)
+		var cell: PanelContainer = _create_fish_cell(fish_data, times_caught)
 		grid.add_child(cell)
 
 	if completion_label:
@@ -110,19 +134,98 @@ func _get_rarity_color(rarity: int) -> Color:
 	return Color(0.6, 0.6, 0.6)
 
 
-func _create_fish_cell(fish_data: FishData, times_caught: int) -> Button:
-	var btn: Button = Button.new()
-	btn.custom_minimum_size = Vector2(100, 72)
-	btn.add_theme_font_size_override("font_size", 12)
+func _create_fish_cell(fish_data: FishData, times_caught: int) -> PanelContainer:
+	var panel: PanelContainer = PanelContainer.new()
+	panel.custom_minimum_size = Vector2(100, 100)
+
+	var vbox: VBoxContainer = VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 4)
+	panel.add_child(vbox)
+
 	if times_caught > 0:
-		btn.text = fish_data.display_name + "\nx" + str(times_caught)
 		var rarity_color: Color = _get_rarity_color(fish_data.rarity)
-		btn.add_theme_color_override("font_color", rarity_color)
-		btn.pressed.connect(_on_fish_pressed.bind(fish_data.id))
+
+		var border_style: StyleBoxFlat = StyleBoxFlat.new()
+		border_style.bg_color = Color(0.08, 0.1, 0.16)
+		border_style.border_color = rarity_color
+		border_style.border_width_top = 2
+		border_style.border_width_bottom = 2
+		border_style.border_width_left = 2
+		border_style.border_width_right = 2
+		border_style.corner_radius_top_left = 4
+		border_style.corner_radius_top_right = 4
+		border_style.corner_radius_bottom_left = 4
+		border_style.corner_radius_bottom_right = 4
+		border_style.content_margin_top = 4
+		border_style.content_margin_bottom = 4
+		border_style.content_margin_left = 4
+		border_style.content_margin_right = 4
+		panel.add_theme_stylebox_override("panel", border_style)
+
+		var sprite: TextureRect = TextureRect.new()
+		sprite.custom_minimum_size = Vector2(64, 64)
+		sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		sprite.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+
+		var atlas_tex: AtlasTexture = AtlasTexture.new()
+		atlas_tex.atlas = FISH_ATLAS
+		atlas_tex.region = FISH_ATLAS_REGIONS.get(fish_data.id, Rect2(0, 0, 16, 16))
+		sprite.texture = atlas_tex
+		vbox.add_child(sprite)
+
+		var name_label: Label = Label.new()
+		name_label.text = fish_data.display_name
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_label.add_theme_font_size_override("font_size", 10)
+		name_label.add_theme_color_override("font_color", rarity_color)
+		vbox.add_child(name_label)
+
+		var count_label: Label = Label.new()
+		count_label.text = "x" + str(times_caught)
+		count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		count_label.add_theme_font_size_override("font_size", 9)
+		vbox.add_child(count_label)
+
+		var click_button: Button = Button.new()
+		click_button.set_anchors_preset(Control.PRESET_FULL_RECT)
+		click_button.flat = true
+		click_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		click_button.pressed.connect(_on_fish_pressed.bind(fish_data.id))
+		panel.add_child(click_button)
 	else:
-		btn.text = "???"
-		btn.modulate = Color(0.3, 0.3, 0.3)
-	return btn
+		var dark_style: StyleBoxFlat = StyleBoxFlat.new()
+		dark_style.bg_color = Color(0.06, 0.06, 0.08)
+		dark_style.border_color = Color(0.15, 0.15, 0.2)
+		dark_style.border_width_top = 2
+		dark_style.border_width_bottom = 2
+		dark_style.border_width_left = 2
+		dark_style.border_width_right = 2
+		dark_style.corner_radius_top_left = 4
+		dark_style.corner_radius_top_right = 4
+		dark_style.corner_radius_bottom_left = 4
+		dark_style.corner_radius_bottom_right = 4
+		dark_style.content_margin_top = 4
+		dark_style.content_margin_bottom = 4
+		dark_style.content_margin_left = 4
+		dark_style.content_margin_right = 4
+		panel.add_theme_stylebox_override("panel", dark_style)
+
+		var silhouette: ColorRect = ColorRect.new()
+		silhouette.custom_minimum_size = Vector2(64, 64)
+		silhouette.color = Color(0.1, 0.1, 0.12)
+		silhouette.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		vbox.add_child(silhouette)
+
+		var unknown_label: Label = Label.new()
+		unknown_label.text = "???"
+		unknown_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		unknown_label.add_theme_font_size_override("font_size", 10)
+		unknown_label.add_theme_color_override("font_color", Color(0.3, 0.3, 0.35))
+		vbox.add_child(unknown_label)
+
+	return panel
 
 
 func _on_fish_pressed(fish_id: String) -> void:

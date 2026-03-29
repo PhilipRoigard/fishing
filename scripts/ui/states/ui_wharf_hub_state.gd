@@ -90,7 +90,7 @@ func _build_layout() -> void:
 
 	var bottom_panel: PanelContainer = PanelContainer.new()
 	bottom_panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	bottom_panel.offset_top = -160
+	bottom_panel.offset_top = -215
 	var bottom_style: StyleBoxFlat = StyleBoxFlat.new()
 	bottom_style.bg_color = Color(0.05, 0.08, 0.15, 0.75)
 	bottom_panel.add_theme_stylebox_override("panel", bottom_style)
@@ -101,6 +101,13 @@ func _build_layout() -> void:
 	bottom_vbox.add_theme_constant_override("separation", 8)
 	bottom_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	bottom_panel.add_child(bottom_vbox)
+
+	var craft_bait_button: Button = Button.new()
+	craft_bait_button.text = "Craft Bait"
+	craft_bait_button.custom_minimum_size = Vector2(200, 44)
+	craft_bait_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	craft_bait_button.pressed.connect(_on_craft_bait_pressed)
+	bottom_vbox.add_child(craft_bait_button)
 
 	cast_button = Button.new()
 	cast_button.text = "CAST"
@@ -165,6 +172,11 @@ func _get_equip_display(entry: Variant, equipment_type: String) -> String:
 		if data and data.display_name != "":
 			display_name = data.display_name
 	return display_name + " Lv." + str(entry.level)
+
+
+func _on_craft_bait_pressed() -> void:
+	HapticManager.light_tap()
+	state_machine.push_state(UIStateMachine.State.BAIT_CRAFT)
 
 
 func _on_cast_pressed() -> void:

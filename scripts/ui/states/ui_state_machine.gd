@@ -22,6 +22,7 @@ enum State {
 	TOOLTIP,
 	PURCHASING,
 	CONSENT,
+	BAIT_CRAFT,
 }
 
 var active_states: Array[UIStateNode] = []
