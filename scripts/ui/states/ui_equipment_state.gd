@@ -91,15 +91,6 @@ func _build_layout() -> void:
 	bg.color = Color(0.03, 0.06, 0.12, 1.0)
 	add_child(bg)
 
-	var back_btn: Button = Button.new()
-	back_btn.text = "<"
-	back_btn.position = Vector2(8, SafeZoneManager.get_top_margin() + 8)
-	back_btn.custom_minimum_size = Vector2(32, 32)
-	back_btn.size = Vector2(32, 32)
-	back_btn.add_theme_font_size_override("font_size", 16)
-	back_btn.pressed.connect(_back)
-	add_child(back_btn)
-
 	var margin: MarginContainer = MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
 	margin.add_theme_constant_override("margin_top", SafeZoneManager.get_top_margin() + 8)
@@ -154,9 +145,19 @@ func _build_layout() -> void:
 
 func _build_currency_bar(parent: VBoxContainer) -> void:
 	var currency_hbox: HBoxContainer = HBoxContainer.new()
-	currency_hbox.add_theme_constant_override("separation", 16)
-	currency_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	currency_hbox.add_theme_constant_override("separation", 8)
 	parent.add_child(currency_hbox)
+
+	var back_btn: Button = Button.new()
+	back_btn.text = "<"
+	back_btn.custom_minimum_size = Vector2(32, 32)
+	back_btn.add_theme_font_size_override("font_size", 16)
+	back_btn.pressed.connect(_back)
+	currency_hbox.add_child(back_btn)
+
+	var spacer: Control = Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	currency_hbox.add_child(spacer)
 
 	var coin_label: Label = Label.new()
 	coin_label.text = "Coins: " + str(CurrencyManager.coins)
