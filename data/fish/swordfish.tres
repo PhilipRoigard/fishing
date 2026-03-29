@@ -20,5 +20,5 @@ scatter_on_catch = false
 fight_speed = 90.0
 fight_erratic = 0.65
 fight_stamina = 1.4
-tension_generation = 0.85
+tension_generation = 1.05
 phase_count = 2

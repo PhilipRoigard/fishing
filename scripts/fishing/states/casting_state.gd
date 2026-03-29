@@ -81,6 +81,9 @@ func _animate_hook_arc(depth: float) -> void:
 	pending_depth = depth
 
 	if not hook_node:
+		_find_hook_node()
+	if not hook_node:
+		print("WARNING: Hook node not found, skipping arc animation")
 		state_machine.change_state(&"waiting", {"depth": depth})
 		return
 
