@@ -34,11 +34,11 @@ func _build_layout() -> void:
 	dimmer.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(dimmer)
 
-	var close_btn: Button = Button.new()
-	close_btn.set_anchors_preset(Control.PRESET_FULL_RECT)
-	close_btn.modulate = Color(1, 1, 1, 0)
-	close_btn.pressed.connect(_back)
-	add_child(close_btn)
+	var dismiss_btn: Button = Button.new()
+	dismiss_btn.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dismiss_btn.modulate = Color(1, 1, 1, 0)
+	dismiss_btn.pressed.connect(_back)
+	add_child(dismiss_btn)
 
 	var popup: PanelContainer = PanelContainer.new()
 	popup.set_anchors_preset(Control.PRESET_CENTER)
@@ -68,6 +68,26 @@ func _build_layout() -> void:
 	var vbox: VBoxContainer = VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 6)
 	popup.add_child(vbox)
+
+	var header_row: HBoxContainer = HBoxContainer.new()
+	vbox.add_child(header_row)
+	var header_spacer: Control = Control.new()
+	header_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header_row.add_child(header_spacer)
+	var close_btn: Button = Button.new()
+	close_btn.text = "X"
+	close_btn.custom_minimum_size = Vector2(28, 28)
+	close_btn.add_theme_font_size_override("font_size", 14)
+	var close_style: StyleBoxFlat = StyleBoxFlat.new()
+	close_style.bg_color = Color(0.7, 0.2, 0.15)
+	close_style.corner_radius_top_left = 4
+	close_style.corner_radius_top_right = 4
+	close_style.corner_radius_bottom_left = 4
+	close_style.corner_radius_bottom_right = 4
+	close_btn.add_theme_stylebox_override("normal", close_style)
+	close_btn.add_theme_color_override("font_color", Color.WHITE)
+	close_btn.pressed.connect(_back)
+	header_row.add_child(close_btn)
 
 	var top_row: HBoxContainer = HBoxContainer.new()
 	top_row.add_theme_constant_override("separation", 8)
