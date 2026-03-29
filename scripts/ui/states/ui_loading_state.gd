@@ -41,7 +41,7 @@ func _build_layout() -> void:
 func _begin_loading() -> void:
 	await get_tree().create_timer(0.5).timeout
 	if visible:
-		state_machine.change_state(UIStateMachine.State.MAIN_MENU)
+		state_machine.change_state(UIStateMachine.State.WHARF_HUB)
 
 
 func _clear_children() -> void:

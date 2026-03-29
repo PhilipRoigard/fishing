@@ -64,6 +64,12 @@ func _build_layout() -> void:
 	currency_bar_instance.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	level_currency_row.add_child(currency_bar_instance)
 
+	var settings_btn: Button = Button.new()
+	settings_btn.text = "S"
+	settings_btn.custom_minimum_size = Vector2(32, 32)
+	settings_btn.pressed.connect(func() -> void: state_machine.push_state(UIStateMachine.State.SETTINGS))
+	level_currency_row.add_child(settings_btn)
+
 	equipment_label = Label.new()
 	equipment_label.text = "No rod equipped"
 	equipment_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
