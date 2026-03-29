@@ -37,11 +37,11 @@ func _grant_starter_items() -> void:
 	equip(_EnumsScript.EquipmentSlot.HOOK, hook_uuid)
 	equip(_EnumsScript.EquipmentSlot.LURE, lure_uuid)
 
-	add_item("worm_bait", "bait", 0)
-	add_item("worm_bait", "bait", 0)
-	add_item("worm_bait", "bait", 0)
-	add_item("worm_bait", "bait", 0)
-	add_item("worm_bait", "bait", 0)
+	add_item("worm", "bait", 0)
+	add_item("worm", "bait", 0)
+	add_item("worm", "bait", 0)
+	add_item("worm", "bait", 0)
+	add_item("worm", "bait", 0)
 
 
 func add_item(item_id: String, equipment_type: String, quality: int = 0) -> String:
