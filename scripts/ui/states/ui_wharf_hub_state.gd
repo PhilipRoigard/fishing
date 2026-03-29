@@ -3,8 +3,14 @@ extends UIStateNode
 var cast_button: Button
 var level_label: Label
 var equipment_label: Label
+var session_catch_label: Label
+var best_catch_label: Label
 var tab_bar_instance: HBoxContainer
 var currency_bar_instance: HBoxContainer
+
+var session_fish_count: int = 0
+var session_best_fish_id: String = ""
+var session_best_rarity: int = -1
 
 const TabBarScript: GDScript = preload("res://scripts/ui/components/tab_bar.gd")
 const CurrencyBarScript: GDScript = preload("res://scripts/ui/components/currency_bar.gd")
@@ -25,7 +31,7 @@ func exit() -> void:
 func _build_layout() -> void:
 	var top_panel: PanelContainer = PanelContainer.new()
 	top_panel.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	top_panel.offset_bottom = 100
+	top_panel.offset_bottom = 150
 	var top_style: StyleBoxFlat = StyleBoxFlat.new()
 	top_style.bg_color = Color(0.05, 0.08, 0.15, 0.75)
 	top_panel.add_theme_stylebox_override("panel", top_style)
@@ -56,6 +62,20 @@ func _build_layout() -> void:
 	equipment_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	equipment_label.add_theme_font_size_override("font_size", 12)
 	top_vbox.add_child(equipment_label)
+
+	session_catch_label = Label.new()
+	session_catch_label.text = "Today's Catch: 0 fish"
+	session_catch_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	session_catch_label.add_theme_font_size_override("font_size", 11)
+	session_catch_label.add_theme_color_override("font_color", Color(0.6, 0.85, 1.0))
+	top_vbox.add_child(session_catch_label)
+
+	best_catch_label = Label.new()
+	best_catch_label.text = "Best Catch: None yet"
+	best_catch_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	best_catch_label.add_theme_font_size_override("font_size", 11)
+	best_catch_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0))
+	top_vbox.add_child(best_catch_label)
 
 	var bottom_panel: PanelContainer = PanelContainer.new()
 	bottom_panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
@@ -92,17 +112,48 @@ func _refresh_display() -> void:
 	if level_label:
 		level_label.text = "Fisherman Lv." + str(current_level)
 
-	var rod_entry: Variant = EquipmentManager.get_equipped(0) if EquipmentManager else null
 	if equipment_label:
-		if rod_entry:
-			var rod_display_name: String = rod_entry.item_id
-			if GameResources.config and GameResources.config.equipment_catalogue:
-				var rod_data: Variant = GameResources.config.equipment_catalogue.get_rod_by_id(rod_entry.item_id)
-				if rod_data and rod_data.display_name != "":
-					rod_display_name = rod_data.display_name
-			equipment_label.text = "Rod: " + rod_display_name + " Lv." + str(rod_entry.level)
+		var lines: Array[String] = []
+		var rod_entry: Variant = EquipmentManager.get_equipped(Enums.EquipmentSlot.ROD) if EquipmentManager else null
+		var hook_entry: Variant = EquipmentManager.get_equipped(Enums.EquipmentSlot.HOOK) if EquipmentManager else null
+		var lure_entry: Variant = EquipmentManager.get_equipped(Enums.EquipmentSlot.LURE) if EquipmentManager else null
+		lines.append("Rod: " + _get_equip_display(rod_entry, "rod"))
+		lines.append("Hook: " + _get_equip_display(hook_entry, "hook"))
+		lines.append("Lure: " + _get_equip_display(lure_entry, "lure"))
+		equipment_label.text = "\n".join(lines)
+
+	if session_catch_label:
+		session_catch_label.text = "Today's Catch: " + str(session_fish_count) + " fish"
+
+	if best_catch_label:
+		if session_best_fish_id != "":
+			var best_name: String = session_best_fish_id
+			if Main.instance and Main.instance.database_system:
+				var fish_data: Variant = Main.instance.database_system.get_fish_by_id(session_best_fish_id)
+				if fish_data:
+					best_name = fish_data.display_name
+			best_catch_label.text = "Best Catch: " + best_name
 		else:
-			equipment_label.text = "No rod equipped"
+			best_catch_label.text = "Best Catch: None yet"
+
+
+func _get_equip_display(entry: Variant, equipment_type: String) -> String:
+	if not entry:
+		return "None"
+	var display_name: String = entry.item_id
+	if GameResources.config and GameResources.config.equipment_catalogue:
+		var catalogue: Variant = GameResources.config.equipment_catalogue
+		var data: Variant = null
+		match equipment_type:
+			"rod":
+				data = catalogue.get_rod_by_id(entry.item_id)
+			"hook":
+				data = catalogue.get_hook_by_id(entry.item_id)
+			"lure":
+				data = catalogue.get_lure_by_id(entry.item_id)
+		if data and data.display_name != "":
+			display_name = data.display_name
+	return display_name + " Lv." + str(entry.level)
 
 
 func _on_cast_pressed() -> void:
@@ -123,6 +174,26 @@ func _on_tab_changed(tab_index: int) -> void:
 	]
 	if tab_index >= 0 and tab_index < tab_states.size():
 		state_machine.push_state(tab_states[tab_index] as UIStateMachine.State)
+
+
+func _setup_connections() -> void:
+	if not SignalBus.fish_caught.is_connected(_on_fish_caught):
+		SignalBus.fish_caught.connect(_on_fish_caught)
+
+
+func _cleanup_connections() -> void:
+	if SignalBus.fish_caught.is_connected(_on_fish_caught):
+		SignalBus.fish_caught.disconnect(_on_fish_caught)
+
+
+func _on_fish_caught(fish_id: String) -> void:
+	session_fish_count += 1
+	if Main.instance and Main.instance.database_system:
+		var fish_data: Variant = Main.instance.database_system.get_fish_by_id(fish_id)
+		if fish_data and fish_data.rarity > session_best_rarity:
+			session_best_rarity = fish_data.rarity
+			session_best_fish_id = fish_id
+	_refresh_display()
 
 
 func _clear_children() -> void:

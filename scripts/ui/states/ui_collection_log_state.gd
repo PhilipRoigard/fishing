@@ -48,7 +48,7 @@ func _build_layout() -> void:
 	vbox.add_child(scroll)
 
 	grid = GridContainer.new()
-	grid.columns = 4
+	grid.columns = 3
 	grid.add_theme_constant_override("h_separation", 8)
 	grid.add_theme_constant_override("v_separation", 8)
 	scroll.add_child(grid)
@@ -112,10 +112,12 @@ func _get_rarity_color(rarity: int) -> Color:
 
 func _create_fish_cell(fish_data: FishData, times_caught: int) -> Button:
 	var btn: Button = Button.new()
-	btn.custom_minimum_size = Vector2(72, 72)
+	btn.custom_minimum_size = Vector2(100, 72)
+	btn.add_theme_font_size_override("font_size", 12)
 	if times_caught > 0:
-		btn.text = fish_data.display_name.substr(0, 6) + "\nx" + str(times_caught)
-		btn.modulate = _get_rarity_color(fish_data.rarity)
+		btn.text = fish_data.display_name + "\nx" + str(times_caught)
+		var rarity_color: Color = _get_rarity_color(fish_data.rarity)
+		btn.add_theme_color_override("font_color", rarity_color)
 		btn.pressed.connect(_on_fish_pressed.bind(fish_data.id))
 	else:
 		btn.text = "???"

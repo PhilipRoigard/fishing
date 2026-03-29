@@ -58,7 +58,7 @@ func _build_layout() -> void:
 	vbox.add_child(scroll)
 
 	grid = GridContainer.new()
-	grid.columns = 4
+	grid.columns = 3
 	grid.add_theme_constant_override("h_separation", 8)
 	grid.add_theme_constant_override("v_separation", 8)
 	scroll.add_child(grid)
@@ -84,9 +84,21 @@ func _refresh_grid() -> void:
 		filtered.assign(items.filter(func(e: EquipmentManager.EquipmentEntry) -> bool: return e.equipment_type == filter_type))
 		items = filtered
 
+	items.sort_custom(_sort_equipment)
+
 	for entry: EquipmentManager.EquipmentEntry in items:
 		var cell: Button = _create_item_cell(entry)
 		grid.add_child(cell)
+
+
+func _sort_equipment(a: EquipmentManager.EquipmentEntry, b: EquipmentManager.EquipmentEntry) -> bool:
+	var a_equipped: bool = _is_item_equipped(a.uuid)
+	var b_equipped: bool = _is_item_equipped(b.uuid)
+	if a_equipped != b_equipped:
+		return a_equipped
+	if a.quality != b.quality:
+		return a.quality > b.quality
+	return a.level > b.level
 
 
 func _get_display_name_for_entry(entry: EquipmentManager.EquipmentEntry) -> String:
@@ -115,15 +127,30 @@ func _get_display_name_for_entry(entry: EquipmentManager.EquipmentEntry) -> Stri
 
 func _create_item_cell(entry: EquipmentManager.EquipmentEntry) -> Button:
 	var btn: Button = Button.new()
-	btn.custom_minimum_size = Vector2(72, 72)
+	btn.custom_minimum_size = Vector2(80, 88)
 	var display_name: String = _get_display_name_for_entry(entry)
-	btn.text = display_name.substr(0, 8) + "\nLv." + str(entry.level)
-	btn.modulate = Enums.QUALITY_COLORS.get(entry.quality, Color.WHITE)
+	var quality_color: Color = Enums.QUALITY_COLORS.get(entry.quality, Color.WHITE)
+	var quality_name: String = Enums.QUALITY_NAMES.get(entry.quality, "Common")
+	btn.text = display_name + "\nLv." + str(entry.level) + " " + quality_name
 
 	var is_equipped: bool = _is_item_equipped(entry.uuid)
 	if is_equipped:
-		btn.text += "\n[E]"
+		btn.text += "\n[EQUIPPED]"
+		var equipped_style: StyleBoxFlat = StyleBoxFlat.new()
+		equipped_style.bg_color = Color(0.1, 0.3, 0.1, 0.8)
+		equipped_style.border_color = Color(0.2, 0.8, 0.2)
+		equipped_style.border_width_bottom = 2
+		equipped_style.border_width_top = 2
+		equipped_style.border_width_left = 2
+		equipped_style.border_width_right = 2
+		equipped_style.corner_radius_top_left = 4
+		equipped_style.corner_radius_top_right = 4
+		equipped_style.corner_radius_bottom_left = 4
+		equipped_style.corner_radius_bottom_right = 4
+		btn.add_theme_stylebox_override("normal", equipped_style)
 
+	btn.add_theme_color_override("font_color", quality_color)
+	btn.add_theme_font_size_override("font_size", 11)
 	btn.pressed.connect(_on_item_pressed.bind(entry.uuid))
 	return btn
 

@@ -1,8 +1,10 @@
-[gd_scene load_steps=18 format=3 uid="uid://fishing_level"]
+[gd_scene load_steps=21 format=3 uid="uid://fishing_level"]
 
 [ext_resource type="Script" path="res://scripts/environment/depth_background.gd" id="1_depth_bg"]
 [ext_resource type="Script" path="res://scripts/environment/fishing_line.gd" id="2_fishing_line"]
 [ext_resource type="Script" path="res://scripts/character/fisherman.gd" id="3_fisherman"]
+[ext_resource type="Script" path="res://scripts/environment/bobber.gd" id="14_bobber"]
+[ext_resource type="Script" path="res://scripts/environment/fishing_level_controller.gd" id="15_controller"]
 [ext_resource type="Texture2D" path="res://assets/sprites/character/naked_body_sprite_sheet.png" id="4_body"]
 [ext_resource type="Texture2D" path="res://assets/sprites/character/overalls_sprite_sheet.png" id="5_overalls"]
 [ext_resource type="Texture2D" path="res://assets/sprites/character/arms_sprite_sheet.png" id="6_arms"]
@@ -28,6 +30,7 @@ fill_from = Vector2(0.5, 0)
 fill_to = Vector2(0.5, 1)
 
 [node name="FishingLevel" type="Node2D"]
+script = ExtResource("15_controller")
 
 [node name="DepthBackgroundLayer" type="CanvasLayer" parent="."]
 layer = -10
@@ -65,6 +68,10 @@ shape = SubResource("CircleShape2D_hook")
 [node name="HookSprite" type="Sprite2D" parent="HookLayer/Hook"]
 texture = SubResource("GradientTexture2D_hook")
 position = Vector2(0, 4)
+visible = false
+
+[node name="Bobber" type="Node2D" parent="HookLayer/Hook"]
+script = ExtResource("14_bobber")
 
 [node name="WaterSurface" type="ColorRect" parent="."]
 z_index = 4

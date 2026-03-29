@@ -1,6 +1,7 @@
 extends BaseState
 
 const FISH_ATLAS: Texture2D = preload("res://assets/sprites/fish/FishGame_Fish_Sprite_Sheet.png")
+const SplashEffectScript: GDScript = preload("res://scripts/environment/splash_effect.gd")
 const FISH_ATLAS_REGIONS: Dictionary = {
 	"sardine": Rect2(0, 0, 16, 16),
 	"snapper": Rect2(16, 0, 16, 16),
@@ -44,6 +45,11 @@ var hook_node: Area2D
 var hook_base_position: Vector2 = Vector2.ZERO
 var fish_sprite: Sprite2D
 var fish_y_range: float = 60.0
+var jump_timer: float = 0.0
+var jump_cooldown: float = 4.0
+var is_jumping: bool = false
+var jump_elapsed: float = 0.0
+var reel_line_flash_timer: float = 0.0
 
 
 func enter(meta: Dictionary = {}) -> void:
@@ -67,6 +73,11 @@ func enter(meta: Dictionary = {}) -> void:
 	fish_stopped = false
 	fish_stop_timer = 0.0
 	active_effects.clear()
+	jump_timer = 0.0
+	jump_cooldown = randf_range(3.0, 6.0)
+	is_jumping = false
+	jump_elapsed = 0.0
+	reel_line_flash_timer = 0.0
 
 	_create_fish_sprite()
 
@@ -94,6 +105,8 @@ func update(delta: float) -> void:
 	_update_phase()
 	_update_active_effects(delta)
 	_update_hook_position()
+	_update_fish_jump(delta)
+	_update_reel_feedback(delta)
 
 	SignalBus.fight_progress_changed.emit(progress)
 	SignalBus.fight_tension_changed.emit(tension)
@@ -257,8 +270,10 @@ func _update_hook_position() -> void:
 	SignalBus.hook_position_changed.emit(hook_node.global_position)
 
 	if fish_sprite and is_instance_valid(fish_sprite):
-		var offset_y: float = (fish_position - 0.5) * fish_y_range
-		fish_sprite.position = Vector2(20.0, offset_y + 10.0)
+		if not is_jumping:
+			var offset_y: float = (fish_position - 0.5) * fish_y_range
+			fish_sprite.position = Vector2(20.0, offset_y + 10.0)
+			fish_sprite.rotation = 0.0
 		fish_sprite.flip_h = fish_direction < 0.0
 
 
@@ -274,7 +289,7 @@ func _create_fish_sprite() -> void:
 	var region: Rect2 = FISH_ATLAS_REGIONS.get(fish_id, Rect2(0, 0, 16, 16))
 	atlas_tex.region = region
 	fish_sprite.texture = atlas_tex
-	fish_sprite.scale = Vector2(4.0, 4.0)
+	fish_sprite.scale = Vector2(5.0, 5.0)
 
 	hook_node.add_child(fish_sprite)
 
@@ -283,3 +298,57 @@ func _remove_fish_sprite() -> void:
 	if fish_sprite and is_instance_valid(fish_sprite):
 		fish_sprite.queue_free()
 		fish_sprite = null
+
+
+func _update_fish_jump(delta: float) -> void:
+	if is_jumping:
+		jump_elapsed += delta
+		var jump_duration: float = 0.6
+		var t: float = jump_elapsed / jump_duration
+		if t >= 1.0:
+			is_jumping = false
+			if fish_sprite and is_instance_valid(fish_sprite):
+				fish_sprite.position.y = (fish_position - 0.5) * fish_y_range + 10.0
+			_spawn_splash_at_fish()
+			return
+		if fish_sprite and is_instance_valid(fish_sprite):
+			var jump_height: float = -40.0 * sin(t * PI)
+			fish_sprite.position.y = (fish_position - 0.5) * fish_y_range + 10.0 + jump_height
+			fish_sprite.rotation = sin(t * PI * 2.0) * 0.3
+		return
+
+	jump_timer += delta
+	if jump_timer >= jump_cooldown:
+		jump_timer = 0.0
+		jump_cooldown = randf_range(3.0, 7.0)
+		is_jumping = true
+		jump_elapsed = 0.0
+		_spawn_splash_at_fish()
+		if fish_sprite and is_instance_valid(fish_sprite):
+			fish_sprite.rotation = 0.0
+
+
+func _update_reel_feedback(delta: float) -> void:
+	if is_reeling:
+		reel_line_flash_timer += delta
+		if fish_sprite and is_instance_valid(fish_sprite):
+			var pulse: float = 1.0 + sin(reel_line_flash_timer * 10.0) * 0.1
+			fish_sprite.scale = Vector2(5.0 * pulse, 5.0 * pulse)
+	else:
+		reel_line_flash_timer = 0.0
+		if fish_sprite and is_instance_valid(fish_sprite) and not is_jumping:
+			fish_sprite.scale = Vector2(5.0, 5.0)
+
+
+func _spawn_splash_at_fish() -> void:
+	if not hook_node:
+		return
+	var fishing_level: Node = null
+	if Main.instance:
+		fishing_level = Main.instance.get_node_or_null("FishingLevel")
+	if not fishing_level:
+		return
+	var splash: Node2D = Node2D.new()
+	splash.set_script(SplashEffectScript)
+	splash.position = hook_node.global_position + Vector2(20.0, (fish_position - 0.5) * fish_y_range)
+	fishing_level.add_child(splash)

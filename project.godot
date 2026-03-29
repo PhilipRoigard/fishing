@@ -27,7 +27,6 @@ PurchaseManager="*res://scripts/monetization/iap/purchase_manager.gd"
 AdManager="*res://scripts/monetization/ads/ad_manager.gd"
 SafeZoneManager="*res://scripts/ui/safe_zone_manager.gd"
 HapticManager="*res://scripts/ui/haptic_manager.gd"
-Playtest="*res://scripts/autoload/playtest.gd"
 
 [display]
 

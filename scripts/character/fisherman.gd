@@ -34,9 +34,20 @@ var _shadow_texture: Texture2D = preload("res://assets/sprites/character/shaddow
 
 var _idle_anim_timer: float = 0.0
 var _idle_anim_frame: int = 0
+var _fishing_idle_timer: float = 0.0
+var _fishing_idle_toggle: bool = false
+var _reel_timer: float = 0.0
+var _reel_toggle: bool = false
+var _cast_release_timer: float = 0.0
+var _bite_dip_timer: float = 0.0
 
 const IDLE_FRAME_DURATION: float = 0.15
 const IDLE_FRAME_COUNT: int = 8
+const FISHING_IDLE_BOB_SPEED: float = 1.2
+const REEL_BOB_SPEED: float = 4.0
+const CAST_RELEASE_DURATION: float = 0.3
+const BITE_DIP_DURATION: float = 0.25
+const BITE_DIP_ANGLE: float = 8.0
 
 
 func _ready() -> void:
@@ -48,16 +59,36 @@ func _ready() -> void:
 	SignalBus.fish_caught.connect(_on_fish_caught)
 	SignalBus.fish_escaped.connect(_on_fish_escaped)
 	SignalBus.line_snapped.connect(_on_line_snapped)
+	SignalBus.bite_occurred.connect(_on_bite_occurred)
 	_set_anim_state(AnimState.IDLE)
 
 
 func _process(delta: float) -> void:
-	if current_anim_state == AnimState.IDLE:
-		_idle_anim_timer += delta
-		if _idle_anim_timer >= IDLE_FRAME_DURATION:
-			_idle_anim_timer -= IDLE_FRAME_DURATION
-			_idle_anim_frame = (_idle_anim_frame + 1) % IDLE_FRAME_COUNT
-			_apply_idle_frames(_idle_anim_frame)
+	match current_anim_state:
+		AnimState.IDLE:
+			_idle_anim_timer += delta
+			if _idle_anim_timer >= IDLE_FRAME_DURATION:
+				_idle_anim_timer -= IDLE_FRAME_DURATION
+				_idle_anim_frame = (_idle_anim_frame + 1) % IDLE_FRAME_COUNT
+				_apply_idle_frames(_idle_anim_frame)
+		AnimState.CAST_RELEASE:
+			_cast_release_timer -= delta
+			if _cast_release_timer <= 0.0:
+				_set_anim_state(AnimState.FISHING_IDLE)
+		AnimState.FISHING_IDLE:
+			_fishing_idle_timer += delta
+			var new_toggle: bool = fmod(_fishing_idle_timer, FISHING_IDLE_BOB_SPEED) > FISHING_IDLE_BOB_SPEED * 0.5
+			if new_toggle != _fishing_idle_toggle:
+				_fishing_idle_toggle = new_toggle
+				_apply_fishing_bob_frame(_fishing_idle_toggle)
+			_update_bite_dip(delta)
+		AnimState.REEL:
+			_reel_timer += delta
+			var reel_toggle: bool = fmod(_reel_timer, 1.0 / REEL_BOB_SPEED) > (1.0 / REEL_BOB_SPEED) * 0.5
+			if reel_toggle != _reel_toggle:
+				_reel_toggle = reel_toggle
+				_apply_fishing_bob_frame(_reel_toggle)
+			_update_bite_dip(delta)
 
 
 func _setup_sprites() -> void:
@@ -109,6 +140,39 @@ func _apply_fishing_idle_frames() -> void:
 	rod_sprite.frame_coords = Vector2i(0, 2)
 
 
+func _apply_cast_release_frames() -> void:
+	body_sprite.frame_coords = Vector2i(13, 2)
+	overalls_sprite.frame_coords = Vector2i(13, 2)
+	hat_sprite.frame_coords = Vector2i(13, 2)
+	hair_sprite.frame_coords = Vector2i(13, 2)
+	arms_sprite.frame_coords = Vector2i(13, 3)
+	beard_sprite.frame_coords = Vector2i(13, 1)
+	eyes_sprite.frame_coords = Vector2i(13, 1)
+	legs_sprite.frame_coords = Vector2i(13, 1)
+	rod_sprite.frame_coords = Vector2i(0, 2)
+
+
+func _apply_fishing_bob_frame(alt: bool) -> void:
+	var col: int = 16 if alt else 15
+	body_sprite.frame_coords = Vector2i(col, 2)
+	overalls_sprite.frame_coords = Vector2i(col, 2)
+	hat_sprite.frame_coords = Vector2i(col, 2)
+	hair_sprite.frame_coords = Vector2i(col, 2)
+	arms_sprite.frame_coords = Vector2i(col, 3)
+	beard_sprite.frame_coords = Vector2i(col, 1)
+	eyes_sprite.frame_coords = Vector2i(col, 1)
+	legs_sprite.frame_coords = Vector2i(col, 1)
+
+
+func _update_bite_dip(delta: float) -> void:
+	if _bite_dip_timer > 0.0:
+		_bite_dip_timer -= delta
+		var dip_t: float = _bite_dip_timer / BITE_DIP_DURATION
+		rod_sprite.rotation_degrees = BITE_DIP_ANGLE * dip_t
+	else:
+		rod_sprite.rotation_degrees = 0.0
+
+
 func _apply_cast_begin_frames() -> void:
 	body_sprite.frame_coords = Vector2i(12, 2)
 	overalls_sprite.frame_coords = Vector2i(12, 2)
@@ -139,16 +203,21 @@ func _set_anim_state(new_state: AnimState) -> void:
 			rod_sprite.visible = true
 			rod_sprite.rotation_degrees = 0.0
 			arms_sprite.position = Vector2.ZERO
-			_apply_cast_begin_frames()
+			_cast_release_timer = CAST_RELEASE_DURATION
+			_apply_cast_release_frames()
 		AnimState.FISHING_IDLE:
 			rod_sprite.visible = true
 			rod_sprite.rotation_degrees = 0.0
 			arms_sprite.position = Vector2.ZERO
+			_fishing_idle_timer = 0.0
+			_fishing_idle_toggle = false
 			_apply_fishing_idle_frames()
 		AnimState.REEL:
 			rod_sprite.visible = true
 			rod_sprite.rotation_degrees = 0.0
 			arms_sprite.position = Vector2.ZERO
+			_reel_timer = 0.0
+			_reel_toggle = false
 			_apply_fishing_idle_frames()
 
 
@@ -171,11 +240,11 @@ func _on_fishing_state_changed(state: Enums.FishingState) -> void:
 
 
 func _on_cast_started(_strength: float) -> void:
-	_set_anim_state(AnimState.CAST_BEGIN)
+	_set_anim_state(AnimState.CAST_RELEASE)
 
 
 func _on_cast_landed(_depth: float) -> void:
-	_set_anim_state(AnimState.FISHING_IDLE)
+	pass
 
 
 func _on_fight_started(_fish_id: String) -> void:
@@ -192,3 +261,7 @@ func _on_fish_escaped(_fish_id: String) -> void:
 
 func _on_line_snapped() -> void:
 	_set_anim_state(AnimState.IDLE)
+
+
+func _on_bite_occurred(_fish_id: String) -> void:
+	_bite_dip_timer = BITE_DIP_DURATION

@@ -25,6 +25,12 @@ var feedback_tween: Tween
 var flash_tween: Tween
 var shake_tween: Tween
 var bite_color_tween: Tween
+var cast_bar_fill_style: StyleBoxFlat
+var tension_flash_active: bool = false
+var tension_flash_time: float = 0.0
+var progress_value_label: Label
+var tension_value_label: Label
+var cast_depth_preview_label: Label
 
 
 func enter(_meta: Variant = null) -> void:
@@ -135,18 +141,18 @@ func _build_layout() -> void:
 	info_vbox.add_child(cast_power_label)
 
 	cast_power_bar = ProgressBar.new()
-	cast_power_bar.custom_minimum_size = Vector2(0, 14)
+	cast_power_bar.custom_minimum_size = Vector2(0, 18)
 	cast_power_bar.max_value = 1.0
 	cast_power_bar.value = 0.0
 	cast_power_bar.visible = false
 	cast_power_bar.show_percentage = false
-	var bar_style: StyleBoxFlat = StyleBoxFlat.new()
-	bar_style.bg_color = Color(0.2, 0.6, 1.0)
-	bar_style.corner_radius_top_left = 4
-	bar_style.corner_radius_top_right = 4
-	bar_style.corner_radius_bottom_left = 4
-	bar_style.corner_radius_bottom_right = 4
-	cast_power_bar.add_theme_stylebox_override("fill", bar_style)
+	cast_bar_fill_style = StyleBoxFlat.new()
+	cast_bar_fill_style.bg_color = Color(0.2, 0.6, 1.0)
+	cast_bar_fill_style.corner_radius_top_left = 4
+	cast_bar_fill_style.corner_radius_top_right = 4
+	cast_bar_fill_style.corner_radius_bottom_left = 4
+	cast_bar_fill_style.corner_radius_bottom_right = 4
+	cast_power_bar.add_theme_stylebox_override("fill", cast_bar_fill_style)
 	var bar_bg: StyleBoxFlat = StyleBoxFlat.new()
 	bar_bg.bg_color = Color(0.1, 0.1, 0.1, 0.8)
 	bar_bg.corner_radius_top_left = 4
@@ -155,6 +161,13 @@ func _build_layout() -> void:
 	bar_bg.corner_radius_bottom_right = 4
 	cast_power_bar.add_theme_stylebox_override("background", bar_bg)
 	info_vbox.add_child(cast_power_bar)
+
+	cast_depth_preview_label = Label.new()
+	cast_depth_preview_label.text = ""
+	cast_depth_preview_label.add_theme_font_size_override("font_size", 11)
+	cast_depth_preview_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	cast_depth_preview_label.visible = false
+	info_vbox.add_child(cast_depth_preview_label)
 
 	return_button = Button.new()
 	return_button.text = "Return"
@@ -212,29 +225,47 @@ func _build_layout() -> void:
 
 	fight_container = VBoxContainer.new()
 	fight_container.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	fight_container.offset_top = -200
+	fight_container.offset_top = -220
 	fight_container.offset_bottom = -10
-	fight_container.add_theme_constant_override("separation", 6)
+	fight_container.offset_left = 12
+	fight_container.offset_right = -12
+	fight_container.add_theme_constant_override("separation", 8)
 	fight_container.visible = false
 	fight_container.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(fight_container)
 
+	var progress_header: HBoxContainer = HBoxContainer.new()
+	fight_container.add_child(progress_header)
 	var progress_label: Label = Label.new()
 	progress_label.text = "Progress"
-	progress_label.add_theme_font_size_override("font_size", 12)
-	fight_container.add_child(progress_label)
+	progress_label.add_theme_font_size_override("font_size", 13)
+	progress_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	progress_header.add_child(progress_label)
+	progress_value_label = Label.new()
+	progress_value_label.text = "30%"
+	progress_value_label.add_theme_font_size_override("font_size", 13)
+	progress_value_label.add_theme_color_override("font_color", Color(0.2, 0.8, 0.2))
+	progress_header.add_child(progress_value_label)
 
 	progress_bar = FightProgressBarScript.new()
-	progress_bar.custom_minimum_size = Vector2(0, 20)
+	progress_bar.custom_minimum_size = Vector2(0, 28)
 	fight_container.add_child(progress_bar)
 
+	var tension_header: HBoxContainer = HBoxContainer.new()
+	fight_container.add_child(tension_header)
 	var tension_label: Label = Label.new()
 	tension_label.text = "Tension"
-	tension_label.add_theme_font_size_override("font_size", 12)
-	fight_container.add_child(tension_label)
+	tension_label.add_theme_font_size_override("font_size", 13)
+	tension_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tension_header.add_child(tension_label)
+	tension_value_label = Label.new()
+	tension_value_label.text = "0%"
+	tension_value_label.add_theme_font_size_override("font_size", 13)
+	tension_value_label.add_theme_color_override("font_color", Color(0.2, 0.8, 0.2))
+	tension_header.add_child(tension_value_label)
 
 	tension_bar = FightTensionBarScript.new()
-	tension_bar.custom_minimum_size = Vector2(0, 20)
+	tension_bar.custom_minimum_size = Vector2(0, 28)
 	fight_container.add_child(tension_bar)
 
 	reel_zone = ReelZoneScript.new()
@@ -249,8 +280,29 @@ func _on_cast_strength_changed(strength: float) -> void:
 	if cast_power_bar:
 		cast_power_bar.value = strength
 		cast_power_bar.visible = strength > 0.0
+	if cast_bar_fill_style and strength > 0.0:
+		var bar_color: Color
+		if strength < 0.5:
+			bar_color = Color(0.2, 0.6, 1.0).lerp(Color(1.0, 0.7, 0.1), strength * 2.0)
+		else:
+			bar_color = Color(1.0, 0.7, 0.1).lerp(Color(0.9, 0.2, 0.1), (strength - 0.5) * 2.0)
+		var pulse: float = 1.0 + sin(Time.get_ticks_msec() * 0.008) * 0.08 * strength
+		bar_color = bar_color.lightened(0.1 * (pulse - 1.0) * 10.0)
+		cast_bar_fill_style.bg_color = bar_color
 	if cast_power_label and strength > 0.0:
 		cast_power_label.text = "Power: " + str(int(strength * 100)) + "%"
+	if cast_depth_preview_label:
+		if strength > 0.0:
+			var min_depth: float = 50.0
+			var max_depth: float = 500.0
+			if GameResources.config and GameResources.config.fishing_config:
+				min_depth = GameResources.config.fishing_config.min_cast_depth
+				max_depth = GameResources.config.fishing_config.max_cast_depth_base
+			var preview_depth: int = int(min_depth + strength * (max_depth - min_depth))
+			cast_depth_preview_label.text = "~" + str(preview_depth) + "m"
+			cast_depth_preview_label.visible = true
+		else:
+			cast_depth_preview_label.visible = false
 
 
 func _on_cast_landed(depth: float) -> void:
@@ -260,6 +312,8 @@ func _on_cast_landed(depth: float) -> void:
 		cast_power_label.text = ""
 	if cast_power_bar:
 		cast_power_bar.visible = false
+	if cast_depth_preview_label:
+		cast_depth_preview_label.visible = false
 
 
 func _on_fishing_state_changed(state: int) -> void:
@@ -271,6 +325,8 @@ func _on_fishing_state_changed(state: int) -> void:
 				cast_power_label.text = ""
 			if cast_power_bar:
 				cast_power_bar.visible = false
+			if cast_depth_preview_label:
+				cast_depth_preview_label.visible = false
 			if bite_flash_label:
 				bite_flash_label.visible = false
 			if bite_tap_label:
@@ -386,14 +442,26 @@ func _on_fight_started(_fish_id: String) -> void:
 func _on_fight_progress_changed(progress: float) -> void:
 	if progress_bar and progress_bar.has_method("set_progress"):
 		progress_bar.set_progress(progress / 100.0)
+	if progress_value_label:
+		progress_value_label.text = str(int(progress)) + "%"
 
 
 func _on_fight_tension_changed(tension: float) -> void:
+	var tension_cap: float = 100.0
+	if GameResources.config and GameResources.config.fishing_config:
+		tension_cap = GameResources.config.fishing_config.tension_snap_threshold
+	var tension_pct: float = tension / tension_cap
 	if tension_bar and tension_bar.has_method("set_tension"):
-		var tension_cap: float = 100.0
-		if GameResources.config and GameResources.config.fishing_config:
-			tension_cap = GameResources.config.fishing_config.tension_snap_threshold
-		tension_bar.set_tension(tension / tension_cap)
+		tension_bar.set_tension(tension_pct)
+	if tension_value_label:
+		tension_value_label.text = str(int(tension_pct * 100.0)) + "%"
+		if tension_pct >= 0.8:
+			var flash: float = abs(sin(Time.get_ticks_msec() * 0.01))
+			tension_value_label.add_theme_color_override("font_color", Color(1.0, flash * 0.3, flash * 0.1))
+		elif tension_pct >= 0.5:
+			tension_value_label.add_theme_color_override("font_color", Color(0.9, 0.7, 0.1))
+		else:
+			tension_value_label.add_theme_color_override("font_color", Color(0.2, 0.8, 0.2))
 
 
 func _on_fish_caught(fish_id: String) -> void:
@@ -402,6 +470,7 @@ func _on_fish_caught(fish_id: String) -> void:
 	HapticManager.success_feedback()
 	_show_feedback("CAUGHT!", Color(0.2, 1.0, 0.2), 1.5)
 	_flash_screen(Color(0.2, 1.0, 0.2, 0.4), 0.3)
+	_shake_ui(0.3, 4.0)
 	var tree: SceneTree = Engine.get_main_loop() as SceneTree
 	if tree:
 		await tree.create_timer(1.0).timeout
@@ -438,6 +507,8 @@ func _hide_fight_ui() -> void:
 		cast_power_label.text = ""
 	if cast_power_bar:
 		cast_power_bar.visible = false
+	if cast_depth_preview_label:
+		cast_depth_preview_label.visible = false
 	if bite_flash_label:
 		bite_flash_label.visible = false
 	if bite_tap_label:
