@@ -133,6 +133,7 @@ func _build_layout() -> void:
 	scroll.get_v_scroll_bar().add_theme_stylebox_override("grabber", StyleBoxEmpty.new())
 	scroll.get_v_scroll_bar().add_theme_stylebox_override("grabber_highlight", StyleBoxEmpty.new())
 	scroll.get_v_scroll_bar().add_theme_stylebox_override("grabber_pressed", StyleBoxEmpty.new())
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	vbox.add_child(scroll)
 
@@ -361,85 +362,85 @@ func _refresh_grid() -> void:
 func _populate_shop_grid() -> void:
 	var player_level: int = ProgressManager.get_current_level()
 	for shop_item: ShopItem in shop_items:
-		var cell: PanelContainer = _create_shop_card(shop_item, player_level)
+		var cell: Button = _create_shop_card(shop_item, player_level)
 		grid.add_child(cell)
 
 
-func _create_shop_card(shop_item: ShopItem, player_level: int) -> PanelContainer:
-	var panel: PanelContainer = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(100, 110)
-	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-
+func _create_shop_card(shop_item: ShopItem, player_level: int) -> Button:
 	var meets_level: bool = player_level >= shop_item.required_level
 	var can_afford: bool = CurrencyManager.can_afford_coins(shop_item.cost_coins)
-
 	var quality_bg: Color = QUALITY_BG_COLORS.get(shop_item.quality, Color(0.3, 0.3, 0.3))
-	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = quality_bg
-	style.border_color = quality_bg.lightened(0.3)
-	style.border_width_bottom = 1
-	style.border_width_top = 1
-	style.border_width_left = 1
-	style.border_width_right = 1
-	style.corner_radius_top_left = 6
-	style.corner_radius_top_right = 6
-	style.corner_radius_bottom_left = 6
-	style.corner_radius_bottom_right = 6
-	style.content_margin_top = 6
-	style.content_margin_bottom = 6
-	style.content_margin_left = 6
-	style.content_margin_right = 6
-	panel.add_theme_stylebox_override("panel", style)
+
+	var card_btn: Button = Button.new()
+	card_btn.custom_minimum_size = Vector2(0, 120)
+	card_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card_btn.clip_text = true
+
+	var card_style: StyleBoxFlat = StyleBoxFlat.new()
+	card_style.bg_color = quality_bg
+	card_style.corner_radius_top_left = 6
+	card_style.corner_radius_top_right = 6
+	card_style.corner_radius_bottom_left = 6
+	card_style.corner_radius_bottom_right = 6
+	card_style.border_color = quality_bg.lightened(0.3)
+	card_style.border_width_bottom = 2
+	card_style.border_width_top = 2
+	card_style.border_width_left = 2
+	card_style.border_width_right = 2
+	card_style.content_margin_top = 4
+	card_style.content_margin_bottom = 4
+	card_style.content_margin_left = 4
+	card_style.content_margin_right = 4
+	card_btn.add_theme_stylebox_override("normal", card_style)
+
+	var hover_style: StyleBoxFlat = card_style.duplicate()
+	hover_style.bg_color = quality_bg.lightened(0.15)
+	card_btn.add_theme_stylebox_override("hover", hover_style)
+
+	var pressed_style: StyleBoxFlat = card_style.duplicate()
+	pressed_style.bg_color = quality_bg.darkened(0.15)
+	card_btn.add_theme_stylebox_override("pressed", pressed_style)
+
+	card_btn.pressed.connect(_on_shop_card_pressed.bind(shop_item))
 
 	var card_vbox: VBoxContainer = VBoxContainer.new()
 	card_vbox.add_theme_constant_override("separation", 2)
 	card_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	panel.add_child(card_vbox)
-
-	var icon_center: CenterContainer = CenterContainer.new()
-	icon_center.custom_minimum_size = Vector2(64, 64)
-	card_vbox.add_child(icon_center)
+	card_vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card_btn.add_child(card_vbox)
 
 	var icon: TextureRect = TextureRect.new()
-	icon.custom_minimum_size = Vector2(64, 64)
+	icon.custom_minimum_size = Vector2(56, 56)
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	icon.texture = _get_item_icon(shop_item.item_id, shop_item.equipment_type)
-	icon_center.add_child(icon)
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card_vbox.add_child(icon)
 
-	var name_btn: Button = Button.new()
-	name_btn.text = shop_item.display_name
-	name_btn.custom_minimum_size = Vector2(0, 20)
-	name_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_btn.add_theme_font_size_override("font_size", 11)
-	name_btn.add_theme_color_override("font_color", Color.WHITE)
-	name_btn.flat = true
-	name_btn.pressed.connect(_on_shop_card_pressed.bind(shop_item))
-	card_vbox.add_child(name_btn)
+	var name_label: Label = Label.new()
+	name_label.text = shop_item.display_name
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_label.add_theme_font_size_override("font_size", 10)
+	name_label.add_theme_color_override("font_color", Color.WHITE)
+	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card_vbox.add_child(name_label)
 
-	icon_center.gui_input.connect(func(event: InputEvent) -> void:
-		if event is InputEventMouseButton and event.pressed:
-			_on_shop_card_pressed(shop_item)
-	)
-
-	var buy_btn: Button = Button.new()
+	var price_label: Label = Label.new()
 	if not meets_level:
-		buy_btn.text = "Lv." + str(shop_item.required_level) + " | " + str(shop_item.cost_coins)
-		buy_btn.disabled = true
-	elif not can_afford:
-		buy_btn.text = str(shop_item.cost_coins) + " coins"
-		buy_btn.disabled = true
+		price_label.text = "Lv." + str(shop_item.required_level) + " | " + str(shop_item.cost_coins)
+		price_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8))
+	elif can_afford:
+		price_label.text = str(shop_item.cost_coins) + " coins"
+		price_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3))
 	else:
-		buy_btn.text = "Buy " + str(shop_item.cost_coins)
-	buy_btn.custom_minimum_size = Vector2(80, 26)
-	buy_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	buy_btn.add_theme_font_size_override("font_size", 10)
-	buy_btn.pressed.connect(_on_buy_pressed.bind(shop_item))
-	card_vbox.add_child(buy_btn)
+		price_label.text = str(shop_item.cost_coins) + " coins"
+		price_label.add_theme_color_override("font_color", Color(0.7, 0.4, 0.4))
+	price_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	price_label.add_theme_font_size_override("font_size", 9)
+	price_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card_vbox.add_child(price_label)
 
-	panel.mouse_filter = Control.MOUSE_FILTER_PASS
-
-	return panel
+	return card_btn
 
 
 func _on_shop_card_pressed(shop_item: ShopItem) -> void:
