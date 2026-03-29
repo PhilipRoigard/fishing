@@ -155,6 +155,7 @@ func _create_screens() -> void:
 	_register(UIStateMachine.State.YES_NO_POPUP, preload("res://scripts/ui/states/ui_yes_no_popup_state.gd"))
 	_register(UIStateMachine.State.PURCHASING, preload("res://scripts/ui/states/ui_purchasing_state.gd"))
 	_register(UIStateMachine.State.BAIT_CRAFT, preload("res://scripts/ui/states/ui_bait_craft_state.gd"))
+	_register(UIStateMachine.State.TOOLTIP, preload("res://scripts/ui/states/ui_tooltip_state.gd"))
 
 
 func _register(state: UIStateMachine.State, script: GDScript) -> void:
