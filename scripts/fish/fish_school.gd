@@ -7,10 +7,12 @@ var members: Array[SwimmingFish] = []
 
 var _path: PackedVector2Array = PackedVector2Array()
 var _current_waypoint_index: int = 0
+var _wander_offset: Vector2 = Vector2.ZERO
+var _wander_timer: float = 0.0
+var _lifetime: float = 0.0
 
-var _offscreen_timer: float = 0.0
-var _camera: Camera2D = null
-var _viewport_size: Vector2 = Vector2.ZERO
+const MAX_LIFETIME: float = 30.0
+const SCREEN_MARGIN: float = 60.0
 
 signal school_empty
 signal school_despawn
@@ -21,84 +23,61 @@ func setup(p_fish_data: FishData, p_school_config: SchoolConfig, p_path: PackedV
 	school_config = p_school_config
 	_path = p_path
 	_current_waypoint_index = 0
-	_offscreen_timer = 0.0
+	_wander_timer = randf_range(2.0, 5.0)
+	_lifetime = 0.0
 
 	if _path.size() > 0:
 		global_position = _path[0]
-
-
-func _ready() -> void:
-	_viewport_size = get_viewport_rect().size
-	_camera = _find_camera()
-
-
-func _find_camera() -> Camera2D:
-	var cameras: Array[Node] = get_tree().get_nodes_in_group("fishing_camera")
-	if cameras.size() > 0:
-		return cameras[0] as Camera2D
-	return null
 
 
 func _process(delta: float) -> void:
 	if members.is_empty():
 		return
 
+	_lifetime += delta
 	_advance_path(delta)
-	_update_offscreen_timer(delta)
+	_update_wander(delta)
+
+	if _lifetime > MAX_LIFETIME:
+		school_despawn.emit()
+
+	if _is_fully_offscreen():
+		school_despawn.emit()
 
 
-func _advance_path(_delta: float) -> void:
+func _advance_path(delta: float) -> void:
 	if _path.is_empty() or _current_waypoint_index >= _path.size():
 		return
 
-	var target: Vector2 = _path[_current_waypoint_index]
+	var target: Vector2 = _path[_current_waypoint_index] + _wander_offset
 	var direction: Vector2 = target - global_position
 	var distance: float = direction.length()
 
 	var speed: float = fish_data.swim_speed if fish_data else 50.0
-	if distance > school_config.waypoint_reach_distance:
-		global_position += direction.normalized() * speed * _delta
+	var reach_dist: float = school_config.waypoint_reach_distance if school_config else 24.0
+
+	if distance > reach_dist:
+		global_position += direction.normalized() * speed * delta
 	else:
 		_current_waypoint_index += 1
 		if _current_waypoint_index >= _path.size():
 			school_despawn.emit()
 
 
-func get_current_target() -> Vector2:
-	return global_position
+func _update_wander(delta: float) -> void:
+	_wander_timer -= delta
+	if _wander_timer <= 0.0:
+		_wander_timer = randf_range(3.0, 6.0)
+		_wander_offset = Vector2(randf_range(-40.0, 40.0), randf_range(-30.0, 30.0))
 
 
-func _update_offscreen_timer(delta: float) -> void:
-	if _is_any_member_onscreen():
-		_offscreen_timer = 0.0
-	else:
-		_offscreen_timer += delta
-		if _offscreen_timer >= school_config.offscreen_despawn_time:
-			school_despawn.emit()
-
-
-func _is_any_member_onscreen() -> bool:
-	var camera_rect: Rect2 = _get_camera_rect()
-	if camera_rect.size == Vector2.ZERO:
-		return true
-
+func _is_fully_offscreen() -> bool:
 	for member: SwimmingFish in members:
 		if is_instance_valid(member) and not member.is_caught:
-			if camera_rect.has_point(member.global_position):
-				return true
-	return false
-
-
-func _get_camera_rect() -> Rect2:
-	if not _camera:
-		_camera = _find_camera()
-	if not _camera:
-		return Rect2()
-
-	var cam_pos: Vector2 = _camera.global_position
-	var zoom: Vector2 = _camera.zoom
-	var half_size: Vector2 = _viewport_size / (2.0 * zoom)
-	return Rect2(cam_pos - half_size, half_size * 2.0)
+			var gp: Vector2 = member.global_position
+			if gp.x > -SCREEN_MARGIN and gp.x < 360 + SCREEN_MARGIN and gp.y > -SCREEN_MARGIN and gp.y < 640 + SCREEN_MARGIN:
+				return false
+	return true
 
 
 func add_member(fish: SwimmingFish) -> void:
