@@ -130,22 +130,9 @@ func _build_section(section_name: String, products: Array) -> void:
 	underline.color = SECTION_COLORS.get(section_name, Color(0.5, 0.5, 0.5))
 	header_container.add_child(underline)
 
-	if section_name == "Gems":
-		var grid: GridContainer = GridContainer.new()
-		grid.columns = 2
-		grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		grid.add_theme_constant_override("h_separation", 10)
-		grid.add_theme_constant_override("v_separation", 10)
-		section_vbox.add_child(grid)
-
-		for product: Variant in products:
-			var card: PanelContainer = _create_product_card(product)
-			card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			grid.add_child(card)
-	else:
-		for product: Variant in products:
-			var card: PanelContainer = _create_product_card(product)
-			section_vbox.add_child(card)
+	for product: Variant in products:
+		var card: PanelContainer = _create_product_card(product)
+		section_vbox.add_child(card)
 
 
 func _create_product_card(product: Variant) -> PanelContainer:
