@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GameResourcesConfig" load_steps=10 format=3]
+[gd_resource type="Resource" script_class="GameResourcesConfig" load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/config/game_resources_config.gd" id="1"]
 [ext_resource type="Resource" path="res://data/fishing_config.tres" id="2"]
@@ -10,6 +10,7 @@
 [ext_resource type="Resource" path="res://data/reward_config.tres" id="8"]
 [ext_resource type="Resource" path="res://data/fish_database.tres" id="9"]
 [ext_resource type="Resource" path="res://data/store/iap_catalogue.tres" id="10"]
+[ext_resource type="Resource" path="res://data/equipment_catalogue.tres" id="11"]
 
 [resource]
 script = ExtResource("1")
@@ -22,3 +23,4 @@ equipment_merge_config = ExtResource("7")
 reward_config = ExtResource("8")
 fish_database = ExtResource("9")
 iap_catalogue = ExtResource("10")
+equipment_catalogue = ExtResource("11")
