@@ -1,11 +1,11 @@
 extends UIStateNode
 
 const QUALITY_BG_COLORS: Dictionary = {
-	Enums.ItemQuality.COMMON: Color(0.3, 0.3, 0.3),
-	Enums.ItemQuality.UNCOMMON: Color(0.15, 0.4, 0.15),
-	Enums.ItemQuality.RARE: Color(0.15, 0.25, 0.5),
-	Enums.ItemQuality.EPIC: Color(0.35, 0.15, 0.45),
-	Enums.ItemQuality.LEGENDARY: Color(0.5, 0.4, 0.1),
+	Enums.ItemQuality.COMMON: Color(0.45, 0.45, 0.45),
+	Enums.ItemQuality.UNCOMMON: Color(0.3, 0.65, 0.15),
+	Enums.ItemQuality.RARE: Color(0.2, 0.45, 0.85),
+	Enums.ItemQuality.EPIC: Color(0.6, 0.25, 0.8),
+	Enums.ItemQuality.LEGENDARY: Color(0.85, 0.7, 0.1),
 }
 
 const SLOT_NAMES: Array[String] = ["Rod", "Hook", "Lure", "Bait"]
@@ -25,6 +25,7 @@ var _bait_shrimp_texture: Texture2D = preload("res://assets/sprites/items/Bait_0
 var _bait_squid_texture: Texture2D = preload("res://assets/sprites/items/Bait_01_pink.png")
 var _bait_green_texture: Texture2D = preload("res://assets/sprites/items/Bait_01_green.png")
 var _rod_sheet_texture: Texture2D = preload("res://assets/sprites/character/fishing_rod_sheet.png")
+var _folley_sheet_texture: Texture2D = preload("res://assets/sprites/items/Folley_Sprite_Sheet.png")
 
 var grid: GridContainer
 var filter_container: HBoxContainer
@@ -162,7 +163,7 @@ func _build_equipment_slots(parent: VBoxContainer) -> void:
 
 func _create_equipment_slot(slot_name: String, slot_type: Enums.EquipmentSlot) -> PanelContainer:
 	var panel: PanelContainer = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(70, 85)
+	panel.custom_minimum_size = Vector2(80, 95)
 
 	var style: StyleBoxFlat = StyleBoxFlat.new()
 	style.bg_color = Color(0.08, 0.1, 0.15)
@@ -197,20 +198,22 @@ func _create_equipment_slot(slot_name: String, slot_type: Enums.EquipmentSlot) -
 
 	if equipped:
 		var quality_color: Color = Enums.QUALITY_COLORS.get(equipped.quality, Color.WHITE)
+		var quality_bg: Color = QUALITY_BG_COLORS.get(equipped.quality, Color(0.15, 0.15, 0.15))
 		style.border_color = quality_color
 		style.border_width_bottom = 2
 		style.border_width_top = 2
 		style.border_width_left = 2
 		style.border_width_right = 2
-		style.bg_color = QUALITY_BG_COLORS.get(equipped.quality, Color(0.15, 0.15, 0.15)).darkened(0.4)
+		style.bg_color = quality_bg.darkened(0.3)
 
 		var icon_container: CenterContainer = CenterContainer.new()
-		icon_container.custom_minimum_size = Vector2(40, 40)
+		icon_container.custom_minimum_size = Vector2(56, 56)
 		inner_vbox.add_child(icon_container)
 
 		var icon: TextureRect = TextureRect.new()
-		icon.custom_minimum_size = Vector2(36, 36)
+		icon.custom_minimum_size = Vector2(52, 52)
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		icon.texture = _get_item_icon(equipped.item_id, equipped.equipment_type)
 		icon_container.add_child(icon)
 
@@ -367,12 +370,13 @@ func _create_shop_card(shop_item: ShopItem, player_level: int) -> PanelContainer
 	panel.add_child(card_vbox)
 
 	var icon_center: CenterContainer = CenterContainer.new()
-	icon_center.custom_minimum_size = Vector2(40, 40)
+	icon_center.custom_minimum_size = Vector2(64, 64)
 	card_vbox.add_child(icon_center)
 
 	var icon: TextureRect = TextureRect.new()
-	icon.custom_minimum_size = Vector2(36, 36)
+	icon.custom_minimum_size = Vector2(64, 64)
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	icon.texture = _get_item_icon(shop_item.item_id, shop_item.equipment_type)
 	if not meets_level:
 		icon.modulate = Color(0.4, 0.4, 0.4)
@@ -491,12 +495,13 @@ func _create_item_card(entry: EquipmentManager.EquipmentEntry) -> PanelContainer
 	panel.add_child(card_vbox)
 
 	var icon_center: CenterContainer = CenterContainer.new()
-	icon_center.custom_minimum_size = Vector2(48, 48)
+	icon_center.custom_minimum_size = Vector2(64, 64)
 	card_vbox.add_child(icon_center)
 
 	var icon: TextureRect = TextureRect.new()
-	icon.custom_minimum_size = Vector2(48, 48)
+	icon.custom_minimum_size = Vector2(64, 64)
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	icon.texture = _get_item_icon(entry.item_id, entry.equipment_type)
 	icon_center.add_child(icon)
 
@@ -551,8 +556,16 @@ func _get_item_icon(item_id: String, equipment_type: String) -> Texture2D:
 	match equipment_type:
 		"rod":
 			var atlas: AtlasTexture = AtlasTexture.new()
-			atlas.atlas = _rod_sheet_texture
-			atlas.region = Rect2(0, 0, 64, 64)
+			atlas.atlas = _folley_sheet_texture
+			match item_id:
+				"bronze_rod":
+					atlas.region = Rect2(65, 2, 15, 15)
+				"silver_rod":
+					atlas.region = Rect2(81, 2, 15, 15)
+				"gold_rod":
+					atlas.region = Rect2(81, 2, 15, 15)
+				_:
+					atlas.region = Rect2(49, 2, 15, 14)
 			return atlas
 		"bait":
 			match item_id:
@@ -562,28 +575,34 @@ func _get_item_icon(item_id: String, equipment_type: String) -> Texture2D:
 					return _bait_shrimp_texture
 				"squid", "squid_bait":
 					return _bait_squid_texture
+				"golden_bait":
+					return _bait_squid_texture
 				_:
 					return _bait_green_texture
 		"hook":
-			return _create_circle_texture(Color(0.7, 0.7, 0.75), 32)
+			var atlas: AtlasTexture = AtlasTexture.new()
+			atlas.atlas = _folley_sheet_texture
+			match item_id:
+				"barbed_hook":
+					atlas.region = Rect2(17, 1, 14, 16)
+				"titanium_hook":
+					atlas.region = Rect2(33, 1, 14, 16)
+				_:
+					atlas.region = Rect2(1, 0, 14, 17)
+			return atlas
 		"lure":
-			return _create_circle_texture(Color(0.3, 0.7, 1.0), 32)
-	return _create_circle_texture(Color(0.5, 0.5, 0.5), 32)
+			var atlas: AtlasTexture = AtlasTexture.new()
+			atlas.atlas = _folley_sheet_texture
+			match item_id:
+				"shiny_lure":
+					atlas.region = Rect2(113, 1, 15, 16)
+				"golden_lure":
+					atlas.region = Rect2(128, 1, 15, 16)
+				_:
+					atlas.region = Rect2(97, 3, 13, 13)
+			return atlas
+	return _bait_green_texture
 
-
-func _create_circle_texture(color: Color, tex_size: int) -> ImageTexture:
-	var img: Image = Image.create(tex_size, tex_size, false, Image.FORMAT_RGBA8)
-	var center: Vector2 = Vector2(tex_size / 2.0, tex_size / 2.0)
-	var radius: float = tex_size / 2.0 - 2.0
-	for x: int in tex_size:
-		for y: int in tex_size:
-			var dist: float = Vector2(x, y).distance_to(center)
-			if dist <= radius:
-				var alpha: float = clampf(1.0 - (dist - radius + 2.0) / 2.0, 0.0, 1.0)
-				img.set_pixel(x, y, Color(color.r, color.g, color.b, alpha))
-			else:
-				img.set_pixel(x, y, Color(0, 0, 0, 0))
-	return ImageTexture.create_from_image(img)
 
 
 func _get_display_name_for_entry(entry: EquipmentManager.EquipmentEntry) -> String:
