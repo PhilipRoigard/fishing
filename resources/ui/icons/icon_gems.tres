@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://bj0bdc7ndflg5"]
+
+[ext_resource type="Texture2D" uid="uid://d2w7oc7ko80ll" path="res://resources/spritesheet/currency_icons.png" id="1_dmluo"]
+
+[resource]
+atlas = ExtResource("1_dmluo")
+region = Rect2(96, 0, 32, 32)

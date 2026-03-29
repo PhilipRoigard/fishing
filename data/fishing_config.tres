@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="FishingConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/fishing_config.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+min_cast_depth = 50.0
+max_cast_depth_base = 500.0
+charge_duration = 1.5
+hook_fall_speed = 200.0
+hook_wobble_amplitude = 3.0
+bite_delay_min = 2.0
+bite_delay_max = 5.0
+bite_window = 2.0
+hook_attract_radius = 40.0
+starting_progress = 30.0
+catch_increase_rate = 40.0
+catch_decrease_rate = 20.0
+base_tension_rate = 25.0
+tension_relief_rate = 35.0
+tension_snap_threshold = 100.0
+tension_fighting_fish_multiplier = 1.5
+fish_speed_base = 64.0
+fish_change_interval = 0.5
+fish_stop_duration = 0.5
+fish_stop_interval_min = 1.0
+fish_stop_interval_max = 5.0
+desperate_phase_threshold = 60.0
+final_stand_phase_threshold = 85.0
+stun_duration_small = 2.0
+stun_duration_large = 4.0
+line_wax_decay_multiplier = 0.5
+line_wax_duration = 8.0
+steel_thread_tension_bonus = 0.3
+steel_thread_duration = 12.0
+lucky_hook_gain_multiplier = 1.4
+lucky_hook_duration = 6.0

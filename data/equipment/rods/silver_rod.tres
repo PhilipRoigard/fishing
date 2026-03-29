@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="RodData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/rod_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "silver_rod"
+display_name = "Silver Rod"
+description = "An advanced silver rod built for deep ocean fishing with superior tension control."
+cast_depth_range = 2000.0
+reel_speed = 1.2
+tension_resistance = 1.5
+cast_depth_per_level = 40.0
+reel_speed_per_level = 0.03
+tension_resistance_per_level = 0.025

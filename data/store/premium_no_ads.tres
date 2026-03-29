@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Product" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/product.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "premium_no_ads"
+display_name = "Remove Ads"
+description = "Permanently remove all ads and unlock premium features."
+type = "premium"
+category = "Premium"
+store_price_usd = 2.99
+is_consumable = false
+grants_premium = true

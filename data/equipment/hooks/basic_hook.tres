@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="HookData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/hook_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "basic_hook"
+display_name = "Basic Hook"
+description = "A simple iron hook. Gets the job done."
+bite_window_bonus = 0.0
+catch_rate_bonus = 0.0
+bite_window_per_level = 0.02
+catch_rate_per_level = 0.01

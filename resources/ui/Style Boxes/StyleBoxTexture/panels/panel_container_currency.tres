@@ -1,0 +1,15 @@
+[gd_resource type="StyleBoxTexture" format=3 uid="uid://c6r71e406suf4"]
+
+[ext_resource type="Texture2D" uid="uid://dei4pa8k8yohe" path="res://resources/ui/Art/ui_spritesheet_02.png" id="1_nki18"]
+
+[resource]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+texture = ExtResource("1_nki18")
+texture_margin_left = 13.0
+texture_margin_top = 14.0
+texture_margin_right = 13.0
+texture_margin_bottom = 17.0
+region_rect = Rect2(9, 169, 13, 18)

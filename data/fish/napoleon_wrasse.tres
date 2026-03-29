@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FishData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/fish_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "napoleon_wrasse"
+display_name = "Napoleon Wrasse"
+rarity = 2
+sell_value_coins = 60
+min_depth = 200.0
+max_depth = 600.0
+biome_flags = 5
+spawn_weight = 2.0
+min_school_size = 1
+max_school_size = 2
+swim_speed = 45.0
+separation_radius = 40.0
+scatter_on_catch = true
+fight_speed = 70.0
+fight_erratic = 0.4
+fight_stamina = 1.8
+tension_generation = 0.7
+phase_count = 2

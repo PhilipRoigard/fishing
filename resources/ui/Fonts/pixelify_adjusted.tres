@@ -1,0 +1,9 @@
+[gd_resource type="FontVariation" format=3 uid="uid://b4kpx2m8qnhvj"]
+
+[ext_resource type="FontFile" uid="uid://bnehhrpilynlc" path="res://resources/ui/Fonts/PixelifySans-Regular.ttf" id="1"]
+
+[resource]
+base_font = ExtResource("1")
+spacing_glyph = -1
+spacing_top = -3
+spacing_bottom = -3

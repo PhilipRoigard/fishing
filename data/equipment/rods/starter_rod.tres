@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="RodData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/rod_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "starter_rod"
+display_name = "Starter Rod"
+description = "A basic fishing rod. Reliable but nothing special."
+cast_depth_range = 500.0
+reel_speed = 1.0
+tension_resistance = 1.0
+cast_depth_per_level = 25.0
+reel_speed_per_level = 0.02
+tension_resistance_per_level = 0.015

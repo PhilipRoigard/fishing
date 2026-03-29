@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FishData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/fish_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "mackerel"
+display_name = "Mackerel"
+rarity = 0
+sell_value_coins = 8
+min_depth = 50.0
+max_depth = 350.0
+biome_flags = 2
+spawn_weight = 10.0
+min_school_size = 3
+max_school_size = 5
+swim_speed = 55.0
+separation_radius = 25.0
+scatter_on_catch = true
+fight_speed = 40.0
+fight_erratic = 0.2
+fight_stamina = 0.5
+tension_generation = 0.3
+phase_count = 1

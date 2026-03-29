@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="GameResourcesConfig" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/game_resources_config.gd" id="1"]
+[ext_resource type="Resource" path="res://data/fishing_config.tres" id="2"]
+[ext_resource type="Resource" path="res://data/spawn_config.tres" id="3"]
+[ext_resource type="Resource" path="res://data/school_config.tres" id="4"]
+[ext_resource type="Resource" path="res://data/depth_zone_config.tres" id="5"]
+[ext_resource type="Resource" path="res://data/quality_config.tres" id="6"]
+[ext_resource type="Resource" path="res://data/equipment_merge_config.tres" id="7"]
+[ext_resource type="Resource" path="res://data/reward_config.tres" id="8"]
+[ext_resource type="Resource" path="res://data/fish_database.tres" id="9"]
+[ext_resource type="Resource" path="res://data/store/iap_catalogue.tres" id="10"]
+
+[resource]
+script = ExtResource("1")
+fishing_config = ExtResource("2")
+spawn_config = ExtResource("3")
+school_config = ExtResource("4")
+depth_zone_config = ExtResource("5")
+quality_config = ExtResource("6")
+equipment_merge_config = ExtResource("7")
+reward_config = ExtResource("8")
+fish_database = ExtResource("9")
+iap_catalogue = ExtResource("10")

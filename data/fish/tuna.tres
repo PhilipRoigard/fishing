@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FishData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/fish_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "tuna"
+display_name = "Tuna"
+rarity = 1
+sell_value_coins = 22
+min_depth = 150.0
+max_depth = 500.0
+biome_flags = 2
+spawn_weight = 5.0
+min_school_size = 2
+max_school_size = 4
+swim_speed = 65.0
+separation_radius = 30.0
+scatter_on_catch = true
+fight_speed = 60.0
+fight_erratic = 0.4
+fight_stamina = 0.8
+tension_generation = 0.6
+phase_count = 1

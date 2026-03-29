@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BaitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/bait_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "shrimp"
+display_name = "Shrimp"
+description = "Fresh shrimp that reef fish find irresistible."
+attraction_modifier = 1.2
+rarity_weight_bonus = 0.0
+required_for_fish_ids = Array[String](["reef_snapper", "coral_grouper", "reef_angel"])
+craft_cost_coins = 75
+is_consumable = true

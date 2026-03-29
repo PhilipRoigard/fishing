@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FishData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/fish_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "pufferfish"
+display_name = "Pufferfish"
+rarity = 1
+sell_value_coins = 16
+min_depth = 50.0
+max_depth = 300.0
+biome_flags = 1
+spawn_weight = 5.0
+min_school_size = 1
+max_school_size = 2
+swim_speed = 30.0
+separation_radius = 35.0
+scatter_on_catch = true
+fight_speed = 40.0
+fight_erratic = 0.5
+fight_stamina = 0.9
+tension_generation = 0.6
+phase_count = 1

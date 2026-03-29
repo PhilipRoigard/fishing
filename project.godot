@@ -1,0 +1,58 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Wharf Fisher"
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.6", "Mobile")
+config/icon="res://icon.svg"
+
+[autoload]
+
+SignalBus="*res://scripts/autoload/signal_bus.gd"
+GameResources="*res://scripts/autoload/game_resources.gd"
+CurrencyManager="*res://scripts/progression/currency_manager.gd"
+CurrencyExchange="*res://scripts/progression/currency_exchange.gd"
+EquipmentManager="*res://scripts/progression/equipment_manager.gd"
+ProgressManager="*res://scripts/progression/progress_manager.gd"
+PurchaseManager="*res://scripts/monetization/iap/purchase_manager.gd"
+AdManager="*res://scripts/monetization/ads/ad_manager.gd"
+SafeZoneManager="*res://scripts/ui/safe_zone_manager.gd"
+HapticManager="*res://scripts/ui/haptic_manager.gd"
+Playtest="*res://scripts/autoload/playtest.gd"
+
+[display]
+
+window/size/viewport_width=360
+window/size/viewport_height=640
+window/size/window_width_override=720
+window/size/window_height_override=1280
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=1
+
+[input]
+
+touch={
+"deadzone": 0.2,
+"events": []
+}
+
+[layer_names]
+
+2d_physics/layer_1="default"
+2d_physics/layer_2="fish"
+2d_physics/layer_3="hook"
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
+renderer/rendering_method="mobile"

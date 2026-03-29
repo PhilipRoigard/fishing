@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Product" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/product.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "gem_pack_large"
+display_name = "Large Gem Pack"
+description = "A chest of 1200 gems."
+type = "gems"
+category = "Gems"
+gem_amount = 1200
+store_price_usd = 9.99
+is_consumable = true

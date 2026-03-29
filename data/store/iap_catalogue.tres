@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="IAPCatalogue" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/iap_catalogue.gd" id="1"]
+[ext_resource type="Resource" path="res://data/store/gem_pack_small.tres" id="2"]
+[ext_resource type="Resource" path="res://data/store/gem_pack_medium.tres" id="3"]
+[ext_resource type="Resource" path="res://data/store/gem_pack_large.tres" id="4"]
+[ext_resource type="Resource" path="res://data/store/gem_pack_mega.tres" id="5"]
+[ext_resource type="Resource" path="res://data/store/starter_bundle.tres" id="6"]
+[ext_resource type="Resource" path="res://data/store/fisher_pass.tres" id="7"]
+[ext_resource type="Resource" path="res://data/store/premium_no_ads.tres" id="8"]
+
+[resource]
+script = ExtResource("1")
+products = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8")]

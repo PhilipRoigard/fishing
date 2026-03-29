@@ -1,0 +1,8 @@
+[gd_resource type="FontVariation" format=3 uid="uid://c3noto_adjusted"]
+
+[ext_resource type="FontFile" path="res://resources/ui/Fonts/NotoSans-Regular.ttf" id="1"]
+
+[resource]
+base_font = ExtResource("1")
+spacing_top = -4
+spacing_bottom = -4

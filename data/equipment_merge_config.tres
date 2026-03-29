@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EquipmentMergeConfig" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/equipment_merge_config.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/config/merge_requirement.gd" id="2_merge_req"]
+
+[sub_resource type="Resource" id="merge_common"]
+script = ExtResource("2_merge_req")
+from_quality = 0
+to_quality = 1
+copies_required = 3
+coin_cost = 100
+
+[sub_resource type="Resource" id="merge_uncommon"]
+script = ExtResource("2_merge_req")
+from_quality = 1
+to_quality = 2
+copies_required = 3
+coin_cost = 300
+
+[sub_resource type="Resource" id="merge_rare"]
+script = ExtResource("2_merge_req")
+from_quality = 2
+to_quality = 3
+copies_required = 3
+coin_cost = 900
+
+[sub_resource type="Resource" id="merge_epic"]
+script = ExtResource("2_merge_req")
+from_quality = 3
+to_quality = 4
+copies_required = 2
+coin_cost = 2000
+
+[resource]
+script = ExtResource("1_script")
+merge_requirements = Array[MergeRequirement]([SubResource("merge_common"), SubResource("merge_uncommon"), SubResource("merge_rare"), SubResource("merge_epic")])

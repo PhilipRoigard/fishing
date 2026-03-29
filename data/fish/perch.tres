@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FishData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/fish_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "perch"
+display_name = "Perch"
+rarity = 0
+sell_value_coins = 6
+min_depth = 0.0
+max_depth = 250.0
+biome_flags = 1
+spawn_weight = 10.0
+min_school_size = 2
+max_school_size = 4
+swim_speed = 38.0
+separation_radius = 22.0
+scatter_on_catch = true
+fight_speed = 35.0
+fight_erratic = 0.15
+fight_stamina = 0.4
+tension_generation = 0.25
+phase_count = 1

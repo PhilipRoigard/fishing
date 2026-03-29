@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Product" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/product.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "starter_bundle"
+display_name = "Starter Bundle"
+description = "500 gems and 5000 coins to kickstart your fishing adventure."
+type = "bundle"
+category = "Bundles"
+coin_amount = 5000
+gem_amount = 500
+store_price_usd = 4.99
+is_consumable = true

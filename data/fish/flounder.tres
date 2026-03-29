@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FishData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/fish_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "flounder"
+display_name = "Flounder"
+rarity = 0
+sell_value_coins = 8
+min_depth = 0.0
+max_depth = 200.0
+biome_flags = 1
+spawn_weight = 10.0
+min_school_size = 1
+max_school_size = 3
+swim_speed = 30.0
+separation_radius = 25.0
+scatter_on_catch = true
+fight_speed = 25.0
+fight_erratic = 0.1
+fight_stamina = 0.6
+tension_generation = 0.3
+phase_count = 1

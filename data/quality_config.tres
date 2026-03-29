@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QualityConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/quality_config.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+base_stat_multiplier = 1.4
+base_level_cost = 100
+level_cost_exponent = 1.0544
+level_caps = {
+0: 15,
+1: 35,
+2: 60,
+3: 90,
+4: 120
+}

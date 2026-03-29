@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="RewardConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/reward_config.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+xp_per_common_catch = 10
+xp_per_uncommon_catch = 25
+xp_per_rare_catch = 50
+xp_per_legendary_catch = 150
+uncommon_sell_multiplier = 1.5
+rare_sell_multiplier = 2.5
+legendary_sell_multiplier = 5.0
+collection_milestone_gem_reward = 50
+level_up_coin_reward = 100
+daily_login_coins = 50
+daily_login_gems = 5
+daily_free_pull = true

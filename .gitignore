@@ -1,0 +1,21 @@
+# Godot
+.godot/
+*.import
+export/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# User data
+user://
+
+# Claude
+.claude/settings.local.json

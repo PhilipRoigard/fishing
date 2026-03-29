@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="TackleBoxPackDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/tackle_box_pack_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "premium_tackle_box"
+display_name = "Premium Tackle Box"
+description = "A premium tackle box with improved odds for rare and epic gear."
+gem_cost = 150
+items_per_pull = 1
+daily_limit = 5
+item_pool_ids = ["rod_basic", "rod_bamboo", "rod_carbon", "hook_standard", "hook_barbed", "hook_circle", "lure_spinner", "lure_crankbait", "lure_jig", "bait_worm", "bait_shrimp", "bait_minnow"]
+common_weight = 40.0
+uncommon_weight = 30.0
+rare_weight = 18.0
+epic_weight = 9.0
+legendary_weight = 3.0
+pity_threshold = 20
+pity_minimum_quality = 2

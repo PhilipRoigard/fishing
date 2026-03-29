@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/consumable_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "line_wax"
+display_name = "Line Wax"
+description = "Wax coating that slows tension decay on the fishing line."
+effect_type = 1
+duration = 8.0
+magnitude = 0.5
+rarity = 0
+max_stack = 10

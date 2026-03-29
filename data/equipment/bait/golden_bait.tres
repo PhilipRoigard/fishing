@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BaitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/bait_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "golden_bait"
+display_name = "Golden Bait"
+description = "Legendary bait infused with rare minerals that attracts the most elusive fish."
+attraction_modifier = 2.0
+rarity_weight_bonus = 0.3
+required_for_fish_ids = Array[String](["ancient_leviathan", "golden_koi", "phantom_ray"])
+craft_cost_coins = 500
+is_consumable = true

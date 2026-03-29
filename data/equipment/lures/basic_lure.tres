@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="LureData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/lure_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "basic_lure"
+display_name = "Basic Lure"
+description = "A plain metal lure. Nothing fancy but it works."
+rare_fish_chance_bonus = 0.0
+bite_speed_bonus = 0.0
+rare_fish_chance_per_level = 0.005
+bite_speed_per_level = 0.03

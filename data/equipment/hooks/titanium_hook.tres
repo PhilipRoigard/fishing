@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="HookData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/hook_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "titanium_hook"
+display_name = "Titanium Hook"
+description = "Lightweight titanium with razor-sharp edges for maximum catch potential."
+bite_window_bonus = 0.5
+catch_rate_bonus = 0.1
+bite_window_per_level = 0.03
+catch_rate_per_level = 0.015

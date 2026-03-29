@@ -1,0 +1,16 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://shaders/depth_background.gdshader" id="1_shader"]
+
+[resource]
+shader = ExtResource("1_shader")
+shader_parameter/surface_color = Vector3(0.4, 0.75, 0.9)
+shader_parameter/mid_color = Vector3(0.15, 0.4, 0.7)
+shader_parameter/deep_color = Vector3(0.04, 0.08, 0.18)
+shader_parameter/depth_offset = 0.0
+shader_parameter/time = 0.0
+shader_parameter/wave_strength = 0.005
+shader_parameter/wave_speed = 1.5
+shader_parameter/vignette_base = 0.15
+shader_parameter/vignette_depth_scale = 0.6
+shader_parameter/vignette_softness = 0.7

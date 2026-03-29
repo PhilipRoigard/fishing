@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://scripts/shaders/bubble-particles.gdshader" id="1_shader"]
+
+[resource]
+shader = ExtResource("1_shader")
+shader_parameter/initial_velocity_min = 80.0
+shader_parameter/initial_velocity_max = 150.0
+shader_parameter/damping = 75.0
+shader_parameter/particle_lifetime = 1.0
+shader_parameter/scale_min = 0.2
+shader_parameter/scale_max = 0.5
+shader_parameter/oscillation_amplitude = 2.0
+shader_parameter/oscillation_frequency = 40.0

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BaitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/bait_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "squid_bait"
+display_name = "Squid Bait"
+description = "Strips of squid that lure deep ocean predators."
+attraction_modifier = 1.5
+rarity_weight_bonus = 0.0
+required_for_fish_ids = Array[String](["deep_marlin", "giant_tuna", "abyssal_eel"])
+craft_cost_coins = 150
+is_consumable = true

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="HookData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/hook_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "barbed_hook"
+display_name = "Barbed Hook"
+description = "Barbed edges give extra grip and a wider bite window."
+bite_window_bonus = 0.3
+catch_rate_bonus = 0.05
+bite_window_per_level = 0.025
+catch_rate_per_level = 0.012

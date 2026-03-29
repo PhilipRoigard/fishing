@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="DepthZoneConfig" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/depth_zone_config.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/config/depth_zone_entry.gd" id="2"]
+
+[sub_resource type="Resource" id="zone_shallows"]
+script = ExtResource("2")
+zone_name = "Shallows"
+zone_type = 0
+min_depth = 0.0
+max_depth = 500.0
+background_color_top = Color(0.3, 0.75, 0.95, 1.0)
+background_color_bottom = Color(0.15, 0.55, 0.8, 1.0)
+ambient_particle_density = 0.5
+
+[sub_resource type="Resource" id="zone_ocean"]
+script = ExtResource("2")
+zone_name = "Open Ocean"
+zone_type = 1
+min_depth = 500.0
+max_depth = 1500.0
+background_color_top = Color(0.15, 0.55, 0.8, 1.0)
+background_color_bottom = Color(0.08, 0.35, 0.6, 1.0)
+ambient_particle_density = 0.8
+
+[sub_resource type="Resource" id="zone_deep"]
+script = ExtResource("2")
+zone_name = "Deep Ocean"
+zone_type = 2
+min_depth = 1500.0
+max_depth = 3500.0
+background_color_top = Color(0.08, 0.35, 0.6, 1.0)
+background_color_bottom = Color(0.03, 0.15, 0.35, 1.0)
+ambient_particle_density = 1.2
+
+[sub_resource type="Resource" id="zone_abyss"]
+script = ExtResource("2")
+zone_name = "The Abyss"
+zone_type = 3
+min_depth = 3500.0
+max_depth = 9999.0
+background_color_top = Color(0.03, 0.15, 0.35, 1.0)
+background_color_bottom = Color(0.01, 0.05, 0.15, 1.0)
+ambient_particle_density = 1.5
+
+[resource]
+script = ExtResource("1")
+zones = [SubResource("zone_shallows"), SubResource("zone_ocean"), SubResource("zone_deep"), SubResource("zone_abyss")]

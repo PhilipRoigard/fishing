@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Product" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/product.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "fisher_pass"
+display_name = "Fisher Pass"
+description = "100 gems per day for 30 days."
+type = "subscription"
+category = "Bundles"
+gem_amount = 100
+store_price_usd = 9.99
+is_consumable = false

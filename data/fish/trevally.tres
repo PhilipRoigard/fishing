@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FishData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/fish_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "trevally"
+display_name = "Trevally"
+rarity = 1
+sell_value_coins = 20
+min_depth = 100.0
+max_depth = 450.0
+biome_flags = 2
+spawn_weight = 5.0
+min_school_size = 2
+max_school_size = 3
+swim_speed = 60.0
+separation_radius = 28.0
+scatter_on_catch = true
+fight_speed = 55.0
+fight_erratic = 0.35
+fight_stamina = 0.75
+tension_generation = 0.55
+phase_count = 1
