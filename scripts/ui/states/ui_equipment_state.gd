@@ -407,12 +407,20 @@ func _create_shop_card(shop_item: ShopItem, player_level: int) -> PanelContainer
 	icon.texture = _get_item_icon(shop_item.item_id, shop_item.equipment_type)
 	icon_center.add_child(icon)
 
-	var name_label: Label = Label.new()
-	name_label.text = shop_item.display_name
-	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_label.add_theme_font_size_override("font_size", 11)
-	name_label.add_theme_color_override("font_color", Color.WHITE)
-	card_vbox.add_child(name_label)
+	var name_btn: Button = Button.new()
+	name_btn.text = shop_item.display_name
+	name_btn.custom_minimum_size = Vector2(0, 20)
+	name_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_btn.add_theme_font_size_override("font_size", 11)
+	name_btn.add_theme_color_override("font_color", Color.WHITE)
+	name_btn.flat = true
+	name_btn.pressed.connect(_on_shop_card_pressed.bind(shop_item))
+	card_vbox.add_child(name_btn)
+
+	icon_center.gui_input.connect(func(event: InputEvent) -> void:
+		if event is InputEventMouseButton and event.pressed:
+			_on_shop_card_pressed(shop_item)
+	)
 
 	var buy_btn: Button = Button.new()
 	if not meets_level:
@@ -436,7 +444,33 @@ func _create_shop_card(shop_item: ShopItem, player_level: int) -> PanelContainer
 
 func _on_shop_card_pressed(shop_item: ShopItem) -> void:
 	HapticManager.light_tap()
-	state_machine.show_tooltip(shop_item.display_name + " (" + Enums.QUALITY_NAMES.get(shop_item.quality, "Common") + ")\n\nType: " + shop_item.equipment_type.capitalize() + "\nCost: " + str(shop_item.cost_coins) + " coins\nRequires: Lv." + str(shop_item.required_level))
+	var quality_name: String = Enums.QUALITY_NAMES.get(shop_item.quality, "Common")
+	var info: String = shop_item.display_name + "\n" + quality_name + "\n"
+
+	if GameResources.config and GameResources.config.equipment_catalogue:
+		var cat: Variant = GameResources.config.equipment_catalogue
+		match shop_item.equipment_type:
+			"rod":
+				var data: Variant = cat.get_rod_by_id(shop_item.item_id)
+				if data:
+					info += "\nCast Depth: " + str(int(data.cast_depth_range)) + "m"
+					info += "\nReel Speed: " + str(snapped(data.reel_speed, 0.1)) + "x"
+					info += "\nTension Resist: " + str(snapped(data.tension_resistance, 0.1)) + "x"
+			"hook":
+				var data: Variant = cat.get_hook_by_id(shop_item.item_id)
+				if data:
+					info += "\nBite Window: +" + str(snapped(data.bite_window_bonus, 0.1)) + "s"
+					info += "\nCatch Rate: +" + str(int(data.catch_rate_bonus * 100)) + "%"
+			"lure":
+				var data: Variant = cat.get_lure_by_id(shop_item.item_id)
+				if data:
+					info += "\nRare Fish: +" + str(int(data.rare_fish_chance_bonus * 100)) + "%"
+					info += "\nBite Speed: +" + str(snapped(data.bite_speed_bonus, 0.1)) + "s"
+
+	info += "\n\nCost: " + str(shop_item.cost_coins) + " coins"
+	info += "\nRequires: Lv." + str(shop_item.required_level)
+
+	state_machine.show_tooltip(info)
 
 
 func _on_buy_pressed(shop_item: ShopItem) -> void:
