@@ -365,13 +365,10 @@ func _create_shop_card(shop_item: ShopItem, player_level: int) -> PanelContainer
 	var meets_level: bool = player_level >= shop_item.required_level
 	var can_afford: bool = CurrencyManager.can_afford_coins(shop_item.cost_coins)
 
+	var quality_bg: Color = QUALITY_BG_COLORS.get(Enums.ItemQuality.COMMON, Color(0.3, 0.3, 0.3))
 	var style: StyleBoxFlat = StyleBoxFlat.new()
-	if meets_level:
-		style.bg_color = Color(0.12, 0.18, 0.25)
-		style.border_color = Color(0.3, 0.5, 0.7)
-	else:
-		style.bg_color = Color(0.1, 0.1, 0.12)
-		style.border_color = Color(0.2, 0.2, 0.25)
+	style.bg_color = quality_bg
+	style.border_color = quality_bg.lightened(0.3)
 	style.border_width_bottom = 1
 	style.border_width_top = 1
 	style.border_width_left = 1
@@ -400,15 +397,13 @@ func _create_shop_card(shop_item: ShopItem, player_level: int) -> PanelContainer
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	icon.texture = _get_item_icon(shop_item.item_id, shop_item.equipment_type)
-	if not meets_level:
-		icon.modulate = Color(0.4, 0.4, 0.4)
 	icon_center.add_child(icon)
 
 	var name_label: Label = Label.new()
 	name_label.text = shop_item.display_name
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.add_theme_font_size_override("font_size", 11)
-	name_label.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9) if meets_level else Color(0.5, 0.5, 0.5))
+	name_label.add_theme_color_override("font_color", Color(0.95, 0.95, 0.95))
 	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD
 	card_vbox.add_child(name_label)
 
@@ -434,7 +429,7 @@ func _create_shop_card(shop_item: ShopItem, player_level: int) -> PanelContainer
 		lock_label.text = "Requires Lv." + str(shop_item.required_level)
 		lock_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		lock_label.add_theme_font_size_override("font_size", 9)
-		lock_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
+		lock_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 		card_vbox.add_child(lock_label)
 	else:
 		var buy_btn: Button = Button.new()
@@ -444,6 +439,8 @@ func _create_shop_card(shop_item: ShopItem, player_level: int) -> PanelContainer
 		buy_btn.disabled = not can_afford
 		buy_btn.pressed.connect(_on_buy_pressed.bind(shop_item))
 		card_vbox.add_child(buy_btn)
+
+	panel.mouse_filter = Control.MOUSE_FILTER_PASS
 
 	return panel
 
