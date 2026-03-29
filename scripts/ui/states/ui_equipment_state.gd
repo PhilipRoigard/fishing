@@ -40,19 +40,22 @@ class ShopItem:
 	var display_name: String
 	var cost_coins: int
 	var required_level: int
+	var quality: int
 
 	func _init(
 		p_item_id: String = "",
 		p_type: String = "",
 		p_name: String = "",
 		p_cost: int = 0,
-		p_level: int = 1
+		p_level: int = 1,
+		p_quality: int = 0
 	) -> void:
 		item_id = p_item_id
 		equipment_type = p_type
 		display_name = p_name
 		cost_coins = p_cost
 		required_level = p_level
+		quality = p_quality
 
 
 var shop_items: Array[ShopItem] = []
@@ -65,13 +68,13 @@ func _init() -> void:
 
 func _build_shop_items() -> void:
 	shop_items.clear()
-	shop_items.append(ShopItem.new("bronze_rod", "rod", "Bronze Rod", 300, 2))
-	shop_items.append(ShopItem.new("barbed_hook", "hook", "Barbed Hook", 200, 2))
-	shop_items.append(ShopItem.new("shiny_lure", "lure", "Shiny Lure", 500, 4))
-	shop_items.append(ShopItem.new("silver_rod", "rod", "Silver Rod", 800, 4))
-	shop_items.append(ShopItem.new("titanium_hook", "hook", "Titanium Hook", 600, 6))
-	shop_items.append(ShopItem.new("golden_lure", "lure", "Golden Lure", 1000, 6))
-	shop_items.append(ShopItem.new("gold_rod", "rod", "Gold Rod", 2000, 8))
+	shop_items.append(ShopItem.new("bronze_rod", "rod", "Bronze Rod", 300, 2, Enums.ItemQuality.UNCOMMON))
+	shop_items.append(ShopItem.new("barbed_hook", "hook", "Barbed Hook", 200, 2, Enums.ItemQuality.UNCOMMON))
+	shop_items.append(ShopItem.new("shiny_lure", "lure", "Shiny Lure", 500, 4, Enums.ItemQuality.RARE))
+	shop_items.append(ShopItem.new("silver_rod", "rod", "Silver Rod", 800, 4, Enums.ItemQuality.RARE))
+	shop_items.append(ShopItem.new("titanium_hook", "hook", "Titanium Hook", 600, 6, Enums.ItemQuality.EPIC))
+	shop_items.append(ShopItem.new("golden_lure", "lure", "Golden Lure", 1000, 6, Enums.ItemQuality.EPIC))
+	shop_items.append(ShopItem.new("gold_rod", "rod", "Gold Rod", 2000, 8, Enums.ItemQuality.LEGENDARY))
 
 
 func enter(_meta: Variant = null) -> void:
@@ -365,7 +368,7 @@ func _create_shop_card(shop_item: ShopItem, player_level: int) -> PanelContainer
 	var meets_level: bool = player_level >= shop_item.required_level
 	var can_afford: bool = CurrencyManager.can_afford_coins(shop_item.cost_coins)
 
-	var quality_bg: Color = QUALITY_BG_COLORS.get(Enums.ItemQuality.COMMON, Color(0.3, 0.3, 0.3))
+	var quality_bg: Color = QUALITY_BG_COLORS.get(shop_item.quality, Color(0.3, 0.3, 0.3))
 	var style: StyleBoxFlat = StyleBoxFlat.new()
 	style.bg_color = quality_bg
 	style.border_color = quality_bg.lightened(0.3)
