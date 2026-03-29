@@ -411,51 +411,25 @@ func _create_shop_card(shop_item: ShopItem, player_level: int) -> PanelContainer
 	name_label.text = shop_item.display_name
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.add_theme_font_size_override("font_size", 11)
-	name_label.add_theme_color_override("font_color", Color(0.95, 0.95, 0.95))
-	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD
+	name_label.add_theme_color_override("font_color", Color.WHITE)
 	card_vbox.add_child(name_label)
 
-	var type_label: Label = Label.new()
-	type_label.text = shop_item.equipment_type.capitalize()
-	type_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	type_label.add_theme_font_size_override("font_size", 9)
-	type_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.6))
-	card_vbox.add_child(type_label)
-
-	var cost_label: Label = Label.new()
-	cost_label.text = str(shop_item.cost_coins) + " coins"
-	cost_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	cost_label.add_theme_font_size_override("font_size", 10)
-	if can_afford and meets_level:
-		cost_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0))
-	else:
-		cost_label.add_theme_color_override("font_color", Color(0.6, 0.4, 0.4))
-	card_vbox.add_child(cost_label)
-
+	var buy_btn: Button = Button.new()
 	if not meets_level:
-		var lock_label: Label = Label.new()
-		lock_label.text = "Requires Lv." + str(shop_item.required_level)
-		lock_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		lock_label.add_theme_font_size_override("font_size", 9)
-		lock_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
-		card_vbox.add_child(lock_label)
+		buy_btn.text = "Lv." + str(shop_item.required_level) + " | " + str(shop_item.cost_coins)
+		buy_btn.disabled = true
+	elif not can_afford:
+		buy_btn.text = str(shop_item.cost_coins) + " coins"
+		buy_btn.disabled = true
 	else:
-		var buy_btn: Button = Button.new()
-		buy_btn.text = "Buy"
-		buy_btn.custom_minimum_size = Vector2(60, 28)
-		buy_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		buy_btn.disabled = not can_afford
-		buy_btn.pressed.connect(_on_buy_pressed.bind(shop_item))
-		card_vbox.add_child(buy_btn)
+		buy_btn.text = "Buy " + str(shop_item.cost_coins)
+	buy_btn.custom_minimum_size = Vector2(80, 26)
+	buy_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	buy_btn.add_theme_font_size_override("font_size", 10)
+	buy_btn.pressed.connect(_on_buy_pressed.bind(shop_item))
+	card_vbox.add_child(buy_btn)
 
 	panel.mouse_filter = Control.MOUSE_FILTER_PASS
-
-	var tap_btn: Button = Button.new()
-	tap_btn.set_anchors_preset(Control.PRESET_FULL_RECT)
-	tap_btn.modulate = Color(1, 1, 1, 0)
-	tap_btn.mouse_filter = Control.MOUSE_FILTER_PASS
-	tap_btn.pressed.connect(_on_shop_card_pressed.bind(shop_item))
-	panel.add_child(tap_btn)
 
 	return panel
 
@@ -602,7 +576,7 @@ func _get_item_icon(item_id: String, equipment_type: String) -> Texture2D:
 				"silver_rod":
 					atlas.region = Rect2(81, 2, 15, 15)
 				"gold_rod":
-					atlas.region = Rect2(49, 17, 15, 15)
+					atlas.region = Rect2(81, 2, 15, 15)
 				_:
 					atlas.region = Rect2(49, 2, 15, 14)
 			return atlas
