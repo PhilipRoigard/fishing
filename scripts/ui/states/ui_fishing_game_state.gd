@@ -19,6 +19,9 @@ var progress_bar: Control
 var tension_bar: Control
 var reel_zone: Control
 
+var fish_name_label: Label
+var tutorial_label: Label
+
 var is_fighting: bool = false
 var bite_flash_tween: Tween
 var feedback_tween: Tween
@@ -223,9 +226,23 @@ func _build_layout() -> void:
 	feedback_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(feedback_label)
 
+	tutorial_label = Label.new()
+	tutorial_label.text = ""
+	tutorial_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tutorial_label.set_anchors_preset(Control.PRESET_CENTER)
+	tutorial_label.offset_left = -160
+	tutorial_label.offset_right = 160
+	tutorial_label.offset_top = 60
+	tutorial_label.offset_bottom = 100
+	tutorial_label.add_theme_font_size_override("font_size", 18)
+	tutorial_label.add_theme_color_override("font_color", Color(0.9, 0.95, 1.0, 0.9))
+	tutorial_label.visible = false
+	tutorial_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(tutorial_label)
+
 	fight_container = VBoxContainer.new()
 	fight_container.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	fight_container.offset_top = -220
+	fight_container.offset_top = -240
 	fight_container.offset_bottom = -10
 	fight_container.offset_left = 12
 	fight_container.offset_right = -12
@@ -233,6 +250,13 @@ func _build_layout() -> void:
 	fight_container.visible = false
 	fight_container.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(fight_container)
+
+	fish_name_label = Label.new()
+	fish_name_label.text = ""
+	fish_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	fish_name_label.add_theme_font_size_override("font_size", 16)
+	fish_name_label.visible = false
+	fight_container.add_child(fish_name_label)
 
 	var progress_header: HBoxContainer = HBoxContainer.new()
 	fight_container.add_child(progress_header)
@@ -299,7 +323,8 @@ func _on_cast_strength_changed(strength: float) -> void:
 				min_depth = GameResources.config.fishing_config.min_cast_depth
 				max_depth = GameResources.config.fishing_config.max_cast_depth_base
 			var preview_depth: int = int(min_depth + strength * (max_depth - min_depth))
-			cast_depth_preview_label.text = "~" + str(preview_depth) + "m"
+			var zone_name: String = _get_depth_zone_name(strength)
+			cast_depth_preview_label.text = "~" + str(preview_depth) + "m (" + zone_name + ")"
 			cast_depth_preview_label.visible = true
 		else:
 			cast_depth_preview_label.visible = false
@@ -331,6 +356,9 @@ func _on_fishing_state_changed(state: int) -> void:
 				bite_flash_label.visible = false
 			if bite_tap_label:
 				bite_tap_label.visible = false
+			if fish_name_label:
+				fish_name_label.visible = false
+			_show_tutorial_hint("Hold anywhere to charge your cast!")
 		Enums.FishingState.CASTING:
 			if depth_label:
 				depth_label.text = "Charging cast..."
@@ -341,6 +369,7 @@ func _on_fishing_state_changed(state: int) -> void:
 				bite_flash_label.visible = false
 			if bite_tap_label:
 				bite_tap_label.visible = false
+			_show_tutorial_hint("Wait for a fish to bite...")
 
 
 func _on_bite_occurred(_fish_id: String) -> void:
@@ -376,6 +405,7 @@ func _on_bite_occurred(_fish_id: String) -> void:
 
 	if cast_power_label:
 		cast_power_label.text = "TAP NOW!"
+	_show_tutorial_hint("TAP to hook the fish!")
 
 
 func _flash_screen(color: Color, duration: float) -> void:
@@ -421,7 +451,7 @@ func _shake_ui(duration: float, intensity: float) -> void:
 	shake_tween.tween_property(self, "position", original_position, 0.03)
 
 
-func _on_fight_started(_fish_id: String) -> void:
+func _on_fight_started(fish_id: String) -> void:
 	is_fighting = true
 	if bite_flash_label:
 		bite_flash_label.visible = false
@@ -437,6 +467,62 @@ func _on_fight_started(_fish_id: String) -> void:
 		return_button.visible = false
 	if cast_power_label:
 		cast_power_label.text = "Hold to reel!"
+	_show_fish_name(fish_id)
+	_show_tutorial_hint("Hold to reel, release to manage tension!")
+
+
+func _get_rarity_color(rarity: int) -> Color:
+	match rarity:
+		Enums.Rarity.COMMON:
+			return Color(0.8, 0.8, 0.8)
+		Enums.Rarity.UNCOMMON:
+			return Color(0.2, 0.9, 0.3)
+		Enums.Rarity.RARE:
+			return Color(0.3, 0.5, 1.0)
+		Enums.Rarity.LEGENDARY:
+			return Color(1.0, 0.7, 0.1)
+	return Color.WHITE
+
+
+func _show_fish_name(fish_id: String) -> void:
+	if not fish_name_label:
+		return
+	var fish_name: String = fish_id
+	var rarity_color: Color = Color.WHITE
+	if Main.instance and Main.instance.database_system:
+		var fd: Variant = Main.instance.database_system.get_fish_by_id(fish_id)
+		if fd:
+			fish_name = fd.display_name
+			rarity_color = _get_rarity_color(fd.rarity)
+	fish_name_label.text = "Fighting: " + fish_name
+	fish_name_label.add_theme_color_override("font_color", rarity_color)
+	fish_name_label.visible = true
+
+
+func _is_first_session() -> bool:
+	if Main.instance and Main.instance.player_state_system:
+		var state: Variant = Main.instance.player_state_system.get_state()
+		if state and state.total_fish_caught == 0:
+			return true
+	return false
+
+
+func _get_depth_zone_name(strength: float) -> String:
+	if strength < 0.33:
+		return "Shallow"
+	elif strength < 0.66:
+		return "Ocean"
+	return "Deep"
+
+
+func _show_tutorial_hint(hint_text: String) -> void:
+	if not tutorial_label:
+		return
+	if not _is_first_session():
+		tutorial_label.visible = false
+		return
+	tutorial_label.text = hint_text
+	tutorial_label.visible = true
 
 
 func _on_fight_progress_changed(progress: float) -> void:
@@ -513,6 +599,10 @@ func _hide_fight_ui() -> void:
 		bite_flash_label.visible = false
 	if bite_tap_label:
 		bite_tap_label.visible = false
+	if fish_name_label:
+		fish_name_label.visible = false
+	if tutorial_label:
+		tutorial_label.visible = false
 
 
 func _on_return_pressed() -> void:

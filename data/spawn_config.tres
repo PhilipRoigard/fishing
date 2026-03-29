@@ -4,8 +4,8 @@
 
 [resource]
 script = ExtResource("1")
-max_fish_on_screen = 25
-spawn_interval = 2.0
+max_fish_on_screen = 35
+spawn_interval = 1.2
 initial_spawn_delay = 0.5
 despawn_distance = 800.0
 spawn_margin = 20.0

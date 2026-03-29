@@ -19,6 +19,8 @@ const CurrencyBarScript: GDScript = preload("res://scripts/ui/components/currenc
 func enter(_meta: Variant = null) -> void:
 	super(_meta)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if not SignalBus.fish_caught.is_connected(_on_fish_caught):
+		SignalBus.fish_caught.connect(_on_fish_caught)
 	_build_layout()
 	_refresh_display()
 
@@ -31,7 +33,7 @@ func exit() -> void:
 func _build_layout() -> void:
 	var top_panel: PanelContainer = PanelContainer.new()
 	top_panel.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	top_panel.offset_bottom = 150
+	top_panel.offset_bottom = 105
 	var top_style: StyleBoxFlat = StyleBoxFlat.new()
 	top_style.bg_color = Color(0.05, 0.08, 0.15, 0.75)
 	top_panel.add_theme_stylebox_override("panel", top_style)
@@ -39,43 +41,52 @@ func _build_layout() -> void:
 	add_child(top_panel)
 
 	var top_margin: MarginContainer = MarginContainer.new()
-	top_margin.add_theme_constant_override("margin_top", 10)
+	top_margin.add_theme_constant_override("margin_top", 6)
 	top_margin.add_theme_constant_override("margin_left", 12)
 	top_margin.add_theme_constant_override("margin_right", 12)
-	top_margin.add_theme_constant_override("margin_bottom", 8)
+	top_margin.add_theme_constant_override("margin_bottom", 6)
 	top_panel.add_child(top_margin)
 
 	var top_vbox: VBoxContainer = VBoxContainer.new()
-	top_vbox.add_theme_constant_override("separation", 4)
+	top_vbox.add_theme_constant_override("separation", 2)
 	top_margin.add_child(top_vbox)
 
-	currency_bar_instance = CurrencyBarScript.new()
-	top_vbox.add_child(currency_bar_instance)
+	var level_currency_row: HBoxContainer = HBoxContainer.new()
+	level_currency_row.add_theme_constant_override("separation", 12)
+	top_vbox.add_child(level_currency_row)
 
 	level_label = Label.new()
 	level_label.text = "Level 1"
-	level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	top_vbox.add_child(level_label)
+	level_label.add_theme_font_size_override("font_size", 13)
+	level_currency_row.add_child(level_label)
+
+	currency_bar_instance = CurrencyBarScript.new()
+	currency_bar_instance.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	level_currency_row.add_child(currency_bar_instance)
 
 	equipment_label = Label.new()
 	equipment_label.text = "No rod equipped"
 	equipment_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	equipment_label.add_theme_font_size_override("font_size", 12)
+	equipment_label.add_theme_font_size_override("font_size", 11)
+	equipment_label.add_theme_color_override("font_color", Color(0.7, 0.75, 0.85))
 	top_vbox.add_child(equipment_label)
 
+	var catch_row: HBoxContainer = HBoxContainer.new()
+	catch_row.add_theme_constant_override("separation", 16)
+	catch_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	top_vbox.add_child(catch_row)
+
 	session_catch_label = Label.new()
-	session_catch_label.text = "Today's Catch: 0 fish"
-	session_catch_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	session_catch_label.text = "Today: 0 fish"
 	session_catch_label.add_theme_font_size_override("font_size", 11)
 	session_catch_label.add_theme_color_override("font_color", Color(0.6, 0.85, 1.0))
-	top_vbox.add_child(session_catch_label)
+	catch_row.add_child(session_catch_label)
 
 	best_catch_label = Label.new()
-	best_catch_label.text = "Best Catch: None yet"
-	best_catch_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	best_catch_label.text = "Best: None yet"
 	best_catch_label.add_theme_font_size_override("font_size", 11)
 	best_catch_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0))
-	top_vbox.add_child(best_catch_label)
+	catch_row.add_child(best_catch_label)
 
 	var bottom_panel: PanelContainer = PanelContainer.new()
 	bottom_panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
@@ -113,17 +124,17 @@ func _refresh_display() -> void:
 		level_label.text = "Fisherman Lv." + str(current_level)
 
 	if equipment_label:
-		var lines: Array[String] = []
 		var rod_entry: Variant = EquipmentManager.get_equipped(Enums.EquipmentSlot.ROD) if EquipmentManager else null
 		var hook_entry: Variant = EquipmentManager.get_equipped(Enums.EquipmentSlot.HOOK) if EquipmentManager else null
 		var lure_entry: Variant = EquipmentManager.get_equipped(Enums.EquipmentSlot.LURE) if EquipmentManager else null
-		lines.append("Rod: " + _get_equip_display(rod_entry, "rod"))
-		lines.append("Hook: " + _get_equip_display(hook_entry, "hook"))
-		lines.append("Lure: " + _get_equip_display(lure_entry, "lure"))
-		equipment_label.text = "\n".join(lines)
+		var parts: Array[String] = []
+		parts.append(_get_equip_display(rod_entry, "rod"))
+		parts.append(_get_equip_display(hook_entry, "hook"))
+		parts.append(_get_equip_display(lure_entry, "lure"))
+		equipment_label.text = " | ".join(parts)
 
 	if session_catch_label:
-		session_catch_label.text = "Today's Catch: " + str(session_fish_count) + " fish"
+		session_catch_label.text = "Today: " + str(session_fish_count) + " fish"
 
 	if best_catch_label:
 		if session_best_fish_id != "":
@@ -132,9 +143,9 @@ func _refresh_display() -> void:
 				var fish_data: Variant = Main.instance.database_system.get_fish_by_id(session_best_fish_id)
 				if fish_data:
 					best_name = fish_data.display_name
-			best_catch_label.text = "Best Catch: " + best_name
+			best_catch_label.text = "Best: " + best_name
 		else:
-			best_catch_label.text = "Best Catch: None yet"
+			best_catch_label.text = "Best: None yet"
 
 
 func _get_equip_display(entry: Variant, equipment_type: String) -> String:
@@ -177,13 +188,11 @@ func _on_tab_changed(tab_index: int) -> void:
 
 
 func _setup_connections() -> void:
-	if not SignalBus.fish_caught.is_connected(_on_fish_caught):
-		SignalBus.fish_caught.connect(_on_fish_caught)
+	pass
 
 
 func _cleanup_connections() -> void:
-	if SignalBus.fish_caught.is_connected(_on_fish_caught):
-		SignalBus.fish_caught.disconnect(_on_fish_caught)
+	pass
 
 
 func _on_fish_caught(fish_id: String) -> void:
