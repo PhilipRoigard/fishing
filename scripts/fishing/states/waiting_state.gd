@@ -1,24 +1,28 @@
 extends BaseState
 
 var target_depth: float = 0.0
-var bite_timer: float = 0.0
-var bite_delay: float = 0.0
 var fishing_config: FishingConfig
-var nibble_timer: float = 0.0
-var nibble_interval: float = 2.0
+var hook_node: Area2D
+var check_timer: float = 0.0
+var attract_timer: float = 0.0
+var has_attracted: bool = false
+
+const BITE_RADIUS: float = 35.0
+const CHECK_INTERVAL: float = 0.2
+const ATTRACT_DELAY: float = 1.0
+const MAX_WAIT_TIME: float = 8.0
+var total_wait_time: float = 0.0
 
 
 func enter(meta: Dictionary = {}) -> void:
 	target_depth = meta.get("depth", 100.0)
 	if GameResources.config:
 		fishing_config = GameResources.config.fishing_config
-	if fishing_config:
-		bite_delay = randf_range(fishing_config.bite_delay_min, fishing_config.bite_delay_max)
-	else:
-		bite_delay = randf_range(3.0, 8.0)
-	bite_timer = 0.0
-	nibble_timer = 0.0
-	nibble_interval = randf_range(1.0, 3.0)
+	check_timer = 0.0
+	attract_timer = 0.0
+	has_attracted = false
+	total_wait_time = 0.0
+	_find_hook()
 	SignalBus.fishing_state_changed.emit(Enums.FishingState.WAITING)
 
 
@@ -27,26 +31,120 @@ func exit() -> void:
 
 
 func update(delta: float) -> void:
-	bite_timer += delta
-	nibble_timer += delta
+	total_wait_time += delta
+	check_timer += delta
+	attract_timer += delta
 
-	if nibble_timer >= nibble_interval:
-		nibble_timer = 0.0
-		nibble_interval = randf_range(1.0, 3.0)
-		SignalBus.show_floating_text.emit("...", Vector2(200, 300), Color(1.0, 1.0, 1.0, 0.5))
+	if not has_attracted and attract_timer >= ATTRACT_DELAY:
+		has_attracted = true
+		_attract_nearby_fish()
 
-	if bite_timer >= bite_delay:
-		_trigger_bite()
+	if check_timer >= CHECK_INTERVAL:
+		check_timer = 0.0
+		var biting_fish: Node = _find_fish_near_hook()
+		if biting_fish:
+			_trigger_bite_from_fish(biting_fish)
+			return
+
+	if total_wait_time >= MAX_WAIT_TIME:
+		_force_attract_fish()
+		total_wait_time = 10.0
 
 
-func _trigger_bite() -> void:
-	var fish_data: FishData = null
-	if Main.instance and Main.instance.database_system:
-		fish_data = Main.instance.database_system.get_fish_for_depth(target_depth)
+func _find_hook() -> void:
+	if Main.instance:
+		hook_node = Main.instance.get_node_or_null("FishingLevel/HookLayer/Hook") as Area2D
 
-	if fish_data:
-		state_machine.change_state(&"bite_alert", {"fish_id": fish_data.id, "depth": target_depth})
-	else:
-		bite_timer = 0.0
-		if fishing_config:
-			bite_delay = randf_range(fishing_config.bite_delay_min, fishing_config.bite_delay_max)
+
+func _find_fish_near_hook() -> Node:
+	if not hook_node:
+		return null
+
+	var hook_pos: Vector2 = hook_node.global_position
+	var fish_layer: Node = null
+	if Main.instance:
+		fish_layer = Main.instance.get_node_or_null("FishingLevel/FishLayer")
+	if not fish_layer:
+		return null
+
+	var closest_fish: Node = null
+	var closest_dist: float = BITE_RADIUS
+
+	for school: Node in fish_layer.get_children():
+		for fish_node: Node in school.get_children():
+			if not (fish_node is SwimmingFish):
+				continue
+			var fish: SwimmingFish = fish_node as SwimmingFish
+			if fish.is_caught:
+				continue
+			var dist: float = fish.global_position.distance_to(hook_pos)
+			if dist < closest_dist:
+				closest_dist = dist
+				closest_fish = fish
+
+	return closest_fish
+
+
+func _trigger_bite_from_fish(fish_node: Node) -> void:
+	var fish: SwimmingFish = fish_node as SwimmingFish
+	if not fish or not fish.fish_data:
+		return
+
+	state_machine.change_state(&"bite_alert", {
+		"fish_id": fish.fish_data.id,
+		"depth": target_depth,
+		"fish_node": fish,
+	})
+
+
+func _attract_nearby_fish() -> void:
+	if not hook_node:
+		return
+
+	var hook_pos: Vector2 = hook_node.global_position
+	var fish_layer: Node = null
+	if Main.instance:
+		fish_layer = Main.instance.get_node_or_null("FishingLevel/FishLayer")
+	if not fish_layer:
+		return
+
+	var attracted_count: int = 0
+	for school: Node in fish_layer.get_children():
+		for fish_node: Node in school.get_children():
+			if not (fish_node is SwimmingFish):
+				continue
+			var fish: SwimmingFish = fish_node as SwimmingFish
+			if fish.is_caught or fish._is_curious:
+				continue
+			var dist: float = fish.global_position.distance_to(hook_pos)
+			if dist < 300.0 and attracted_count < 3:
+				fish._is_curious = true
+				fish._curiosity_target = hook_pos + Vector2(randf_range(-10.0, 10.0), randf_range(-10.0, 10.0))
+				fish._curiosity_timer = randf_range(5.0, 10.0)
+				fish._nibble_timer = randf_range(0.3, 1.0)
+				attracted_count += 1
+
+
+func _force_attract_fish() -> void:
+	if not hook_node:
+		return
+
+	var hook_pos: Vector2 = hook_node.global_position
+	var fish_layer: Node = null
+	if Main.instance:
+		fish_layer = Main.instance.get_node_or_null("FishingLevel/FishLayer")
+	if not fish_layer:
+		return
+
+	for school: Node in fish_layer.get_children():
+		for fish_node: Node in school.get_children():
+			if not (fish_node is SwimmingFish):
+				continue
+			var fish: SwimmingFish = fish_node as SwimmingFish
+			if fish.is_caught:
+				continue
+			fish._is_curious = true
+			fish._curiosity_target = hook_pos + Vector2(randf_range(-8.0, 8.0), randf_range(-8.0, 8.0))
+			fish._curiosity_timer = randf_range(8.0, 15.0)
+			fish._nibble_timer = randf_range(0.2, 0.5)
+			return

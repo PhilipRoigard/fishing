@@ -52,14 +52,22 @@ var jump_elapsed: float = 0.0
 var reel_line_flash_timer: float = 0.0
 
 
+var caught_fish_node: Node = null
+
 func enter(meta: Dictionary = {}) -> void:
 	fish_id = meta.get("fish_id", "")
 	depth = meta.get("depth", 0.0)
+	caught_fish_node = meta.get("fish_node", null)
 
 	if GameResources.config:
 		fishing_config = GameResources.config.fishing_config
 	if Main.instance and Main.instance.database_system:
 		fish_data = Main.instance.database_system.get_fish_by_id(fish_id)
+
+	if caught_fish_node and is_instance_valid(caught_fish_node) and caught_fish_node is SwimmingFish:
+		var sf: SwimmingFish = caught_fish_node as SwimmingFish
+		sf.visible = false
+		sf.is_caught = true
 
 	_find_hook_node()
 

@@ -37,9 +37,9 @@ const SINE_AMPLITUDE: float = 8.0
 const SINE_PERIOD: float = 2.5
 const SEPARATION_RADIUS: float = 25.0
 const SEPARATION_STRENGTH: float = 30.0
-const CURIOSITY_RANGE: float = 150.0
-const CURIOSITY_SPEED_MULT: float = 0.6
-const CURIOSITY_CHANCE: float = 0.3
+const CURIOSITY_RANGE: float = 250.0
+const CURIOSITY_SPEED_MULT: float = 1.2
+const CURIOSITY_CHANCE: float = 0.5
 const NIBBLE_DISTANCE: float = 20.0
 
 signal fish_despawned(fish: SwimmingFish)

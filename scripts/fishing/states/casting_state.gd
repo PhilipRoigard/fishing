@@ -118,7 +118,9 @@ func _spawn_landing_splash() -> void:
 func _find_hook_node() -> void:
 	var fishing_level: Node = _get_fishing_level()
 	if fishing_level:
-		hook_node = fishing_level.get_node_or_null("%Hook")
+		hook_node = fishing_level.get_node_or_null("HookLayer/Hook") as Area2D
+		if not hook_node:
+			hook_node = fishing_level.get_node_or_null("%Hook") as Area2D
 
 
 func _find_rod_tip() -> void:
