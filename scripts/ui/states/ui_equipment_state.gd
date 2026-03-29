@@ -16,7 +16,7 @@ const SLOT_TYPES: Array[Enums.EquipmentSlot] = [
 	Enums.EquipmentSlot.BAIT,
 ]
 
-const FILTER_LABELS: Array[String] = ["All", "Rods", "Hooks", "Lures", "Bait", "Shop"]
+const FILTER_LABELS: Array[String] = ["All", "Rod", "Hk", "Lr", "Bt", "Shop"]
 const FILTER_TYPES: Array[String] = ["", "rod", "hook", "lure", "bait", "shop"]
 const SHOP_FILTER_INDEX: int = 5
 
@@ -91,24 +91,28 @@ func _build_layout() -> void:
 	bg.color = Color(0.03, 0.06, 0.12, 1.0)
 	add_child(bg)
 
+	var back_btn: Button = Button.new()
+	back_btn.text = "<"
+	back_btn.position = Vector2(8, SafeZoneManager.get_top_margin() + 8)
+	back_btn.custom_minimum_size = Vector2(32, 32)
+	back_btn.size = Vector2(32, 32)
+	back_btn.add_theme_font_size_override("font_size", 16)
+	back_btn.pressed.connect(_back)
+	add_child(back_btn)
+
 	var margin: MarginContainer = MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_top", SafeZoneManager.get_top_margin() + 10)
-	margin.add_theme_constant_override("margin_bottom", SafeZoneManager.get_bottom_margin() + 10)
+	margin.add_theme_constant_override("margin_top", SafeZoneManager.get_top_margin() + 8)
+	margin.add_theme_constant_override("margin_bottom", SafeZoneManager.get_bottom_margin() + 8)
 	margin.add_theme_constant_override("margin_left", 12)
 	margin.add_theme_constant_override("margin_right", 12)
 	add_child(margin)
 
 	var vbox: VBoxContainer = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 8)
+	vbox.add_theme_constant_override("separation", 6)
 	margin.add_child(vbox)
 
-	var title: Label = Label.new()
-	title.text = "Equipment"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 20)
-	title.add_theme_color_override("font_color", Color(0.9, 0.85, 0.7))
-	vbox.add_child(title)
+	_build_currency_bar(vbox)
 
 	_build_equipment_slots(vbox)
 
@@ -116,15 +120,15 @@ func _build_layout() -> void:
 	vbox.add_child(sep)
 
 	filter_container = HBoxContainer.new()
-	filter_container.add_theme_constant_override("separation", 4)
+	filter_container.add_theme_constant_override("separation", 2)
 	vbox.add_child(filter_container)
 
 	for i: int in FILTER_LABELS.size():
 		var btn: Button = Button.new()
 		btn.text = FILTER_LABELS[i]
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		btn.custom_minimum_size = Vector2(0, 32)
-		btn.add_theme_font_size_override("font_size", 12)
+		btn.custom_minimum_size = Vector2(0, 28)
+		btn.add_theme_font_size_override("font_size", 10)
 		btn.pressed.connect(_on_filter_pressed.bind(i))
 		filter_container.add_child(btn)
 
@@ -146,6 +150,25 @@ func _build_layout() -> void:
 	grid_margin.add_child(grid)
 
 	_build_bottom_bar(vbox)
+
+
+func _build_currency_bar(parent: VBoxContainer) -> void:
+	var currency_hbox: HBoxContainer = HBoxContainer.new()
+	currency_hbox.add_theme_constant_override("separation", 16)
+	currency_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	parent.add_child(currency_hbox)
+
+	var coin_label: Label = Label.new()
+	coin_label.text = "Coins: " + str(CurrencyManager.coins)
+	coin_label.add_theme_font_size_override("font_size", 12)
+	coin_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0))
+	currency_hbox.add_child(coin_label)
+
+	var gem_label: Label = Label.new()
+	gem_label.text = "Gems: " + str(CurrencyManager.gems)
+	gem_label.add_theme_font_size_override("font_size", 12)
+	gem_label.add_theme_color_override("font_color", Color(0.4, 0.8, 1.0))
+	currency_hbox.add_child(gem_label)
 
 
 func _build_equipment_slots(parent: VBoxContainer) -> void:
@@ -240,13 +263,6 @@ func _build_bottom_bar(parent: VBoxContainer) -> void:
 	var bottom_hbox: HBoxContainer = HBoxContainer.new()
 	bottom_hbox.add_theme_constant_override("separation", 8)
 	parent.add_child(bottom_hbox)
-
-	var back_btn: Button = Button.new()
-	back_btn.text = "Back"
-	back_btn.custom_minimum_size = Vector2(80, 40)
-	back_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	back_btn.pressed.connect(_back)
-	bottom_hbox.add_child(back_btn)
 
 	var equip_tab_btn: Button = Button.new()
 	equip_tab_btn.text = "Equipment"

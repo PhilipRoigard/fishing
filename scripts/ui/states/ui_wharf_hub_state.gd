@@ -65,8 +65,14 @@ func _build_layout() -> void:
 	level_currency_row.add_child(currency_bar_instance)
 
 	var settings_btn: Button = Button.new()
-	settings_btn.text = "S"
-	settings_btn.custom_minimum_size = Vector2(32, 32)
+	settings_btn.text = ""
+	settings_btn.custom_minimum_size = Vector2(36, 36)
+	var gear_atlas: AtlasTexture = AtlasTexture.new()
+	gear_atlas.atlas = preload("res://assets/sprites/ui/sweeper/ui_spritesheet_02.png")
+	gear_atlas.region = Rect2(224, 240, 16, 16)
+	settings_btn.icon = gear_atlas
+	settings_btn.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	settings_btn.expand_icon = true
 	settings_btn.pressed.connect(func() -> void: state_machine.push_state(UIStateMachine.State.SETTINGS))
 	level_currency_row.add_child(settings_btn)
 
