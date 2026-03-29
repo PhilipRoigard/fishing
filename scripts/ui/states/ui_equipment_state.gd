@@ -31,6 +31,7 @@ var grid: GridContainer
 var filter_container: HBoxContainer
 var active_filter: int = 0
 var slot_containers: Array[PanelContainer] = []
+var bottom_bar: HBoxContainer
 var active_tab: int = 0
 
 
@@ -272,6 +273,7 @@ func _build_bottom_bar(parent: VBoxContainer) -> void:
 	var bottom_hbox: HBoxContainer = HBoxContainer.new()
 	bottom_hbox.add_theme_constant_override("separation", 8)
 	parent.add_child(bottom_hbox)
+	bottom_bar = bottom_hbox
 
 	var equip_tab_btn: Button = Button.new()
 	equip_tab_btn.text = "Equipment"
@@ -307,6 +309,9 @@ func _build_bottom_bar(parent: VBoxContainer) -> void:
 func _refresh_all() -> void:
 	_refresh_grid()
 	_update_filter_buttons()
+	if bottom_bar:
+		var is_shop: bool = FILTER_TYPES[active_filter] == "shop"
+		bottom_bar.visible = not is_shop
 
 
 func _update_filter_buttons() -> void:
@@ -445,7 +450,19 @@ func _create_shop_card(shop_item: ShopItem, player_level: int) -> PanelContainer
 
 	panel.mouse_filter = Control.MOUSE_FILTER_PASS
 
+	var tap_btn: Button = Button.new()
+	tap_btn.set_anchors_preset(Control.PRESET_FULL_RECT)
+	tap_btn.modulate = Color(1, 1, 1, 0)
+	tap_btn.mouse_filter = Control.MOUSE_FILTER_PASS
+	tap_btn.pressed.connect(_on_shop_card_pressed.bind(shop_item))
+	panel.add_child(tap_btn)
+
 	return panel
+
+
+func _on_shop_card_pressed(shop_item: ShopItem) -> void:
+	HapticManager.light_tap()
+	state_machine.show_tooltip(shop_item.display_name + " (" + Enums.QUALITY_NAMES.get(shop_item.quality, "Common") + ")\n\nType: " + shop_item.equipment_type.capitalize() + "\nCost: " + str(shop_item.cost_coins) + " coins\nRequires: Lv." + str(shop_item.required_level))
 
 
 func _on_buy_pressed(shop_item: ShopItem) -> void:
@@ -585,7 +602,7 @@ func _get_item_icon(item_id: String, equipment_type: String) -> Texture2D:
 				"silver_rod":
 					atlas.region = Rect2(81, 2, 15, 15)
 				"gold_rod":
-					atlas.region = Rect2(81, 2, 15, 15)
+					atlas.region = Rect2(49, 17, 15, 15)
 				_:
 					atlas.region = Rect2(49, 2, 15, 14)
 			return atlas
