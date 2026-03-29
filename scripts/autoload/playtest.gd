@@ -4,11 +4,19 @@ func _ready() -> void:
 	await get_tree().create_timer(1.0).timeout
 	var sm: Variant = _get_sm()
 	sm.change_state(2)
-	await get_tree().create_timer(0.5).timeout
-	_ss("hub_gear")
+	await get_tree().create_timer(0.3).timeout
 	sm.push_state(5)
 	await get_tree().create_timer(0.5).timeout
-	_ss("eq_fixed_layout")
+	_ss("eq_grid")
+
+	var first_uuid: String = ""
+	if EquipmentManager.inventory.size() > 0:
+		first_uuid = EquipmentManager.inventory[0].uuid
+	if first_uuid != "":
+		sm.push_state(6, {"uuid": first_uuid})
+		await get_tree().create_timer(0.5).timeout
+		_ss("eq_details_popup")
+
 	print("[PT] Done")
 
 func _ss(n: String) -> void:
