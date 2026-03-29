@@ -38,6 +38,11 @@ func _build_layout() -> void:
 	vbox.add_child(title)
 
 	var scroll: ScrollContainer = ScrollContainer.new()
+	scroll.add_theme_stylebox_override("scroll", StyleBoxEmpty.new())
+	scroll.get_v_scroll_bar().add_theme_stylebox_override("scroll", StyleBoxEmpty.new())
+	scroll.get_v_scroll_bar().add_theme_stylebox_override("grabber", StyleBoxEmpty.new())
+	scroll.get_v_scroll_bar().add_theme_stylebox_override("grabber_highlight", StyleBoxEmpty.new())
+	scroll.get_v_scroll_bar().add_theme_stylebox_override("grabber_pressed", StyleBoxEmpty.new())
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	vbox.add_child(scroll)
 
