@@ -44,8 +44,9 @@ func _build_layout() -> void:
 	popup.set_anchors_preset(Control.PRESET_CENTER)
 	popup.offset_left = -150
 	popup.offset_right = 150
-	popup.offset_top = -160
-	popup.offset_bottom = 160
+	popup.offset_top = -110
+	popup.offset_bottom = 110
+	popup.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var popup_style: StyleBoxFlat = StyleBoxFlat.new()
 	popup_style.bg_color = Color(0.9, 0.88, 0.82)
 	popup_style.corner_radius_top_left = 8
