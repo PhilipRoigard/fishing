@@ -33,6 +33,14 @@ func _add_to_collection(fish_id: String) -> void:
 	var count: int = state.collection_log.get(fish_id, 0) + 1
 	state.collection_log[fish_id] = count
 	state.total_fish_caught += 1
+
+	var caught_quality: int = 0
+	if state.equipped_bait_id.begins_with("bait_q"):
+		caught_quality = state.equipped_bait_id.substr(6).to_int()
+	var best_quality: int = state.collection_best_quality.get(fish_id, -1)
+	if caught_quality > best_quality:
+		state.collection_best_quality[fish_id] = caught_quality
+
 	SignalBus.collection_updated.emit(fish_id, count)
 	SignalBus.save_requested.emit()
 

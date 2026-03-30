@@ -148,7 +148,7 @@ func _create_screens() -> void:
 	_register(UIStateMachine.State.EQUIPMENT, preload("res://scripts/ui/states/ui_equipment_state.gd"))
 	_register_scene(UIStateMachine.State.EQUIPMENT_DETAILS, preload("res://scenes/ui/components/equipment_details_popup.tscn"))
 	_register(UIStateMachine.State.COLLECTION_LOG, preload("res://scripts/ui/states/ui_collection_log_state.gd"))
-	_register(UIStateMachine.State.FISH_DETAILS, preload("res://scripts/ui/states/ui_fish_details_state.gd"))
+	_register_scene(UIStateMachine.State.FISH_DETAILS, preload("res://scenes/ui/components/fish_details_popup.tscn"))
 	_register(UIStateMachine.State.STORE, preload("res://scripts/ui/states/ui_store_state.gd"))
 	_register(UIStateMachine.State.TACKLE_BOX, preload("res://scripts/ui/states/ui_tackle_box_state.gd"))
 	_register(UIStateMachine.State.TACKLE_BOX_REVEAL, preload("res://scripts/ui/states/ui_tackle_box_reveal_state.gd"))

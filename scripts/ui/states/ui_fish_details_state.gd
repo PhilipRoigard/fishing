@@ -1,96 +1,92 @@
 extends UIStateNode
 
+const FISH_ATLAS: Texture2D = preload("res://assets/sprites/fish/FishGame_Fish_Sprite_Sheet.png")
+const FISH_ATLAS_REGIONS: Dictionary = {
+	"sardine": Rect2(0, 0, 16, 16),
+	"snapper": Rect2(16, 0, 16, 16),
+	"anchovy": Rect2(0, 16, 16, 16),
+	"herring": Rect2(16, 16, 16, 16),
+	"pufferfish": Rect2(32, 16, 16, 16),
+	"clownfish": Rect2(48, 16, 16, 16),
+	"flounder": Rect2(0, 32, 16, 16),
+	"tuna": Rect2(16, 32, 16, 16),
+	"trevally": Rect2(32, 32, 16, 16),
+	"mackerel": Rect2(64, 16, 16, 16),
+	"perch": Rect2(80, 0, 16, 16),
+	"barramundi": Rect2(96, 0, 16, 16),
+	"marlin": Rect2(96, 32, 16, 16),
+	"swordfish": Rect2(80, 16, 16, 16),
+	"napoleon_wrasse": Rect2(96, 16, 16, 16),
+	"giant_trevally": Rect2(48, 0, 16, 16),
+	"manta_ray": Rect2(112, 16, 16, 16),
+	"great_white_shark": Rect2(112, 32, 16, 16),
+	"sunfish": Rect2(80, 32, 16, 16),
+	"whale_shark": Rect2(64, 32, 16, 16),
+}
+
+const QUALITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
+
+@onready var background: ColorRect = %Background
+@onready var fish_name_label: Label = %FishName
+@onready var fish_icon: TextureRect = %FishIcon
+@onready var fish_container: PanelContainer = %FishContainer
+@onready var quality_fill: ColorRect = %QualityFill
+@onready var caught_label: Label = %CaughtLabel
+@onready var quality_label: Label = %QualityLabel
+@onready var depth_label: Label = %DepthLabel
+@onready var value_label: Label = %ValueLabel
+
 var fish_id: String = ""
+
+
+func _ready() -> void:
+	if background and not background.gui_input.is_connected(_on_background_input):
+		background.gui_input.connect(_on_background_input)
+
+
+func _on_background_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
+		_back()
 
 
 func enter(meta: Variant = null) -> void:
 	super(meta)
 	if meta is Dictionary:
 		fish_id = meta.get("fish_id", "")
-	_build_layout()
+	_populate_data()
 
 
-func exit() -> void:
-	super()
-	_clear_children()
-
-
-func _build_layout() -> void:
-	var bg: ColorRect = ColorRect.new()
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.color = Color(0.03, 0.06, 0.12, 1.0)
-	add_child(bg)
-
+func _populate_data() -> void:
 	var fish_data: FishData = null
 	if Main.instance and Main.instance.database_system:
 		fish_data = Main.instance.database_system.get_fish_by_id(fish_id)
 
-	var margin: MarginContainer = MarginContainer.new()
-	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_top", SafeZoneManager.get_top_margin() + 20)
-	margin.add_theme_constant_override("margin_bottom", SafeZoneManager.get_bottom_margin() + 20)
-	margin.add_theme_constant_override("margin_left", 24)
-	margin.add_theme_constant_override("margin_right", 24)
-	add_child(margin)
-
-	var vbox: VBoxContainer = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 14)
-	margin.add_child(vbox)
-
 	if not fish_data:
-		var unknown_label: Label = Label.new()
-		unknown_label.text = "Fish not found"
-		vbox.add_child(unknown_label)
-	else:
-		var name_label: Label = Label.new()
-		name_label.text = fish_data.display_name
-		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		vbox.add_child(name_label)
+		fish_name_label.text = "Unknown"
+		return
 
-		var rarity_name: String = Enums.RARITY_NAMES.get(fish_data.rarity, "Common")
-		var rarity_label: Label = Label.new()
-		rarity_label.text = rarity_name
-		rarity_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		vbox.add_child(rarity_label)
+	fish_name_label.text = fish_data.display_name
 
-		var separator: HSeparator = HSeparator.new()
-		vbox.add_child(separator)
+	var atlas_tex: AtlasTexture = AtlasTexture.new()
+	atlas_tex.atlas = FISH_ATLAS
+	atlas_tex.region = FISH_ATLAS_REGIONS.get(fish_data.id, Rect2(0, 0, 16, 16))
+	fish_icon.texture = atlas_tex
 
-		var depth_label: Label = Label.new()
-		depth_label.text = "Depth: " + str(int(fish_data.min_depth)) + "m - " + str(int(fish_data.max_depth)) + "m"
-		vbox.add_child(depth_label)
+	var state: PlayerState = null
+	if Main.instance and Main.instance.player_state_system:
+		state = Main.instance.player_state_system.get_state()
 
-		if fish_data.bait_requirement_id != "":
-			var bait_label: Label = Label.new()
-			bait_label.text = "Requires bait: " + fish_data.bait_requirement_id
-			vbox.add_child(bait_label)
+	var times_caught: int = 0
+	var best_quality: int = 0
+	if state:
+		times_caught = state.collection_log.get(fish_id, 0)
+		best_quality = state.collection_best_quality.get(fish_id, 0)
 
-		var value_label: Label = Label.new()
-		value_label.text = "Sell value: " + str(fish_data.sell_value_coins) + " coins"
-		vbox.add_child(value_label)
+	var quality_color: Color = Enums.QUALITY_COLORS.get(best_quality, Color(0.6, 0.6, 0.6))
+	quality_fill.color = quality_color
 
-		var state: PlayerState = null
-		if Main.instance and Main.instance.player_state_system:
-			state = Main.instance.player_state_system.get_state()
-
-		if state:
-			var times_caught: int = state.collection_log.get(fish_id, 0)
-			var caught_label: Label = Label.new()
-			caught_label.text = "Times caught: " + str(times_caught)
-			vbox.add_child(caught_label)
-
-	var spacer: Control = Control.new()
-	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	vbox.add_child(spacer)
-
-	var back_button: Button = Button.new()
-	back_button.text = "Back"
-	back_button.custom_minimum_size = Vector2(140, 44)
-	back_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	back_button.pressed.connect(_back)
-	vbox.add_child(back_button)
-
-
-func _clear_children() -> void:
-	for child: Node in get_children():
-		child.queue_free()
+	caught_label.text = "Caught: x%d" % times_caught
+	quality_label.text = "Best: %s" % QUALITY_NAMES[mini(best_quality, QUALITY_NAMES.size() - 1)]
+	quality_label.add_theme_color_override("font_color", quality_color)
+	depth_label.text = "Depth: %dm - %dm" % [int(fish_data.min_depth), int(fish_data.max_depth)]
+	value_label.text = "Sell: %d coins" % fish_data.sell_value_coins

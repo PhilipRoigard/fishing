@@ -77,9 +77,9 @@ func _build_layout() -> void:
 	vbox.add_child(scroll)
 
 	grid = GridContainer.new()
-	grid.columns = 3
-	grid.add_theme_constant_override("h_separation", 8)
-	grid.add_theme_constant_override("v_separation", 8)
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 6)
+	grid.add_theme_constant_override("v_separation", 6)
 	scroll.add_child(grid)
 
 
@@ -106,12 +106,14 @@ func _refresh_grid() -> void:
 
 	for fish_data: FishData in fish_db.fish:
 		var times_caught: int = 0
+		var best_quality: int = -1
 		if state:
 			times_caught = state.collection_log.get(fish_data.id, 0)
+			best_quality = state.collection_best_quality.get(fish_data.id, -1)
 		if times_caught > 0:
 			caught_count += 1
 
-		var cell: PanelContainer = _create_fish_cell(fish_data, times_caught)
+		var cell: PanelContainer = _create_fish_cell(fish_data, times_caught, best_quality)
 		grid.add_child(cell)
 
 	if completion_label:
@@ -121,109 +123,32 @@ func _refresh_grid() -> void:
 		completion_label.text = str(caught_count) + "/" + str(total_count) + " (" + str(pct) + "%)"
 
 
-func _get_rarity_color(rarity: int) -> Color:
-	match rarity:
-		Enums.Rarity.UNCOMMON:
-			return Color(0.2, 0.8, 0.2)
-		Enums.Rarity.RARE:
-			return Color(0.2, 0.6, 1.0)
-		Enums.Rarity.LEGENDARY:
-			return Color(1.0, 0.84, 0.0)
-	return Color(0.6, 0.6, 0.6)
 
+func _create_fish_cell(fish_data: FishData, times_caught: int, best_quality: int) -> PanelContainer:
+	var card_scene: PackedScene = preload("res://scenes/ui/components/item_card.tscn")
+	var card: ItemCard = card_scene.instantiate() as ItemCard
 
-func _create_fish_cell(fish_data: FishData, times_caught: int) -> PanelContainer:
-	var panel: PanelContainer = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(100, 100)
-
-	var vbox: VBoxContainer = VBoxContainer.new()
-	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	vbox.add_theme_constant_override("separation", 4)
-	panel.add_child(vbox)
+	var atlas_tex: AtlasTexture = AtlasTexture.new()
+	atlas_tex.atlas = FISH_ATLAS
+	atlas_tex.region = FISH_ATLAS_REGIONS.get(fish_data.id, Rect2(0, 0, 16, 16))
 
 	if times_caught > 0:
-		var rarity_color: Color = _get_rarity_color(fish_data.rarity)
-
-		var border_style: StyleBoxFlat = StyleBoxFlat.new()
-		border_style.bg_color = Color(0.08, 0.1, 0.16)
-		border_style.border_color = rarity_color
-		border_style.border_width_top = 2
-		border_style.border_width_bottom = 2
-		border_style.border_width_left = 2
-		border_style.border_width_right = 2
-		border_style.corner_radius_top_left = 4
-		border_style.corner_radius_top_right = 4
-		border_style.corner_radius_bottom_left = 4
-		border_style.corner_radius_bottom_right = 4
-		border_style.content_margin_top = 4
-		border_style.content_margin_bottom = 4
-		border_style.content_margin_left = 4
-		border_style.content_margin_right = 4
-		panel.add_theme_stylebox_override("panel", border_style)
-
-		var sprite: TextureRect = TextureRect.new()
-		sprite.custom_minimum_size = Vector2(64, 64)
-		sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		sprite.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-
-		var atlas_tex: AtlasTexture = AtlasTexture.new()
-		atlas_tex.atlas = FISH_ATLAS
-		atlas_tex.region = FISH_ATLAS_REGIONS.get(fish_data.id, Rect2(0, 0, 16, 16))
-		sprite.texture = atlas_tex
-		vbox.add_child(sprite)
-
-		var name_label: Label = Label.new()
-		name_label.text = fish_data.display_name
-		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		name_label.add_theme_font_size_override("font_size", 10)
-		name_label.add_theme_color_override("font_color", rarity_color)
-		vbox.add_child(name_label)
-
-		var count_label: Label = Label.new()
-		count_label.text = "x" + str(times_caught)
-		count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		count_label.add_theme_font_size_override("font_size", 9)
-		vbox.add_child(count_label)
-
-		var click_button: Button = Button.new()
-		click_button.set_anchors_preset(Control.PRESET_FULL_RECT)
-		click_button.flat = true
-		click_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-		click_button.pressed.connect(_on_fish_pressed.bind(fish_data.id))
-		panel.add_child(click_button)
+		var quality_color: Color = Enums.QUALITY_COLORS.get(best_quality, Color(0.6, 0.6, 0.6))
+		card.ready.connect(func() -> void:
+			card.set_item_data(fish_data.id, "", atlas_tex, 0, quality_color)
+			card.level_label.text = "x" + str(times_caught)
+			card.selected.connect(_on_fish_pressed.bind(fish_data.id))
+		)
 	else:
-		var dark_style: StyleBoxFlat = StyleBoxFlat.new()
-		dark_style.bg_color = Color(0.06, 0.06, 0.08)
-		dark_style.border_color = Color(0.15, 0.15, 0.2)
-		dark_style.border_width_top = 2
-		dark_style.border_width_bottom = 2
-		dark_style.border_width_left = 2
-		dark_style.border_width_right = 2
-		dark_style.corner_radius_top_left = 4
-		dark_style.corner_radius_top_right = 4
-		dark_style.corner_radius_bottom_left = 4
-		dark_style.corner_radius_bottom_right = 4
-		dark_style.content_margin_top = 4
-		dark_style.content_margin_bottom = 4
-		dark_style.content_margin_left = 4
-		dark_style.content_margin_right = 4
-		panel.add_theme_stylebox_override("panel", dark_style)
+		card.ready.connect(func() -> void:
+			card.item_texture.texture = atlas_tex
+			card.item_texture.modulate = Color(0.15, 0.15, 0.2, 0.9)
+			card.quality_fill.color = Color(0.08, 0.08, 0.1)
+			card.level_label.text = "???"
+			card.level_label.add_theme_color_override("font_color", Color(0.25, 0.25, 0.3))
+		)
 
-		var silhouette: ColorRect = ColorRect.new()
-		silhouette.custom_minimum_size = Vector2(64, 64)
-		silhouette.color = Color(0.1, 0.1, 0.12)
-		silhouette.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		vbox.add_child(silhouette)
-
-		var unknown_label: Label = Label.new()
-		unknown_label.text = "???"
-		unknown_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		unknown_label.add_theme_font_size_override("font_size", 10)
-		unknown_label.add_theme_color_override("font_color", Color(0.3, 0.3, 0.35))
-		vbox.add_child(unknown_label)
-
-	return panel
+	return card
 
 
 func _on_fish_pressed(fish_id: String) -> void:

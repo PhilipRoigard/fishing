@@ -7,6 +7,7 @@ extends Resource
 @export var fisherman_xp: int = 0
 @export var total_fish_caught: int = 0
 @export var collection_log: Dictionary = {}
+@export var collection_best_quality: Dictionary = {}
 @export var equipped_rod_uuid: String = ""
 @export var equipped_hook_uuid: String = ""
 @export var equipped_lure_uuid: String = ""
