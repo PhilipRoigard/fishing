@@ -306,7 +306,12 @@ func _refresh_grid() -> void:
 		if Main.instance and Main.instance.player_state_system:
 			state = Main.instance.player_state_system.get_state()
 		if state:
+			var equipped_bait_quality: int = -1
+			if state.equipped_bait_id.begins_with("bait_q"):
+				equipped_bait_quality = state.equipped_bait_id.substr(6).to_int()
 			for quality: int in [1, 2, 3, 4]:
+				if quality == equipped_bait_quality:
+					continue
 				var count: int = state.bait_inventory.get(quality, 0)
 				if count > 0:
 					grid_data.append(BaitStack.new(quality, count))
@@ -322,8 +327,14 @@ func _populate_bait_grid() -> void:
 		item_grid.set_data([])
 		return
 
+	var equipped_bait_quality: int = -1
+	if state.equipped_bait_id.begins_with("bait_q"):
+		equipped_bait_quality = state.equipped_bait_id.substr(6).to_int()
+
 	var stacks: Array = []
 	for quality: int in [1, 2, 3, 4]:
+		if quality == equipped_bait_quality:
+			continue
 		var count: int = state.bait_inventory.get(quality, 0)
 		if count > 0:
 			stacks.append(BaitStack.new(quality, count))

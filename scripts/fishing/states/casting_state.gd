@@ -69,10 +69,8 @@ func _on_cast_input_ended() -> void:
 	if not fishing_config:
 		return
 
-	var max_depth: float = fishing_config.max_cast_depth_base
 	var mods: RefCounted = EquipmentManager.compute_fight_modifiers()
-	if mods and mods.max_cast_depth > 0.0:
-		max_depth = mods.max_cast_depth
+	var max_depth: float = mods.max_cast_depth
 	var depth: float = fishing_config.min_cast_depth + cast_strength * (max_depth - fishing_config.min_cast_depth)
 	SignalBus.cast_started.emit(cast_strength)
 	SignalBus.cast_landed.emit(depth)

@@ -555,7 +555,14 @@ func _on_fish_caught(fish_id: String) -> void:
 	if Main.instance and Main.instance.player_state_system:
 		var pstate: PlayerState = Main.instance.player_state_system.get_state()
 		if pstate and pstate.equipped_bait_id.begins_with("bait_q"):
-			caught_quality = pstate.equipped_bait_id.substr(6).to_int()
+			var bait_q: int = pstate.equipped_bait_id.substr(6).to_int()
+			caught_quality = bait_q
+			var remaining: int = pstate.bait_inventory.get(bait_q, 0) - 1
+			if remaining <= 0:
+				pstate.bait_inventory.erase(bait_q)
+				pstate.equipped_bait_id = ""
+			else:
+				pstate.bait_inventory[bait_q] = remaining
 	state_machine.push_state(UIStateMachine.State.CATCH_RESULT, {"fish_id": fish_id, "caught_quality": caught_quality})
 
 

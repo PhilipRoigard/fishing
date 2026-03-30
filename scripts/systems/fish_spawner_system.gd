@@ -59,7 +59,13 @@ func _spawn_school(fish_data: FishData) -> void:
 		spawn_x = 370.0
 		target_x = -10.0
 
-	var spawn_y: float = randf_range(170.0, 550.0)
+	var depth_range: Vector2 = _get_visible_depth_range()
+	var fish_min_y: float = maxf(fish_data.min_depth, depth_range.x + 30.0)
+	var fish_max_y: float = minf(fish_data.max_depth, depth_range.y - 30.0)
+	if fish_min_y > fish_max_y:
+		fish_min_y = depth_range.x + 30.0
+		fish_max_y = depth_range.y - 30.0
+	var spawn_y: float = randf_range(fish_min_y, fish_max_y)
 
 	var path: PackedVector2Array = PackedVector2Array()
 	path.append(Vector2(spawn_x, spawn_y))
@@ -147,14 +153,13 @@ func _cleanup_despawned() -> void:
 
 
 func _get_visible_depth_range() -> Vector2:
-	var camera_rect: Rect2 = _get_camera_rect()
-	if camera_rect.size == Vector2.ZERO:
-		return Vector2(0.0, 200.0)
-	return Vector2(camera_rect.position.y, camera_rect.end.y)
-
-
-func _get_camera_rect() -> Rect2:
-	return Rect2(Vector2.ZERO, Vector2(360, 640))
+	var viewport: Viewport = get_viewport()
+	if not viewport:
+		return Vector2(0.0, 640.0)
+	var canvas_transform: Transform2D = viewport.get_canvas_transform()
+	var top_y: float = -canvas_transform.origin.y
+	var bottom_y: float = top_y + viewport.get_visible_rect().size.y
+	return Vector2(top_y, bottom_y)
 
 
 const FISH_ATLAS_REGIONS: Dictionary = {

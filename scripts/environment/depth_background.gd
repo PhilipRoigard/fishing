@@ -1,22 +1,26 @@
 extends ColorRect
 
 var surface_color: Color = Color(0.3, 0.75, 0.95)
-var mid_color: Color = Color(0.15, 0.55, 0.8)
-var deep_color: Color = Color(0.04, 0.08, 0.18)
-var current_depth_offset: float = 0.0
-var target_depth_offset: float = 0.0
+var mid_color: Color = Color(0.1, 0.35, 0.65)
+var deep_color: Color = Color(0.02, 0.04, 0.1)
+var abyss_color: Color = Color(0.01, 0.01, 0.03)
 
-@export var depth_scroll_speed: float = 2.0
+@export var max_depth_for_gradient: float = 3000.0
+
+const WATER_START_Y: float = 140.0
+var _camera_y: float = 0.0
 
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	SignalBus.cast_landed.connect(_on_cast_landed)
 
 
-func _process(delta: float) -> void:
-	current_depth_offset = lerpf(current_depth_offset, target_depth_offset, delta * depth_scroll_speed)
+func _process(_delta: float) -> void:
+	var viewport: Viewport = get_viewport()
+	if viewport:
+		var canvas: Transform2D = viewport.get_canvas_transform()
+		_camera_y = -canvas.origin.y
 	queue_redraw()
 
 
@@ -29,14 +33,21 @@ func _draw() -> void:
 	var bands: int = int(rect_size.y / band_height) + 1
 
 	for i: int in bands:
-		var t: float = float(i) / float(bands)
-		var depth_t: float = clampf(t + current_depth_offset, 0.0, 1.0)
+		var screen_y: float = i * band_height
+		var world_y: float = _camera_y + screen_y
+		var water_depth: float = maxf(world_y - WATER_START_Y, 0.0)
+		var depth_t: float = clampf(water_depth / max_depth_for_gradient, 0.0, 1.0)
+
 		var band_color: Color
-		if depth_t < 0.5:
-			band_color = surface_color.lerp(mid_color, depth_t * 2.0)
+		if world_y < WATER_START_Y:
+			band_color = Color(0.45, 0.3, 0.18)
+		elif depth_t < 0.3:
+			band_color = surface_color.lerp(mid_color, depth_t / 0.3)
+		elif depth_t < 0.7:
+			band_color = mid_color.lerp(deep_color, (depth_t - 0.3) / 0.4)
 		else:
-			band_color = mid_color.lerp(deep_color, (depth_t - 0.5) * 2.0)
-		draw_rect(Rect2(0, i * band_height, rect_size.x, band_height + 1), band_color)
+			band_color = deep_color.lerp(abyss_color, (depth_t - 0.7) / 0.3)
+		draw_rect(Rect2(0, screen_y, rect_size.x, band_height + 1), band_color)
 
 
 func apply_zone_colors(zone_entry: Variant) -> void:
@@ -44,8 +55,4 @@ func apply_zone_colors(zone_entry: Variant) -> void:
 		return
 	surface_color = zone_entry.background_color_top
 	deep_color = zone_entry.background_color_bottom
-	mid_color = surface_color.lerp(deep_color, 0.5)
-
-
-func _on_cast_landed(depth: float) -> void:
-	target_depth_offset = clampf(depth / 2000.0, 0.0, 0.8)
+	mid_color = surface_color.lerp(deep_color, 0.4)

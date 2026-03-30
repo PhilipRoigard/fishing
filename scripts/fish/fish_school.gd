@@ -69,10 +69,16 @@ func _update_wander(delta: float) -> void:
 
 
 func _is_fully_offscreen() -> bool:
+	var viewport: Viewport = get_viewport()
+	if not viewport:
+		return false
+	var canvas_transform: Transform2D = viewport.get_canvas_transform()
+	var view_top: float = -canvas_transform.origin.y - SCREEN_MARGIN
+	var view_bottom: float = view_top + viewport.get_visible_rect().size.y + SCREEN_MARGIN * 2.0
 	for member: SwimmingFish in members:
 		if is_instance_valid(member) and not member.is_caught:
 			var gp: Vector2 = member.global_position
-			if gp.x > -SCREEN_MARGIN and gp.x < 360 + SCREEN_MARGIN and gp.y > -SCREEN_MARGIN and gp.y < 640 + SCREEN_MARGIN:
+			if gp.x > -SCREEN_MARGIN and gp.x < 360 + SCREEN_MARGIN and gp.y > view_top and gp.y < view_bottom:
 				return false
 	return true
 
