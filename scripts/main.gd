@@ -50,10 +50,8 @@ func _initialize_systems() -> void:
 	fishing_level.name = "FishingLevel"
 	add_child(fishing_level)
 
-	var ui_manager_script: GDScript = preload("res://scripts/ui/ui_manager.gd")
-	ui_manager = ui_manager_script.new()
-	ui_manager.name = "UIManager"
-	ui_manager.layer = 10
+	var ui_scene: PackedScene = preload("res://scenes/ui/ui.tscn")
+	ui_manager = ui_scene.instantiate()
 	add_child(ui_manager)
 
 

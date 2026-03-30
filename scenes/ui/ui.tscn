@@ -1,0 +1,191 @@
+[gd_scene load_steps=20 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/ui_manager.gd" id="1_manager"]
+[ext_resource type="Script" path="res://scripts/ui/states/ui_loading_state.gd" id="2_loading"]
+[ext_resource type="Script" path="res://scripts/ui/states/ui_main_menu_state.gd" id="3_menu"]
+[ext_resource type="Script" path="res://scripts/ui/states/ui_wharf_hub_state.gd" id="4_hub"]
+[ext_resource type="Script" path="res://scripts/ui/states/ui_fishing_game_state.gd" id="5_fishing"]
+[ext_resource type="Script" path="res://scripts/ui/states/ui_catch_result_state.gd" id="6_catch"]
+[ext_resource type="Script" path="res://scripts/ui/states/ui_equipment_state.gd" id="7_equip"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/equipment_details_popup.tscn" id="8_equipdetails"]
+[ext_resource type="Script" path="res://scripts/ui/states/ui_collection_log_state.gd" id="9_collection"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/fish_details_popup.tscn" id="10_fishdetails"]
+[ext_resource type="Script" path="res://scripts/ui/states/ui_store_state.gd" id="11_store"]
+[ext_resource type="Script" path="res://scripts/ui/states/ui_tackle_box_state.gd" id="12_tacklebox"]
+[ext_resource type="Script" path="res://scripts/ui/states/ui_tackle_box_reveal_state.gd" id="13_reveal"]
+[ext_resource type="Script" path="res://scripts/ui/states/ui_settings_state.gd" id="14_settings"]
+[ext_resource type="Script" path="res://scripts/ui/states/ui_pause_state.gd" id="15_pause"]
+[ext_resource type="Script" path="res://scripts/ui/states/ui_yes_no_popup_state.gd" id="16_yesno"]
+[ext_resource type="Script" path="res://scripts/ui/states/ui_purchasing_state.gd" id="17_purchasing"]
+[ext_resource type="Script" path="res://scripts/ui/states/ui_bait_craft_state.gd" id="18_baitcraft"]
+[ext_resource type="Script" path="res://scripts/ui/states/ui_tooltip_state.gd" id="19_tooltip"]
+
+[node name="UI" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_manager")
+
+[node name="LoadingStateNode" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_loading")
+
+[node name="MainMenuStateNode" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_menu")
+
+[node name="WharfHubStateNode" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_hub")
+
+[node name="FishingGameStateNode" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_fishing")
+
+[node name="CatchResultStateNode" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("6_catch")
+
+[node name="EquipmentStateNode" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("7_equip")
+
+[node name="EquipmentDetailsStateNode" parent="." instance=ExtResource("8_equipdetails")]
+visible = false
+
+[node name="CollectionLogStateNode" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("9_collection")
+
+[node name="FishDetailsStateNode" parent="." instance=ExtResource("10_fishdetails")]
+visible = false
+
+[node name="StoreStateNode" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("11_store")
+
+[node name="TackleBoxStateNode" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("12_tacklebox")
+
+[node name="TackleBoxRevealStateNode" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("13_reveal")
+
+[node name="SettingsStateNode" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("14_settings")
+
+[node name="PauseStateNode" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("15_pause")
+
+[node name="YesNoPopupStateNode" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("16_yesno")
+
+[node name="PurchasingStateNode" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("17_purchasing")
+
+[node name="BaitCraftStateNode" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("18_baitcraft")
+
+[node name="TooltipStateNode" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("19_tooltip")
