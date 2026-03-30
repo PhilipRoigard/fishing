@@ -143,7 +143,7 @@ func _create_fish_cell(fish_data: FishData, times_caught: int, best_quality: int
 		card.ready.connect(func() -> void:
 			card.item_texture.texture = atlas_tex
 			card.item_texture.modulate = Color(0.15, 0.15, 0.2, 0.9)
-			card.quality_fill.color = Color(0.08, 0.08, 0.1)
+			card.self_modulate = Color(0.15, 0.15, 0.18)
 			card.level_label.text = "???"
 			card.level_label.add_theme_color_override("font_color", Color(0.25, 0.25, 0.3))
 		)

@@ -6,7 +6,7 @@ signal selected
 @onready var item_texture: TextureRect = $MarginContainer/TextureRect
 @onready var level_label: Label = %LevelLabel
 @onready var selection_highlight: ColorRect = %SelectionHighlight
-@onready var quality_fill: ColorRect = %QualityFill
+@onready var fill_panel: Panel = %FillPanel
 
 var item_id: String = ""
 var uuid: String = ""
@@ -51,4 +51,4 @@ func set_item_data(id: String, p_uuid: String, texture: Texture2D, level: int, q
 	item_texture.texture = texture
 	level_label.text = "Lv.%d" % level
 
-	quality_fill.color = quality_color
+	self_modulate = quality_color

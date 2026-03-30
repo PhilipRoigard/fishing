@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/components/item_card.gd" id="1_script"]
-[ext_resource type="StyleBox" uid="uid://b7f7xfg5gy5wu" path="res://resources/ui/Style Boxes/StyleBoxTexture/panels/panel_container_item_card.tres" id="2_style"]
+[ext_resource type="StyleBox" uid="uid://b7f7xfg5gy5wu" path="res://resources/ui/Style Boxes/StyleBoxTexture/panels/panel_container_item_card.tres" id="2_border"]
+[ext_resource type="StyleBox" uid="uid://fq5cq1ysw1ls" path="res://resources/ui/Style Boxes/StyleBoxFlat/item_card_panel_inner.tres" id="3_fill"]
 
 [node name="ItemCard" type="PanelContainer"]
 custom_minimum_size = Vector2(70, 70)
@@ -9,23 +10,23 @@ offset_right = 70.0
 offset_bottom = 70.0
 size_flags_horizontal = 4
 mouse_filter = 1
-theme_override_styles/panel = ExtResource("2_style")
+theme_override_styles/panel = ExtResource("2_border")
 script = ExtResource("1_script")
 
-[node name="QualityFill" type="ColorRect" parent="."]
+[node name="FillPanel" type="Panel" parent="."]
 unique_name_in_owner = true
 show_behind_parent = true
 layout_mode = 2
 mouse_filter = 2
-color = Color(0.6, 0.6, 0.6, 1)
+theme_override_styles/panel = ExtResource("3_fill")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 6
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
 
 [node name="TextureRect" type="TextureRect" parent="MarginContainer"]
 layout_mode = 2
@@ -45,13 +46,13 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -40.0
-offset_top = -14.0
-offset_right = -3.0
-offset_bottom = -1.0
+offset_left = -50.0
+offset_top = -20.0
+offset_right = -6.0
+offset_bottom = -4.0
 grow_horizontal = 0
 grow_vertical = 0
-theme_override_font_sizes/font_size = 10
+theme_override_font_sizes/font_size = 14
 text = "Lv.1"
 horizontal_alignment = 2
 vertical_alignment = 2

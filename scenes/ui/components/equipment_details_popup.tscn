@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/states/ui_equipment_details_state.gd" id="1_script"]
 [ext_resource type="StyleBox" path="res://resources/ui/Style Boxes/StyleBoxTexture/panels/panel_container_item_card.tres" id="4_card"]
+[ext_resource type="StyleBox" uid="uid://fq5cq1ysw1ls" path="res://resources/ui/Style Boxes/StyleBoxFlat/item_card_panel_inner.tres" id="5_fill"]
 
 [node name="EquipmentDetails" type="Control"]
 layout_mode = 3
@@ -80,12 +81,12 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_styles/panel = ExtResource("4_card")
 
-[node name="QualityFill" type="ColorRect" parent="PopupPanel/MarginContainer/VBoxContainer/Details/LeftColumn/ItemContainer"]
+[node name="FillPanel" type="Panel" parent="PopupPanel/MarginContainer/VBoxContainer/Details/LeftColumn/ItemContainer"]
 unique_name_in_owner = true
 show_behind_parent = true
 layout_mode = 2
 mouse_filter = 2
-color = Color(0.6, 0.6, 0.6, 1)
+theme_override_styles/panel = ExtResource("5_fill")
 
 [node name="MarginContainer" type="MarginContainer" parent="PopupPanel/MarginContainer/VBoxContainer/Details/LeftColumn/ItemContainer"]
 layout_mode = 2
