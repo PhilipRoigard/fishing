@@ -223,6 +223,7 @@ func _on_craft_pressed(quality: int) -> void:
 
 	var current_bait: int = state.bait_inventory.get(quality, 0)
 	state.bait_inventory[quality] = current_bait + 1
+	SignalBus.save_requested.emit()
 	_refresh_display()
 
 

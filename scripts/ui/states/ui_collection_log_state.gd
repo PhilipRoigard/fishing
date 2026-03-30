@@ -1,29 +1,5 @@
 extends UIStateNode
 
-const FISH_ATLAS: Texture2D = preload("res://assets/sprites/fish/FishGame_Fish_Sprite_Sheet.png")
-const FISH_ATLAS_REGIONS: Dictionary = {
-	"sardine": Rect2(0, 0, 16, 16),
-	"snapper": Rect2(16, 0, 16, 16),
-	"anchovy": Rect2(0, 16, 16, 16),
-	"herring": Rect2(16, 16, 16, 16),
-	"pufferfish": Rect2(32, 16, 16, 16),
-	"clownfish": Rect2(48, 16, 16, 16),
-	"flounder": Rect2(0, 32, 16, 16),
-	"tuna": Rect2(16, 32, 16, 16),
-	"trevally": Rect2(32, 32, 16, 16),
-	"mackerel": Rect2(64, 16, 16, 16),
-	"perch": Rect2(80, 0, 16, 16),
-	"barramundi": Rect2(96, 0, 16, 16),
-	"marlin": Rect2(96, 32, 16, 16),
-	"swordfish": Rect2(80, 16, 16, 16),
-	"napoleon_wrasse": Rect2(96, 16, 16, 16),
-	"giant_trevally": Rect2(48, 0, 16, 16),
-	"manta_ray": Rect2(112, 16, 16, 16),
-	"great_white_shark": Rect2(112, 32, 16, 16),
-	"sunfish": Rect2(80, 32, 16, 16),
-	"whale_shark": Rect2(64, 32, 16, 16),
-}
-
 var grid: GridContainer
 var completion_label: Label
 
@@ -127,25 +103,22 @@ func _refresh_grid() -> void:
 func _create_fish_cell(fish_data: FishData, times_caught: int, best_quality: int) -> PanelContainer:
 	var card_scene: PackedScene = preload("res://scenes/ui/components/item_card.tscn")
 	var card: ItemCard = card_scene.instantiate() as ItemCard
-
-	var atlas_tex: AtlasTexture = AtlasTexture.new()
-	atlas_tex.atlas = FISH_ATLAS
-	atlas_tex.region = FISH_ATLAS_REGIONS.get(fish_data.id, Rect2(0, 0, 16, 16))
+	var fish_tex: Texture2D = fish_data.texture
 
 	if times_caught > 0:
 		var quality_color: Color = Enums.QUALITY_COLORS.get(best_quality, Color(0.6, 0.6, 0.6))
 		card.ready.connect(func() -> void:
-			card.set_item_data(fish_data.id, "", atlas_tex, 0, quality_color)
+			card.set_item_data(fish_data.id, "", fish_tex, 0, quality_color)
 			card.level_label.text = "x" + str(times_caught)
 			card.selected.connect(_on_fish_pressed.bind(fish_data.id))
 		)
 	else:
 		card.ready.connect(func() -> void:
-			card.item_texture.texture = atlas_tex
-			card.item_texture.modulate = Color(0.15, 0.15, 0.2, 0.9)
-			card.self_modulate = Color(0.15, 0.15, 0.18)
+			card.item_texture.texture = fish_tex
+			card.item_texture.modulate = Color(0.0, 0.0, 0.0, 1.0)
+			card.self_modulate = Color(0.12, 0.12, 0.14)
 			card.level_label.text = "???"
-			card.level_label.add_theme_color_override("font_color", Color(0.25, 0.25, 0.3))
+			card.level_label.add_theme_color_override("font_color", Color(0.2, 0.2, 0.25))
 		)
 
 	return card

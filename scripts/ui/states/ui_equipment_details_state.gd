@@ -169,6 +169,7 @@ func _equip_bait() -> void:
 		state.equipped_bait_id = ""
 	else:
 		state.equipped_bait_id = bait_key
+	SignalBus.save_requested.emit()
 	_back()
 
 

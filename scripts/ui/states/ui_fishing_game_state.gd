@@ -563,6 +563,7 @@ func _on_fish_caught(fish_id: String) -> void:
 				pstate.equipped_bait_id = ""
 			else:
 				pstate.bait_inventory[bait_q] = remaining
+			SignalBus.save_requested.emit()
 	var fish_data: FishData = null
 	if Main.instance and Main.instance.database_system:
 		fish_data = Main.instance.database_system.get_fish_by_id(fish_id)
