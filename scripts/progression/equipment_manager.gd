@@ -219,20 +219,19 @@ func merge(uuids: Array[String]) -> String:
 
 func compute_fight_modifiers() -> RefCounted:
 	var mods: RefCounted = _FightModifiersScript.new()
-	var quality_multipliers: Dictionary = _EnumsScript.QUALITY_MULTIPLIERS
-	var rod_slot: int = _EnumsScript.EquipmentSlot.ROD
-	var hook_slot: int = _EnumsScript.EquipmentSlot.HOOK
 
-	var rod: EquipmentEntry = get_equipped(rod_slot)
-	if rod:
-		var quality_mult: float = quality_multipliers.get(rod.quality, 1.0)
-		mods.reel_speed = 1.0 + (rod.level * 0.02) * quality_mult
-		mods.tension_resistance = 1.0 + (rod.level * 0.015) * quality_mult
+	var stat_cfg: Variant = null
+	if GameResources.config:
+		stat_cfg = GameResources.config.equipment_stat_config
 
-	var hook: EquipmentEntry = get_equipped(hook_slot)
-	if hook:
-		var quality_mult: float = quality_multipliers.get(hook.quality, 1.0)
-		mods.catch_bonus = (hook.level * 0.01) * quality_mult
+	var total_depth: float = 0.0
+	for slot: int in [_EnumsScript.EquipmentSlot.ROD, _EnumsScript.EquipmentSlot.HOOK, _EnumsScript.EquipmentSlot.LURE]:
+		var entry: EquipmentEntry = get_equipped(slot)
+		if entry and stat_cfg:
+			total_depth += stat_cfg.get_cast_depth_at_level(entry.level, entry.quality)
+
+	if total_depth > 0.0:
+		mods.max_cast_depth = total_depth
 
 	return mods
 

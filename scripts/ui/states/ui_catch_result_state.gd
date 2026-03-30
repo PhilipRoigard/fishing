@@ -60,6 +60,7 @@ func _build_layout() -> void:
 	add_child(bg)
 
 	var panel: PanelContainer = PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", preload("res://resources/ui/Style Boxes/StyleBoxTexture/panels/panel_container_header.tres"))
 	panel.set_anchors_preset(Control.PRESET_CENTER)
 	panel.custom_minimum_size = Vector2(300, 450)
 	panel.offset_left = -150
