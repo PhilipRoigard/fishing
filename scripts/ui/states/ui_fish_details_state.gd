@@ -30,7 +30,6 @@ const QUALITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Leg
 @onready var fish_name_label: Label = %FishName
 @onready var fish_icon: TextureRect = %FishIcon
 @onready var fish_container: PanelContainer = %FishContainer
-@onready var fish_container: PanelContainer = %FishContainer
 @onready var caught_label: Label = %CaughtLabel
 @onready var quality_label: Label = %QualityLabel
 @onready var depth_label: Label = %DepthLabel
