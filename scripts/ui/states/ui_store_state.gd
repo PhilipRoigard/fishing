@@ -212,8 +212,6 @@ func _on_pull_pressed(pack_id: String) -> void:
 		item_type = "hook"
 	elif pulled_item_id.begins_with("lure"):
 		item_type = "lure"
-	elif pulled_item_id.begins_with("bait"):
-		item_type = "bait"
 
 	EquipmentManager.add_item(pulled_item_id, item_type, pulled_quality)
 

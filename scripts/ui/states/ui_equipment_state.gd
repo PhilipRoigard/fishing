@@ -16,9 +16,8 @@ const SLOT_TYPES: Array[Enums.EquipmentSlot] = [
 	Enums.EquipmentSlot.BAIT,
 ]
 
-const FILTER_LABELS: Array[String] = ["All", "Rod", "Hk", "Lr", "Bt", "Shop"]
-const FILTER_TYPES: Array[String] = ["", "rod", "hook", "lure", "bait", "shop"]
-const SHOP_FILTER_INDEX: int = 5
+const FILTER_LABELS: Array[String] = ["All", "Rod", "Hook", "Lure", "Bait"]
+const FILTER_TYPES: Array[String] = ["", "rod", "hook", "lure", "bait"]
 
 var _bait_worm_texture: Texture2D = preload("res://assets/sprites/items/Bait_01.png")
 var _bait_shrimp_texture: Texture2D = preload("res://assets/sprites/items/Bait_01_blue.png")
@@ -32,51 +31,6 @@ var scroll: ScrollContainer
 var filter_container: HBoxContainer
 var active_filter: int = 0
 var slot_containers: Array[PanelContainer] = []
-var bottom_bar: HBoxContainer
-var active_tab: int = 0
-
-
-class ShopItem:
-	var item_id: String
-	var equipment_type: String
-	var display_name: String
-	var cost_coins: int
-	var required_level: int
-	var quality: int
-
-	func _init(
-		p_item_id: String = "",
-		p_type: String = "",
-		p_name: String = "",
-		p_cost: int = 0,
-		p_level: int = 1,
-		p_quality: int = 0
-	) -> void:
-		item_id = p_item_id
-		equipment_type = p_type
-		display_name = p_name
-		cost_coins = p_cost
-		required_level = p_level
-		quality = p_quality
-
-
-var shop_items: Array[ShopItem] = []
-
-
-func _init() -> void:
-	super()
-	_build_shop_items()
-
-
-func _build_shop_items() -> void:
-	shop_items.clear()
-	shop_items.append(ShopItem.new("bronze_rod", "rod", "Bronze Rod", 300, 2, Enums.ItemQuality.UNCOMMON))
-	shop_items.append(ShopItem.new("barbed_hook", "hook", "Barbed Hook", 200, 2, Enums.ItemQuality.UNCOMMON))
-	shop_items.append(ShopItem.new("shiny_lure", "lure", "Shiny Lure", 500, 4, Enums.ItemQuality.RARE))
-	shop_items.append(ShopItem.new("silver_rod", "rod", "Silver Rod", 800, 4, Enums.ItemQuality.RARE))
-	shop_items.append(ShopItem.new("titanium_hook", "hook", "Titanium Hook", 600, 6, Enums.ItemQuality.EPIC))
-	shop_items.append(ShopItem.new("golden_lure", "lure", "Golden Lure", 1000, 6, Enums.ItemQuality.EPIC))
-	shop_items.append(ShopItem.new("gold_rod", "rod", "Gold Rod", 2000, 8, Enums.ItemQuality.LEGENDARY))
 
 
 func enter(_meta: Variant = null) -> void:
@@ -149,7 +103,6 @@ func _build_layout() -> void:
 	item_grid.setup(scroll, _configure_card)
 	scroll.resized.connect(func() -> void: item_grid.update_columns(scroll.size.x - 24.0))
 
-	_build_bottom_bar(vbox)
 
 
 
@@ -201,49 +154,10 @@ func _create_equipment_slot(slot_name: String, slot_type: Enums.EquipmentSlot) -
 	return empty_card
 
 
-func _build_bottom_bar(parent: VBoxContainer) -> void:
-	var bottom_hbox: HBoxContainer = HBoxContainer.new()
-	bottom_hbox.add_theme_constant_override("separation", 8)
-	parent.add_child(bottom_hbox)
-	bottom_bar = bottom_hbox
-
-	var equip_tab_btn: Button = Button.new()
-	equip_tab_btn.text = "Equipment"
-	equip_tab_btn.custom_minimum_size = Vector2(0, 40)
-	equip_tab_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	if active_tab == 0:
-		var active_style: StyleBoxFlat = StyleBoxFlat.new()
-		active_style.bg_color = Color(0.15, 0.25, 0.4)
-		active_style.corner_radius_top_left = 4
-		active_style.corner_radius_top_right = 4
-		active_style.corner_radius_bottom_left = 4
-		active_style.corner_radius_bottom_right = 4
-		equip_tab_btn.add_theme_stylebox_override("normal", active_style)
-	equip_tab_btn.pressed.connect(_on_tab_pressed.bind(0))
-	bottom_hbox.add_child(equip_tab_btn)
-
-	var merge_tab_btn: Button = Button.new()
-	merge_tab_btn.text = "Merge"
-	merge_tab_btn.custom_minimum_size = Vector2(0, 40)
-	merge_tab_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	if active_tab == 1:
-		var active_style: StyleBoxFlat = StyleBoxFlat.new()
-		active_style.bg_color = Color(0.15, 0.25, 0.4)
-		active_style.corner_radius_top_left = 4
-		active_style.corner_radius_top_right = 4
-		active_style.corner_radius_bottom_left = 4
-		active_style.corner_radius_bottom_right = 4
-		merge_tab_btn.add_theme_stylebox_override("normal", active_style)
-	merge_tab_btn.pressed.connect(_on_tab_pressed.bind(1))
-	bottom_hbox.add_child(merge_tab_btn)
-
 
 func _refresh_all() -> void:
 	_refresh_grid()
 	_update_filter_buttons()
-	if bottom_bar:
-		var is_shop: bool = FILTER_TYPES[active_filter] == "shop"
-		bottom_bar.visible = not is_shop
 
 
 func _update_filter_buttons() -> void:
@@ -268,10 +182,6 @@ func _update_filter_buttons() -> void:
 func _refresh_grid() -> void:
 	var filter_type: String = FILTER_TYPES[active_filter]
 
-	if filter_type == "shop":
-		_populate_shop_grid()
-		return
-
 	var items: Array[EquipmentManager.EquipmentEntry] = []
 	items.assign(EquipmentManager.inventory)
 
@@ -287,15 +197,6 @@ func _refresh_grid() -> void:
 
 
 func _configure_card(card: ItemCard, _index: int, data: Variant) -> void:
-	if data is ShopItem:
-		var shop_item: ShopItem = data as ShopItem
-		var quality_color: Color = Enums.QUALITY_COLORS.get(shop_item.quality, Color.WHITE)
-		var icon_texture: Texture2D = _get_item_icon(shop_item.item_id, shop_item.equipment_type)
-		card.set_item_data(shop_item.item_id, "", icon_texture, 0, quality_color)
-		card.level_label.text = str(shop_item.cost_coins) + "c"
-		card.selected.connect(_on_shop_card_pressed.bind(shop_item))
-		return
-
 	var entry: EquipmentManager.EquipmentEntry = data as EquipmentManager.EquipmentEntry
 	if not entry:
 		return
@@ -304,63 +205,6 @@ func _configure_card(card: ItemCard, _index: int, data: Variant) -> void:
 	card.set_item_data(entry.item_id, entry.uuid, icon_texture, entry.level, quality_color)
 	card.selected.connect(_on_item_pressed.bind(entry.uuid))
 
-
-func _populate_shop_grid() -> void:
-	var player_level: int = ProgressManager.get_current_level()
-	var shop_data: Array = []
-	for shop_item: ShopItem in shop_items:
-		shop_data.append(shop_item)
-	item_grid.set_data(shop_data)
-
-
-
-func _on_shop_card_pressed(shop_item: ShopItem) -> void:
-	HapticManager.light_tap()
-	var quality_name: String = Enums.QUALITY_NAMES.get(shop_item.quality, "Common")
-	var info: String = shop_item.display_name + "\n" + quality_name + "\n"
-
-	if GameResources.config and GameResources.config.equipment_catalogue:
-		var cat: Variant = GameResources.config.equipment_catalogue
-		match shop_item.equipment_type:
-			"rod":
-				var data: Variant = cat.get_rod_by_id(shop_item.item_id)
-				if data:
-					info += "\nCast Depth: " + str(int(data.cast_depth_range)) + "m"
-					info += "\nReel Speed: " + str(snapped(data.reel_speed, 0.1)) + "x"
-					info += "\nTension Resist: " + str(snapped(data.tension_resistance, 0.1)) + "x"
-			"hook":
-				var data: Variant = cat.get_hook_by_id(shop_item.item_id)
-				if data:
-					info += "\nBite Window: +" + str(snapped(data.bite_window_bonus, 0.1)) + "s"
-					info += "\nCatch Rate: +" + str(int(data.catch_rate_bonus * 100)) + "%"
-			"lure":
-				var data: Variant = cat.get_lure_by_id(shop_item.item_id)
-				if data:
-					info += "\nRare Fish: +" + str(int(data.rare_fish_chance_bonus * 100)) + "%"
-					info += "\nBite Speed: +" + str(snapped(data.bite_speed_bonus, 0.1)) + "s"
-
-	info += "\n\nCost: " + str(shop_item.cost_coins) + " coins"
-	info += "\nRequires: Lv." + str(shop_item.required_level)
-
-	state_machine.show_tooltip(info)
-
-
-func _on_buy_pressed(shop_item: ShopItem) -> void:
-	HapticManager.medium_tap()
-
-	if not CurrencyManager.can_afford_coins(shop_item.cost_coins):
-		SignalBus.show_notification.emit("Not enough coins!", Color.RED)
-		return
-
-	var player_level: int = ProgressManager.get_current_level()
-	if player_level < shop_item.required_level:
-		SignalBus.show_notification.emit("Requires Lv." + str(shop_item.required_level), Color.RED)
-		return
-
-	CurrencyManager.spend_coins(shop_item.cost_coins)
-	EquipmentManager.add_item(shop_item.item_id, shop_item.equipment_type, 0)
-	SignalBus.show_notification.emit("Purchased " + shop_item.display_name + "!", Color(0.2, 0.8, 0.2))
-	_refresh_all()
 
 
 func _sort_equipment(a: EquipmentManager.EquipmentEntry, b: EquipmentManager.EquipmentEntry) -> bool:
@@ -465,13 +309,6 @@ func _on_filter_pressed(index: int) -> void:
 	HapticManager.light_tap()
 	_refresh_all()
 
-
-func _on_tab_pressed(tab: int) -> void:
-	HapticManager.light_tap()
-	active_tab = tab
-	_clear_children()
-	_build_layout()
-	_refresh_all()
 
 
 func _on_item_pressed(uuid: String) -> void:
