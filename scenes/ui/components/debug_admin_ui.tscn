@@ -193,6 +193,14 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Current: 0"
 
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent"]
+layout_mode = 2
+
+[node name="ResetInventoryButton" type="Button" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+text = "Reset Inventory (clears save)"
+
 [connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TitleRow/CloseButton" to="." method="toggle_visibility"]
 [connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/CoinsRow/RemoveCoins100" to="." method="_on_remove_coins_1000"]
 [connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/CoinsRow/RemoveCoins10" to="." method="_on_remove_coins_100"]
@@ -202,3 +210,4 @@ text = "Current: 0"
 [connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/GemsRow/RemoveGems10" to="." method="_on_remove_gems_100"]
 [connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/GemsRow/AddGems10" to="." method="_on_add_gems_100"]
 [connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/GemsRow/AddGems100" to="." method="_on_add_gems_1000"]
+[connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/ResetInventoryButton" to="." method="_on_reset_inventory"]

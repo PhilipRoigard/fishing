@@ -341,18 +341,28 @@ func _do_pull(pack_path: String, count: int) -> void:
 
 		var pool: Array[String] = pack.item_pool_ids
 		var pulled_item_id: String = pool[randi() % pool.size()] if not pool.is_empty() else "unknown_item"
-		var item_type: String = "rod"
-		if pulled_item_id.begins_with("hook"):
-			item_type = "hook"
-		elif pulled_item_id.begins_with("lure"):
-			item_type = "lure"
+		var item_type: String = _detect_item_type(pulled_item_id)
 
-		EquipmentManager.add_item(pulled_item_id, item_type, pulled_quality)
-		results.append({"item_id": pulled_item_id, "quality": pulled_quality})
+		var new_uuid: String = EquipmentManager.add_item(pulled_item_id, item_type, pulled_quality)
+		results.append({"item_id": pulled_item_id, "quality": pulled_quality, "uuid": new_uuid})
 
 	SignalBus.tackle_box_pull_started.emit(pack.id)
 	state_machine.push_state(UIStateMachine.State.TACKLE_BOX_REVEAL, results)
 
+
+
+func _detect_item_type(item_id: String) -> String:
+	if GameResources.config and GameResources.config.equipment_catalogue:
+		var cat: EquipmentCatalogue = GameResources.config.equipment_catalogue
+		if cat.get_rod_by_id(item_id):
+			return "rod"
+		if cat.get_hook_by_id(item_id):
+			return "hook"
+		if cat.get_lure_by_id(item_id):
+			return "lure"
+		if cat.get_bait_by_id(item_id):
+			return "bait"
+	return "rod"
 
 
 func _populate_sections() -> void:

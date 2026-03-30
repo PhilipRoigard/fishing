@@ -72,3 +72,11 @@ func _on_add_gems_100() -> void:
 
 func _on_add_gems_1000() -> void:
 	CurrencyManager.add_gems(1000)
+
+
+func _on_reset_inventory() -> void:
+	EquipmentManager.inventory.clear()
+	EquipmentManager.loadout.clear()
+	EquipmentManager._save_data()
+	EquipmentManager._grant_starter_items()
+	print("DEBUG: Inventory reset")

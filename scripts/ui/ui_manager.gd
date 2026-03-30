@@ -146,7 +146,7 @@ func _create_screens() -> void:
 	_register(UIStateMachine.State.FISHING_GAME, preload("res://scripts/ui/states/ui_fishing_game_state.gd"))
 	_register(UIStateMachine.State.CATCH_RESULT, preload("res://scripts/ui/states/ui_catch_result_state.gd"))
 	_register(UIStateMachine.State.EQUIPMENT, preload("res://scripts/ui/states/ui_equipment_state.gd"))
-	_register(UIStateMachine.State.EQUIPMENT_DETAILS, preload("res://scripts/ui/states/ui_equipment_details_state.gd"))
+	_register_scene(UIStateMachine.State.EQUIPMENT_DETAILS, preload("res://scenes/ui/components/equipment_details_popup.tscn"))
 	_register(UIStateMachine.State.COLLECTION_LOG, preload("res://scripts/ui/states/ui_collection_log_state.gd"))
 	_register(UIStateMachine.State.FISH_DETAILS, preload("res://scripts/ui/states/ui_fish_details_state.gd"))
 	_register(UIStateMachine.State.STORE, preload("res://scripts/ui/states/ui_store_state.gd"))
@@ -163,6 +163,13 @@ func _create_screens() -> void:
 func _register(state: UIStateMachine.State, script: GDScript) -> void:
 	var node: UIStateNode = script.new()
 	node.set_anchors_preset(Control.PRESET_FULL_RECT)
+	node.theme = game_theme
+	add_child(node)
+	state_machine.add_state(state, node)
+
+
+func _register_scene(state: UIStateMachine.State, scene: PackedScene) -> void:
+	var node: UIStateNode = scene.instantiate() as UIStateNode
 	node.theme = game_theme
 	add_child(node)
 	state_machine.add_state(state, node)

@@ -1,12 +1,5 @@
 extends UIStateNode
 
-const QUALITY_BG_COLORS: Dictionary = {
-	Enums.ItemQuality.COMMON: Color(0.45, 0.45, 0.45),
-	Enums.ItemQuality.UNCOMMON: Color(0.3, 0.65, 0.15),
-	Enums.ItemQuality.RARE: Color(0.2, 0.45, 0.85),
-	Enums.ItemQuality.EPIC: Color(0.6, 0.25, 0.8),
-	Enums.ItemQuality.LEGENDARY: Color(0.85, 0.7, 0.1),
-}
 
 const SLOT_NAMES: Array[String] = ["Rod", "Hook", "Lure", "Bait"]
 const SLOT_TYPES: Array[Enums.EquipmentSlot] = [

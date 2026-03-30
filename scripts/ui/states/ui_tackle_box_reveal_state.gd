@@ -192,6 +192,7 @@ func _create_cards_hidden() -> void:
 		var item_id: String = ""
 		var quality: int = 0
 		var item_type: String = "rod"
+		var uuid: String = ""
 
 		if result is TackleBoxPullResult:
 			var pull: TackleBoxPullResult = result as TackleBoxPullResult
@@ -200,11 +201,14 @@ func _create_cards_hidden() -> void:
 		elif result is Dictionary:
 			item_id = result.get("item_id", "")
 			quality = result.get("quality", 0)
+			uuid = result.get("uuid", "")
 
-		if item_id.begins_with("hook"):
-			item_type = "hook"
-		elif item_id.begins_with("lure"):
-			item_type = "lure"
+		if GameResources.config and GameResources.config.equipment_catalogue:
+			var cat: EquipmentCatalogue = GameResources.config.equipment_catalogue
+			if cat.get_hook_by_id(item_id):
+				item_type = "hook"
+			elif cat.get_lure_by_id(item_id):
+				item_type = "lure"
 
 		var card: ItemCard = _item_card_scene.instantiate() as ItemCard
 		var quality_color: Color = Enums.QUALITY_COLORS.get(quality, Color.WHITE)
@@ -214,7 +218,10 @@ func _create_cards_hidden() -> void:
 		card.pivot_offset = Vector2(35, 35)
 
 		var icon_texture: Texture2D = _get_item_icon(item_id, item_type)
-		card.set_item_data.call_deferred(item_id, "", icon_texture, 1, quality_color)
+		card.set_item_data.call_deferred(item_id, uuid, icon_texture, 1, quality_color)
+
+		if uuid != "":
+			card.selected.connect(_on_card_selected.bind(uuid))
 
 		item_grid.add_child(card)
 		item_cards.append(card)
@@ -262,6 +269,13 @@ func _on_reveal_complete() -> void:
 	_reveal_complete = true
 	_skip_requested = false
 	continue_button.visible = true
+
+
+func _on_card_selected(uuid: String) -> void:
+	if not _reveal_complete:
+		return
+	HapticManager.light_tap()
+	state_machine.push_state(UIStateMachine.State.EQUIPMENT_DETAILS, {"uuid": uuid})
 
 
 func _on_continue_pressed() -> void:

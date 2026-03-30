@@ -6,6 +6,7 @@ signal selected
 @onready var item_texture: TextureRect = $MarginContainer/TextureRect
 @onready var level_label: Label = %LevelLabel
 @onready var selection_highlight: ColorRect = %SelectionHighlight
+@onready var quality_fill: ColorRect = %QualityFill
 
 var item_id: String = ""
 var uuid: String = ""
@@ -50,18 +51,4 @@ func set_item_data(id: String, p_uuid: String, texture: Texture2D, level: int, q
 	item_texture.texture = texture
 	level_label.text = "Lv.%d" % level
 
-	var style: StyleBoxFlat = StyleBoxFlat.new()
-	var quality_bg: Color = quality_color.darkened(0.5)
-	style.bg_color = quality_bg
-	style.corner_radius_top_left = 4
-	style.corner_radius_top_right = 4
-	style.corner_radius_bottom_left = 4
-	style.corner_radius_bottom_right = 4
-
-	style.border_color = quality_bg.lightened(0.2)
-	style.border_width_bottom = 1
-	style.border_width_top = 1
-	style.border_width_left = 1
-	style.border_width_right = 1
-
-	add_theme_stylebox_override("panel", style)
+	quality_fill.color = quality_color
