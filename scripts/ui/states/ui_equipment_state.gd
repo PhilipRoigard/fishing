@@ -98,7 +98,7 @@ func _build_layout() -> void:
 	var margin: MarginContainer = MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
 	margin.add_theme_constant_override("margin_top", SafeZoneManager.get_top_margin() + 8)
-	margin.add_theme_constant_override("margin_bottom", SafeZoneManager.get_bottom_margin() + 8)
+	margin.add_theme_constant_override("margin_bottom", SafeZoneManager.get_bottom_margin() + 78)
 	margin.add_theme_constant_override("margin_left", 12)
 	margin.add_theme_constant_override("margin_right", 12)
 	add_child(margin)

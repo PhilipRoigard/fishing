@@ -171,12 +171,20 @@ func _start_loading() -> void:
 
 
 func set_tab_bar(bar: Control) -> void:
+	if tab_bar and tab_bar.get_parent():
+		tab_bar.get_parent().remove_child(tab_bar)
 	tab_bar = bar
+	add_child(tab_bar)
 
 
 func show_tab_bar(should_show: bool) -> void:
 	if tab_bar:
 		tab_bar.visible = should_show
+
+
+func raise_tab_bar() -> void:
+	if tab_bar and tab_bar.get_parent():
+		tab_bar.get_parent().move_child.call_deferred(tab_bar, tab_bar.get_parent().get_child_count() - 1)
 
 
 func get_state_machine() -> UIStateMachine:

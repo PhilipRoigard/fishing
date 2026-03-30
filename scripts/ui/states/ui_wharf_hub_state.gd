@@ -12,7 +12,7 @@ var session_fish_count: int = 0
 var session_best_fish_id: String = ""
 var session_best_rarity: int = -1
 
-const TabBarScript: GDScript = preload("res://scripts/ui/components/tab_bar.gd")
+const TabBarScene: PackedScene = preload("res://scenes/ui/components/tab_bar.tscn")
 const CurrencyBarScript: GDScript = preload("res://scripts/ui/components/currency_bar.gd")
 
 
@@ -23,10 +23,12 @@ func enter(_meta: Variant = null) -> void:
 		SignalBus.fish_caught.connect(_on_fish_caught)
 	_build_layout()
 	_refresh_display()
+	ui_manager.show_tab_bar(true)
 
 
 func exit() -> void:
 	super()
+	ui_manager.show_tab_bar(false)
 	_clear_children()
 
 
@@ -128,11 +130,10 @@ func _build_layout() -> void:
 	cast_button.pressed.connect(_on_cast_pressed)
 	bottom_vbox.add_child(cast_button)
 
-	tab_bar_instance = TabBarScript.new()
-	tab_bar_instance.custom_minimum_size = Vector2(0, 40)
-	tab_bar_instance.tab_changed.connect(_on_tab_changed)
-	bottom_vbox.add_child(tab_bar_instance)
-	ui_manager.set_tab_bar(tab_bar_instance)
+	if not tab_bar_instance or not is_instance_valid(tab_bar_instance):
+		tab_bar_instance = TabBarScene.instantiate()
+		tab_bar_instance.tab_changed.connect(_on_tab_changed)
+		ui_manager.set_tab_bar(tab_bar_instance)
 
 
 func _refresh_display() -> void:
@@ -200,15 +201,27 @@ func _on_cast_pressed() -> void:
 		Main.instance.fishing_system.start_fishing()
 
 
+func focus() -> void:
+	super()
+	if tab_bar_instance and tab_bar_instance.is_inside_tree():
+		tab_bar_instance.select_home()
+	ui_manager.show_tab_bar(true)
+
+
 func _on_tab_changed(tab_index: int) -> void:
-	var tab_states: Array[int] = [
-		UIStateMachine.State.COLLECTION_LOG,
-		UIStateMachine.State.EQUIPMENT,
-		UIStateMachine.State.STORE,
-		UIStateMachine.State.TACKLE_BOX,
-	]
-	if tab_index >= 0 and tab_index < tab_states.size():
-		state_machine.push_state(tab_states[tab_index] as UIStateMachine.State)
+	HapticManager.light_tap()
+	var state: int = tab_bar_instance.TAB_STATES[tab_index]
+	if tab_index == 2:
+		if state_machine.active_states.size() > 1 and state_machine._get_active_state_node() != self:
+			state_machine.pop_state()
+		return
+	if state < 0:
+		return
+	var target_state: UIStateMachine.State = state as UIStateMachine.State
+	if state_machine.active_states.size() > 1 and state_machine._get_active_state_node() != self:
+		state_machine.replace_top_state(target_state)
+	else:
+		state_machine.push_state(target_state)
 
 
 func _setup_connections() -> void:

@@ -83,6 +83,24 @@ func pop_state() -> void:
 	state_changed.emit(_get_active_state())
 
 
+func replace_top_state(state: State, meta: Variant = null) -> void:
+	if active_states.size() <= 1:
+		push_state(state, meta)
+		return
+
+	if state not in states:
+		push_error("UIStateMachine: State not found: %s" % state)
+		return
+
+	_get_active_state_node().unfocus()
+	_get_active_state_node().exit()
+	active_states.pop_back()
+	active_states.push_back(states[state])
+	_get_active_state_node().enter(meta)
+	_get_active_state_node().focus()
+	state_changed.emit(state)
+
+
 func _get_active_state() -> State:
 	for state_key: State in states:
 		if states[state_key] == _get_active_state_node():

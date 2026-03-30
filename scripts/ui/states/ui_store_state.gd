@@ -7,6 +7,12 @@ const SECTION_COLORS: Dictionary = {
 	"Premium": Color(0.9, 0.5, 1.0),
 }
 
+const TACKLE_BOX_PATHS: Array[String] = [
+	"res://data/gacha/basic_tackle_box.tres",
+	"res://data/gacha/premium_tackle_box.tres",
+	"res://data/gacha/legendary_tackle_box.tres",
+]
+
 var coin_label: Label
 var gem_label: Label
 var content_container: VBoxContainer
@@ -43,7 +49,7 @@ func _build_layout() -> void:
 	var margin: MarginContainer = MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
 	margin.add_theme_constant_override("margin_top", SafeZoneManager.get_top_margin() + 8)
-	margin.add_theme_constant_override("margin_bottom", SafeZoneManager.get_bottom_margin() + 8)
+	margin.add_theme_constant_override("margin_bottom", SafeZoneManager.get_bottom_margin() + 78)
 	margin.add_theme_constant_override("margin_left", 16)
 	margin.add_theme_constant_override("margin_right", 16)
 	add_child(margin)
@@ -69,6 +75,7 @@ func _build_layout() -> void:
 	content_container.add_theme_constant_override("separation", 20)
 	scroll.add_child(content_container)
 
+	_populate_tackle_box_section()
 	_populate_sections()
 
 
@@ -99,6 +106,165 @@ func _build_top_bar(parent: VBoxContainer) -> void:
 	gem_label.add_theme_font_size_override("font_size", 12)
 	gem_label.add_theme_color_override("font_color", Color(0.4, 0.8, 1.0))
 	bar.add_child(gem_label)
+
+
+func _populate_tackle_box_section() -> void:
+	var packs: Array[TackleBoxPackDefinition] = []
+	for path: String in TACKLE_BOX_PATHS:
+		if not ResourceLoader.exists(path):
+			continue
+		var pack: TackleBoxPackDefinition = load(path) as TackleBoxPackDefinition
+		if pack:
+			packs.append(pack)
+
+	if packs.is_empty():
+		return
+
+	var section_vbox: VBoxContainer = VBoxContainer.new()
+	section_vbox.add_theme_constant_override("separation", 10)
+	content_container.add_child(section_vbox)
+
+	var header_container: VBoxContainer = VBoxContainer.new()
+	header_container.add_theme_constant_override("separation", 4)
+	section_vbox.add_child(header_container)
+
+	var header_label: Label = Label.new()
+	header_label.text = "TACKLE BOX"
+	header_label.add_theme_font_size_override("font_size", 18)
+	header_label.add_theme_color_override("font_color", Color(0.95, 0.95, 0.95))
+	header_container.add_child(header_label)
+
+	var underline: ColorRect = ColorRect.new()
+	underline.custom_minimum_size = Vector2(0, 3)
+	underline.color = Color(0.3, 0.85, 0.5)
+	header_container.add_child(underline)
+
+	for pack: TackleBoxPackDefinition in packs:
+		var card: PanelContainer = _create_pack_card(pack)
+		section_vbox.add_child(card)
+
+
+func _create_pack_card(pack: TackleBoxPackDefinition) -> PanelContainer:
+	var panel: PanelContainer = PanelContainer.new()
+	panel.custom_minimum_size = Vector2(0, 70)
+
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = Color(0.08, 0.1, 0.16)
+	style.corner_radius_top_left = 8
+	style.corner_radius_top_right = 8
+	style.corner_radius_bottom_left = 8
+	style.corner_radius_bottom_right = 8
+	style.border_color = Color(0.18, 0.22, 0.3)
+	style.border_width_bottom = 1
+	style.border_width_top = 1
+	style.border_width_left = 1
+	style.border_width_right = 1
+	style.content_margin_top = 10
+	style.content_margin_bottom = 10
+	style.content_margin_left = 12
+	style.content_margin_right = 12
+	panel.add_theme_stylebox_override("panel", style)
+
+	var row: HBoxContainer = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	panel.add_child(row)
+
+	var info_vbox: VBoxContainer = VBoxContainer.new()
+	info_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	info_vbox.add_theme_constant_override("separation", 2)
+	row.add_child(info_vbox)
+
+	var name_label: Label = Label.new()
+	name_label.text = pack.display_name
+	name_label.add_theme_font_size_override("font_size", 14)
+	name_label.add_theme_color_override("font_color", Color(0.95, 0.95, 0.95))
+	info_vbox.add_child(name_label)
+
+	var desc_label: Label = Label.new()
+	desc_label.text = str(pack.gem_cost) + " Gems  •  " + str(pack.daily_limit) + " pulls/day"
+	desc_label.add_theme_font_size_override("font_size", 11)
+	desc_label.add_theme_color_override("font_color", Color(0.55, 0.55, 0.6))
+	info_vbox.add_child(desc_label)
+
+	var pull_btn: Button = Button.new()
+	pull_btn.text = "Pull"
+	pull_btn.custom_minimum_size = Vector2(80, 36)
+
+	var btn_style: StyleBoxFlat = StyleBoxFlat.new()
+	btn_style.bg_color = Color(0.2, 0.45, 0.7)
+	btn_style.corner_radius_top_left = 6
+	btn_style.corner_radius_top_right = 6
+	btn_style.corner_radius_bottom_left = 6
+	btn_style.corner_radius_bottom_right = 6
+	btn_style.content_margin_left = 10
+	btn_style.content_margin_right = 10
+	pull_btn.add_theme_stylebox_override("normal", btn_style)
+
+	var btn_hover_style: StyleBoxFlat = btn_style.duplicate()
+	btn_hover_style.bg_color = Color(0.25, 0.55, 0.8)
+	pull_btn.add_theme_stylebox_override("hover", btn_hover_style)
+
+	var btn_pressed_style: StyleBoxFlat = btn_style.duplicate()
+	btn_pressed_style.bg_color = Color(0.15, 0.35, 0.6)
+	pull_btn.add_theme_stylebox_override("pressed", btn_pressed_style)
+
+	pull_btn.add_theme_font_size_override("font_size", 13)
+	pull_btn.pressed.connect(_on_pull_pressed.bind(pack.id))
+	row.add_child(pull_btn)
+
+	return panel
+
+
+func _on_pull_pressed(pack_id: String) -> void:
+	HapticManager.medium_tap()
+	if not CurrencyManager:
+		return
+
+	var pack: TackleBoxPackDefinition = _find_pack_by_id(pack_id)
+	if not pack:
+		return
+
+	if not CurrencyManager.can_afford_gems(pack.gem_cost):
+		SignalBus.show_notification.emit("Not enough gems!", Color.RED)
+		return
+
+	CurrencyManager.spend_gems(pack.gem_cost)
+
+	var weights: Dictionary = pack.get_quality_weights()
+	var total_weight: float = pack.get_total_weight()
+	var roll: float = randf() * total_weight
+	var cumulative: float = 0.0
+	var pulled_quality: int = 0
+	for quality_key: Variant in weights:
+		cumulative += weights[quality_key]
+		if roll <= cumulative:
+			pulled_quality = quality_key as int
+			break
+
+	var pool: Array[String] = pack.item_pool_ids
+	var pulled_item_id: String = pool[randi() % pool.size()] if not pool.is_empty() else "unknown_item"
+	var item_type: String = "rod"
+	if pulled_item_id.begins_with("hook"):
+		item_type = "hook"
+	elif pulled_item_id.begins_with("lure"):
+		item_type = "lure"
+	elif pulled_item_id.begins_with("bait"):
+		item_type = "bait"
+
+	EquipmentManager.add_item(pulled_item_id, item_type, pulled_quality)
+
+	SignalBus.tackle_box_pull_started.emit(pack_id)
+	state_machine.push_state(UIStateMachine.State.TACKLE_BOX_REVEAL, {"item_id": pulled_item_id, "quality": pulled_quality})
+
+
+func _find_pack_by_id(pack_id: String) -> TackleBoxPackDefinition:
+	for path: String in TACKLE_BOX_PATHS:
+		if not ResourceLoader.exists(path):
+			continue
+		var pack: TackleBoxPackDefinition = load(path) as TackleBoxPackDefinition
+		if pack and pack.id == pack_id:
+			return pack
+	return null
 
 
 func _populate_sections() -> void:

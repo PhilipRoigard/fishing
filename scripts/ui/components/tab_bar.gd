@@ -2,58 +2,101 @@ extends HBoxContainer
 
 signal tab_changed(tab_index: int)
 
-const TAB_LABELS: Array[String] = ["Fish", "Equipment", "Store", "Tackle Box"]
-const TAB_STATES: Array[int] = [
-	UIStateMachine.State.COLLECTION_LOG,
-	UIStateMachine.State.EQUIPMENT,
-	UIStateMachine.State.STORE,
-	UIStateMachine.State.TACKLE_BOX,
-]
+enum Tab {
+	INVENTORY = 0,
+	STORE = 1,
+	HOME = 2,
+	FISH = 3,
+	SETTINGS = 4,
+}
 
-@export var active_color: Color = Color(0.2, 0.6, 1.0)
-@export var inactive_color: Color = Color(0.5, 0.5, 0.5)
+const TAB_LABELS: Dictionary = {
+	Tab.INVENTORY: "Inventory",
+	Tab.STORE: "Store",
+	Tab.HOME: "Home",
+	Tab.FISH: "Fish",
+	Tab.SETTINGS: "Settings",
+}
 
-var active_tab_index: int = -1
-var tab_buttons: Array[Button] = []
+const TAB_STATES: Dictionary = {
+	Tab.INVENTORY: UIStateMachine.State.EQUIPMENT,
+	Tab.STORE: UIStateMachine.State.STORE,
+	Tab.HOME: -1,
+	Tab.FISH: UIStateMachine.State.COLLECTION_LOG,
+	Tab.SETTINGS: UIStateMachine.State.SETTINGS,
+}
+
+@onready var _normal_style: StyleBox = preload("res://resources/ui/Style Boxes/StyleBoxFlat/tab_wood_normal.tres")
+@onready var _selected_style: StyleBox = preload("res://resources/ui/Style Boxes/StyleBoxFlat/tab_wood_selected.tres")
+
+@onready var inventory_tab: Button = %TabInventory
+@onready var store_tab: Button = %TabStore
+@onready var home_tab: Button = %TabHome
+@onready var fish_tab: Button = %TabFish
+@onready var settings_tab: Button = %TabSettings
+
+var expanded_ratio: float = 1.5
+var collapsed_ratio: float = 1.0
+
+var _buttons: Dictionary = {}
+var _current_tab: Tab = Tab.HOME
 
 
 func _ready() -> void:
-	_build_tabs()
+	_buttons = {
+		Tab.INVENTORY: inventory_tab,
+		Tab.STORE: store_tab,
+		Tab.HOME: home_tab,
+		Tab.FISH: fish_tab,
+		Tab.SETTINGS: settings_tab,
+	}
 	SignalBus.tab_should_change.connect(_on_tab_should_change)
 
 
-func _build_tabs() -> void:
-	for i: int in TAB_LABELS.size():
-		var btn: Button = Button.new()
-		btn.text = TAB_LABELS[i]
-		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		btn.custom_minimum_size.y = 48
-		btn.pressed.connect(_on_tab_pressed.bind(i))
-		add_child(btn)
-		tab_buttons.append(btn)
-	_update_tab_visuals()
-
-
-func _on_tab_pressed(index: int) -> void:
-	if index == active_tab_index:
+func _select_tab(index: Tab) -> void:
+	if _current_tab == index:
 		return
-	active_tab_index = index
-	_update_tab_visuals()
+
+	_current_tab = index
+	for tab: int in Tab.values():
+		_apply_tab_state(tab as Tab, tab == _current_tab)
+
 	tab_changed.emit(index)
-	HapticManager.light_tap()
+
+
+func select_home() -> void:
+	_current_tab = Tab.HOME
+	for tab: int in Tab.values():
+		_apply_tab_state(tab as Tab, tab == _current_tab)
+
+
+func _apply_tab_state(index: Tab, is_selected: bool) -> void:
+	var button: Button = _buttons[index]
+	button.add_theme_stylebox_override("normal", _selected_style if is_selected else _normal_style)
+	button.text = TAB_LABELS[index] if is_selected else ""
+	button.size_flags_stretch_ratio = expanded_ratio if is_selected else collapsed_ratio
 
 
 func _on_tab_should_change(tab_index: int) -> void:
-	if tab_index >= 0 and tab_index < tab_buttons.size():
-		_on_tab_pressed(tab_index)
+	if tab_index >= 0 and tab_index < Tab.size():
+		_select_tab(tab_index as Tab)
 
 
-func set_active_tab(index: int) -> void:
-	active_tab_index = index
-	_update_tab_visuals()
+func _on_inventory_pressed() -> void:
+	_select_tab(Tab.INVENTORY)
 
 
-func _update_tab_visuals() -> void:
-	for i: int in tab_buttons.size():
-		var btn: Button = tab_buttons[i]
-		btn.modulate = active_color if i == active_tab_index else inactive_color
+func _on_store_pressed() -> void:
+	_select_tab(Tab.STORE)
+
+
+func _on_home_pressed() -> void:
+	_select_tab(Tab.HOME)
+
+
+func _on_fish_pressed() -> void:
+	_select_tab(Tab.FISH)
+
+
+func _on_settings_pressed() -> void:
+	_select_tab(Tab.SETTINGS)

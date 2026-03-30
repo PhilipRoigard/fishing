@@ -1,0 +1,138 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="StyleBox" path="res://resources/ui/Style Boxes/StyleBoxFlat/tab_wood_normal.tres" id="1_normal"]
+[ext_resource type="Script" path="res://scripts/ui/components/tab_bar.gd" id="1_script"]
+[ext_resource type="StyleBox" path="res://resources/ui/Style Boxes/StyleBoxFlat/tab_wood_selected.tres" id="2_selected"]
+[ext_resource type="StyleBox" path="res://resources/ui/Style Boxes/StyleBoxFlat/tab_wood_disabled.tres" id="3_disabled"]
+[ext_resource type="Texture2D" uid="uid://ckie3qm2q58o6" path="res://resources/ui/Art/ui_spritesheet_02.png" id="4_spritesheet"]
+[ext_resource type="Script" path="res://scripts/ui/components/auto_size_button.gd" id="5_autosize"]
+
+[sub_resource type="AtlasTexture" id="icon_inventory"]
+atlas = ExtResource("4_spritesheet")
+region = Rect2(224, 224, 16, 16)
+
+[sub_resource type="AtlasTexture" id="icon_store"]
+atlas = ExtResource("4_spritesheet")
+region = Rect2(240, 240, 16, 16)
+
+[sub_resource type="AtlasTexture" id="icon_home"]
+atlas = ExtResource("4_spritesheet")
+region = Rect2(208, 224, 16, 16)
+
+[sub_resource type="AtlasTexture" id="icon_fish"]
+atlas = ExtResource("4_spritesheet")
+region = Rect2(208, 240, 16, 16)
+
+[sub_resource type="AtlasTexture" id="icon_settings"]
+atlas = ExtResource("4_spritesheet")
+region = Rect2(224, 240, 16, 16)
+
+[node name="TabBar" type="HBoxContainer"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -70.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_vertical = 8
+theme_override_constants/separation = -2
+script = ExtResource("1_script")
+
+[node name="TabInventory" type="Button" parent="."]
+unique_name_in_owner = true
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = ExtResource("1_normal")
+theme_override_styles/pressed = ExtResource("2_selected")
+theme_override_styles/hover = ExtResource("2_selected")
+theme_override_styles/disabled = ExtResource("3_disabled")
+icon = SubResource("icon_inventory")
+clip_text = true
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
+script = ExtResource("5_autosize")
+max_font_size = 14
+
+[node name="TabStore" type="Button" parent="."]
+unique_name_in_owner = true
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = ExtResource("1_normal")
+theme_override_styles/pressed = ExtResource("2_selected")
+theme_override_styles/hover = ExtResource("2_selected")
+theme_override_styles/disabled = ExtResource("3_disabled")
+icon = SubResource("icon_store")
+clip_text = true
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
+script = ExtResource("5_autosize")
+max_font_size = 14
+
+[node name="TabHome" type="Button" parent="."]
+unique_name_in_owner = true
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.5
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = ExtResource("2_selected")
+theme_override_styles/pressed = ExtResource("2_selected")
+theme_override_styles/hover = ExtResource("2_selected")
+theme_override_styles/disabled = ExtResource("3_disabled")
+text = "Home"
+icon = SubResource("icon_home")
+clip_text = true
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
+script = ExtResource("5_autosize")
+max_font_size = 14
+
+[node name="TabFish" type="Button" parent="."]
+unique_name_in_owner = true
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = ExtResource("1_normal")
+theme_override_styles/pressed = ExtResource("2_selected")
+theme_override_styles/hover = ExtResource("2_selected")
+theme_override_styles/disabled = ExtResource("3_disabled")
+icon = SubResource("icon_fish")
+clip_text = true
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
+script = ExtResource("5_autosize")
+max_font_size = 14
+
+[node name="TabSettings" type="Button" parent="."]
+unique_name_in_owner = true
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = ExtResource("1_normal")
+theme_override_styles/pressed = ExtResource("2_selected")
+theme_override_styles/hover = ExtResource("2_selected")
+theme_override_styles/disabled = ExtResource("3_disabled")
+icon = SubResource("icon_settings")
+clip_text = true
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
+script = ExtResource("5_autosize")
+max_font_size = 14
+
+[connection signal="pressed" from="TabInventory" to="." method="_on_inventory_pressed"]
+[connection signal="pressed" from="TabStore" to="." method="_on_store_pressed"]
+[connection signal="pressed" from="TabHome" to="." method="_on_home_pressed"]
+[connection signal="pressed" from="TabFish" to="." method="_on_fish_pressed"]
+[connection signal="pressed" from="TabSettings" to="." method="_on_settings_pressed"]
