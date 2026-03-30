@@ -1,0 +1,144 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/states/ui_merge_state.gd" id="1_script"]
+[ext_resource type="StyleBox" uid="uid://dlva7w51sxolv" path="res://resources/ui/Style Boxes/StyleBoxTexture/panels/panel_container.tres" id="2_panel"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/item_card.tscn" id="3_itemcard"]
+[ext_resource type="Script" path="res://scripts/ui/components/virtualized_item_grid.gd" id="4_vgrid"]
+
+[node name="MergeState" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.06, 0.12, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 78
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PreviewPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = ExtResource("2_panel")
+
+[node name="PreviewMargin" type="MarginContainer" parent="MarginContainer/VBoxContainer/PreviewPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="PreviewVBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TopRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin/PreviewVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SelectedSlot" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin/PreviewVBox/TopRow" instance=ExtResource("3_itemcard")]
+unique_name_in_owner = true
+
+[node name="InfoLabel" type="Label" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin/PreviewVBox/TopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+text = "Select equipment
+to merge!"
+autowrap_mode = 2
+
+[node name="BottomRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin/PreviewVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="MaterialSlot1" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin/PreviewVBox/BottomRow" instance=ExtResource("3_itemcard")]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.3)
+
+[node name="MaterialSlot2" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin/PreviewVBox/BottomRow" instance=ExtResource("3_itemcard")]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.3)
+
+[node name="ArrowLabel" type="Label" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin/PreviewVBox/BottomRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = ">"
+
+[node name="ResultSlot" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin/PreviewVBox/BottomRow" instance=ExtResource("3_itemcard")]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.3)
+
+[node name="HeaderPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("2_panel")
+
+[node name="HeaderMargin" type="MarginContainer" parent="MarginContainer/VBoxContainer/HeaderPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="HeaderHBox" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HeaderPanel/HeaderMargin"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer/HeaderPanel/HeaderMargin/HeaderHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+text = "My Equipment"
+horizontal_alignment = 1
+
+[node name="LoadoutButton" type="Button" parent="MarginContainer/VBoxContainer/HeaderPanel/HeaderMargin/HeaderHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 32)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Loadout"
+
+[node name="MergeAllButton" type="Button" parent="MarginContainer/VBoxContainer/HeaderPanel/HeaderMargin/HeaderHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 32)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Merge All"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ItemsGrid" type="Control" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("4_vgrid")
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HeaderPanel/HeaderMargin/HeaderHBox/LoadoutButton" to="." method="_on_loadout_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HeaderPanel/HeaderMargin/HeaderHBox/MergeAllButton" to="." method="_on_merge_all_pressed"]

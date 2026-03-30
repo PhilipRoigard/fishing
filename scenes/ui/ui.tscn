@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/ui_manager.gd" id="1_manager"]
 [ext_resource type="Script" path="res://scripts/ui/states/ui_loading_state.gd" id="2_loading"]
@@ -19,6 +19,7 @@
 [ext_resource type="Script" path="res://scripts/ui/states/ui_purchasing_state.gd" id="17_purchasing"]
 [ext_resource type="Script" path="res://scripts/ui/states/ui_bait_craft_state.gd" id="18_baitcraft"]
 [ext_resource type="Script" path="res://scripts/ui/states/ui_tooltip_state.gd" id="19_tooltip"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/merge_state.tscn" id="20_merge"]
 
 [node name="UI" type="CanvasLayer"]
 layer = 10
@@ -189,3 +190,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("19_tooltip")
+
+[node name="MergeStateNode" parent="." instance=ExtResource("20_merge")]
+visible = false

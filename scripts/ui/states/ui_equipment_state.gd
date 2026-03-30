@@ -42,11 +42,6 @@ var filter_container: HBoxContainer
 var cast_depth_label: Label
 var active_filter: int = 0
 var slot_containers: Array[PanelContainer] = []
-var is_merge_mode: bool = false
-var merge_selected: Array[String] = []
-var merge_item_id: String = ""
-var merge_quality: int = -1
-var merge_btn_ref: Button
 
 
 func enter(_meta: Variant = null) -> void:
@@ -136,12 +131,12 @@ func _build_layout() -> void:
 	items_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	header_hbox.add_child(items_label)
 
-	merge_btn_ref = Button.new()
-	merge_btn_ref.text = "Merge" if not is_merge_mode else "Items"
-	merge_btn_ref.custom_minimum_size = Vector2(100, 32)
-	merge_btn_ref.add_theme_font_size_override("font_size", 14)
-	merge_btn_ref.pressed.connect(_on_merge_pressed)
-	header_hbox.add_child(merge_btn_ref)
+	var merge_btn: Button = Button.new()
+	merge_btn.text = "Merge"
+	merge_btn.custom_minimum_size = Vector2(100, 32)
+	merge_btn.add_theme_font_size_override("font_size", 14)
+	merge_btn.pressed.connect(_on_merge_pressed)
+	header_hbox.add_child(merge_btn)
 
 	filter_container = HBoxContainer.new()
 	filter_container.add_theme_constant_override("separation", 2)
@@ -293,14 +288,9 @@ func _update_filter_buttons() -> void:
 
 
 func _refresh_grid() -> void:
-	if is_merge_mode:
-		filter_container.visible = false
-	else:
-		filter_container.visible = true
+	var filter_type: String = FILTER_TYPES[active_filter]
 
-	var filter_type: String = FILTER_TYPES[active_filter] if not is_merge_mode else ""
-
-	if filter_type == "bait" and not is_merge_mode:
+	if filter_type == "bait":
 		_populate_bait_grid()
 		return
 
@@ -323,7 +313,7 @@ func _refresh_grid() -> void:
 	var grid_data: Array = []
 	grid_data.append_array(unequipped)
 
-	if filter_type == "" and not is_merge_mode:
+	if filter_type == "":
 		var state: PlayerState = null
 		if Main.instance and Main.instance.player_state_system:
 			state = Main.instance.player_state_system.get_state()
@@ -369,14 +359,7 @@ func _configure_card(card: ItemCard, _index: int, data: Variant) -> void:
 	var icon_texture: Texture2D = _get_item_icon(entry.item_id, entry.equipment_type)
 	card.set_item_data(entry.item_id, entry.uuid, icon_texture, entry.level, quality_color)
 
-	if is_merge_mode:
-		var is_selected: bool = merge_selected.has(entry.uuid)
-		card.set_selected(is_selected)
-		if merge_item_id != "" and (entry.item_id != merge_item_id or entry.quality != merge_quality):
-			card.set_dimmed(true)
-		card.selected.connect(_on_merge_card_pressed.bind(entry.uuid))
-	else:
-		card.selected.connect(_on_item_pressed.bind(entry.uuid))
+	card.selected.connect(_on_item_pressed.bind(entry.uuid))
 
 
 
@@ -496,74 +479,8 @@ func _on_bait_pressed(quality: int) -> void:
 
 func _on_merge_pressed() -> void:
 	HapticManager.light_tap()
-	is_merge_mode = not is_merge_mode
-	merge_selected.clear()
-	merge_item_id = ""
-	merge_quality = -1
-	_clear_children()
-	_build_layout()
-	_refresh_all()
+	state_machine.push_state(UIStateMachine.State.MERGE)
 
-
-func _on_merge_card_pressed(uuid: String) -> void:
-	HapticManager.light_tap()
-	var entry: EquipmentManager.EquipmentEntry = EquipmentManager.get_item(uuid)
-	if not entry:
-		return
-
-	if merge_item_id == "" or (entry.item_id != merge_item_id or entry.quality != merge_quality):
-		merge_selected.clear()
-		merge_item_id = entry.item_id
-		merge_quality = entry.quality
-
-	if merge_selected.has(uuid):
-		merge_selected.erase(uuid)
-	else:
-		var merge_cfg: Variant = null
-		if GameResources.config:
-			merge_cfg = GameResources.config.equipment_merge_config
-		var max_select: int = 3
-		if merge_cfg:
-			var req: Variant = merge_cfg.get_requirement_for_quality(entry.quality)
-			if req:
-				max_select = req.copies_required
-		if merge_selected.size() < max_select:
-			merge_selected.append(uuid)
-
-	_refresh_grid()
-	_try_execute_merge()
-
-
-func _try_execute_merge() -> void:
-	if merge_selected.is_empty():
-		return
-
-	var merge_cfg: Variant = null
-	if GameResources.config:
-		merge_cfg = GameResources.config.equipment_merge_config
-	if not merge_cfg:
-		return
-
-	var req: Variant = merge_cfg.get_requirement_for_quality(merge_quality)
-	if not req:
-		return
-
-	if merge_selected.size() < req.copies_required:
-		return
-
-	var uuids: Array[String] = []
-	uuids.assign(merge_selected)
-	var result: String = EquipmentManager.merge(uuids)
-	if result != "":
-		var quality_names: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
-		var to_q: int = req.to_quality
-		SignalBus.show_notification.emit("Merged into %s!" % quality_names[mini(to_q, 4)], Enums.QUALITY_COLORS.get(to_q, Color.WHITE))
-		merge_selected.clear()
-		merge_item_id = ""
-		merge_quality = -1
-		_clear_children()
-		_build_layout()
-		_refresh_all()
 
 
 func _clear_children() -> void:

@@ -77,20 +77,8 @@ func _populate_tackle_box_section() -> void:
 	section_vbox.add_theme_constant_override("separation", 10)
 	content_container.add_child(section_vbox)
 
-	var header_container: VBoxContainer = VBoxContainer.new()
-	header_container.add_theme_constant_override("separation", 4)
-	section_vbox.add_child(header_container)
-
-	var header_label: Label = Label.new()
-	header_label.text = "TACKLE"
-	header_label.add_theme_font_size_override("font_size", 18)
-	header_label.add_theme_color_override("font_color", Color(0.95, 0.95, 0.95))
-	header_container.add_child(header_label)
-
-	var underline: ColorRect = ColorRect.new()
-	underline.custom_minimum_size = Vector2(0, 3)
-	underline.color = Color(0.3, 0.85, 0.5)
-	header_container.add_child(underline)
+	var header: PanelContainer = _create_section_header("Tackle")
+	section_vbox.add_child(header)
 
 	var packs_row: HBoxContainer = HBoxContainer.new()
 	packs_row.add_theme_constant_override("separation", 10)
@@ -365,6 +353,22 @@ func _detect_item_type(item_id: String) -> String:
 	return "rod"
 
 
+func _create_section_header(title: String) -> PanelContainer:
+	var panel: PanelContainer = PanelContainer.new()
+	var margin: MarginContainer = MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 8)
+	margin.add_theme_constant_override("margin_right", 8)
+	margin.add_theme_constant_override("margin_top", 6)
+	margin.add_theme_constant_override("margin_bottom", 6)
+	panel.add_child(margin)
+	var label: Label = Label.new()
+	label.text = title
+	label.add_theme_font_size_override("font_size", 18)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	margin.add_child(label)
+	return panel
+
+
 func _populate_sections() -> void:
 	var catalogue: Variant = null
 	if GameResources.config:
@@ -384,20 +388,8 @@ func _build_section(section_name: String, products: Array) -> void:
 	section_vbox.add_theme_constant_override("separation", 10)
 	content_container.add_child(section_vbox)
 
-	var header_container: VBoxContainer = VBoxContainer.new()
-	header_container.add_theme_constant_override("separation", 4)
-	section_vbox.add_child(header_container)
-
-	var header_label: Label = Label.new()
-	header_label.text = section_name.to_upper()
-	header_label.add_theme_font_size_override("font_size", 18)
-	header_label.add_theme_color_override("font_color", Color(0.95, 0.95, 0.95))
-	header_container.add_child(header_label)
-
-	var underline: ColorRect = ColorRect.new()
-	underline.custom_minimum_size = Vector2(0, 3)
-	underline.color = SECTION_COLORS.get(section_name, Color(0.5, 0.5, 0.5))
-	header_container.add_child(underline)
+	var header: PanelContainer = _create_section_header(section_name)
+	section_vbox.add_child(header)
 
 	for product: Variant in products:
 		var card: PanelContainer = _create_product_card(product)

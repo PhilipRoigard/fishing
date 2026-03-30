@@ -23,6 +23,7 @@ enum State {
 	PURCHASING,
 	CONSENT,
 	BAIT_CRAFT,
+	MERGE,
 }
 
 var active_states: Array[UIStateNode] = []
