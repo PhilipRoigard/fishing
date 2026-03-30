@@ -1,0 +1,204 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/debug_admin_ui.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://resources/spritesheet/currency_icons.png" id="2_icons"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_coins"]
+atlas = ExtResource("2_icons")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gems"]
+atlas = ExtResource("2_icons")
+region = Rect2(96, 0, 32, 32)
+
+[node name="DebugAdminUI" type="Control"]
+z_index = 100
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer"]
+modulate = Color(1, 1, 1, 0.95)
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="BackgroundPanel" type="Panel" parent="MarginContainer/PanelContainer"]
+modulate = Color(0, 0, 0, 0.7)
+layout_mode = 2
+
+[node name="ContentMargin" type="MarginContainer" parent="MarginContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/ContentMargin"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="TitleRow" type="HBoxContainer" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TitleRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 1, 0, 1)
+theme_override_font_sizes/font_size = 16
+text = "DEBUG / ADMIN PANEL"
+horizontal_alignment = 1
+
+[node name="CloseButton" type="Button" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TitleRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+text = "X"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer"]
+layout_mode = 2
+
+[node name="InstructionLabel" type="Label" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "Press TAB to toggle this panel"
+horizontal_alignment = 1
+
+[node name="TabContainer" type="TabContainer" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 10
+current_tab = 0
+
+[node name="Currency" type="ScrollContainer" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+metadata/_tab_index = 0
+
+[node name="CurrencyContent" type="VBoxContainer" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 5
+
+[node name="CurrencyLabel" type="Label" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.9, 1, 1)
+text = "Currency Controls:"
+
+[node name="CoinsRow" type="HBoxContainer" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="CoinsIcon" type="TextureRect" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/CoinsRow"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = SubResource("AtlasTexture_coins")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CoinsLabel" type="Label" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/CoinsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Coins:"
+vertical_alignment = 1
+
+[node name="RemoveCoins100" type="Button" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/CoinsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 30)
+layout_mode = 2
+text = "--"
+
+[node name="RemoveCoins10" type="Button" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/CoinsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(35, 30)
+layout_mode = 2
+text = "-"
+
+[node name="AddCoins10" type="Button" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/CoinsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(35, 30)
+layout_mode = 2
+text = "+"
+
+[node name="AddCoins100" type="Button" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/CoinsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 30)
+layout_mode = 2
+text = "++"
+
+[node name="CoinsAmountLabel" type="Label" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Current: 0"
+
+[node name="GemsRow" type="HBoxContainer" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="GemsIcon" type="TextureRect" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/GemsRow"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = SubResource("AtlasTexture_gems")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="GemsLabel" type="Label" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/GemsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Gems:"
+vertical_alignment = 1
+
+[node name="RemoveGems100" type="Button" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/GemsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 30)
+layout_mode = 2
+text = "--"
+
+[node name="RemoveGems10" type="Button" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/GemsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(35, 30)
+layout_mode = 2
+text = "-"
+
+[node name="AddGems10" type="Button" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/GemsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(35, 30)
+layout_mode = 2
+text = "+"
+
+[node name="AddGems100" type="Button" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/GemsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 30)
+layout_mode = 2
+text = "++"
+
+[node name="GemsAmountLabel" type="Label" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Current: 0"
+
+[connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TitleRow/CloseButton" to="." method="toggle_visibility"]
+[connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/CoinsRow/RemoveCoins100" to="." method="_on_remove_coins_1000"]
+[connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/CoinsRow/RemoveCoins10" to="." method="_on_remove_coins_100"]
+[connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/CoinsRow/AddCoins10" to="." method="_on_add_coins_100"]
+[connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/CoinsRow/AddCoins100" to="." method="_on_add_coins_1000"]
+[connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/GemsRow/RemoveGems100" to="." method="_on_remove_gems_1000"]
+[connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/GemsRow/RemoveGems10" to="." method="_on_remove_gems_100"]
+[connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/GemsRow/AddGems10" to="." method="_on_add_gems_100"]
+[connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/GemsRow/AddGems100" to="." method="_on_add_gems_1000"]

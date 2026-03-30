@@ -14,6 +14,7 @@ func _ready() -> void:
 	add_child(state_machine)
 
 	_create_screens()
+	_create_debug_ui()
 	_start_loading()
 
 
@@ -165,6 +166,13 @@ func _register(state: UIStateMachine.State, script: GDScript) -> void:
 	node.theme = game_theme
 	add_child(node)
 	state_machine.add_state(state, node)
+
+
+func _create_debug_ui() -> void:
+	var debug_scene: PackedScene = preload("res://scenes/ui/components/debug_admin_ui.tscn")
+	var debug_ui: Control = debug_scene.instantiate()
+	debug_ui.theme = game_theme
+	add_child(debug_ui)
 
 
 func _start_loading() -> void:

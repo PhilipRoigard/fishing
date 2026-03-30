@@ -22,12 +22,16 @@ var _reveal_index: int = 0
 var _skip_requested: bool = false
 
 
-func _process(_delta: float) -> void:
-	if Input.is_action_just_pressed("press"):
+func _input(event: InputEvent) -> void:
+	if not visible:
+		return
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		if _waiting_for_tap:
 			_open()
+			get_viewport().set_input_as_handled()
 		elif _revealing:
 			_skip_requested = true
+			get_viewport().set_input_as_handled()
 
 
 func enter(meta: Variant = null) -> void:

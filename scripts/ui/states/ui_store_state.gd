@@ -7,11 +7,11 @@ const SECTION_COLORS: Dictionary = {
 	"Premium": Color(0.9, 0.5, 1.0),
 }
 
-const TACKLE_BOX_PATHS: Array[String] = [
-	"res://data/gacha/basic_tackle_box.tres",
-	"res://data/gacha/premium_tackle_box.tres",
-	"res://data/gacha/legendary_tackle_box.tres",
-]
+const COMMON_PACK_PATH: String = "res://data/gacha/basic_tackle_box.tres"
+const PREMIUM_PACK_PATH: String = "res://data/gacha/premium_tackle_box.tres"
+const PREMIUM_SINGLE_COST: int = 300
+const PREMIUM_MEGA_COST: int = 2600
+const PREMIUM_MEGA_COUNT: int = 10
 
 var content_container: VBoxContainer
 
@@ -73,30 +73,39 @@ func _build_layout() -> void:
 
 
 func _populate_tackle_box_section() -> void:
-	var packs: Array[TackleBoxPackDefinition] = []
-	for path: String in TACKLE_BOX_PATHS:
-		if not ResourceLoader.exists(path):
-			continue
-		var pack: TackleBoxPackDefinition = load(path) as TackleBoxPackDefinition
-		if pack:
-			packs.append(pack)
+	var section_vbox: VBoxContainer = VBoxContainer.new()
+	section_vbox.add_theme_constant_override("separation", 10)
+	content_container.add_child(section_vbox)
 
-	if packs.is_empty():
-		return
+	var header_container: VBoxContainer = VBoxContainer.new()
+	header_container.add_theme_constant_override("separation", 4)
+	section_vbox.add_child(header_container)
+
+	var header_label: Label = Label.new()
+	header_label.text = "TACKLE"
+	header_label.add_theme_font_size_override("font_size", 18)
+	header_label.add_theme_color_override("font_color", Color(0.95, 0.95, 0.95))
+	header_container.add_child(header_label)
+
+	var underline: ColorRect = ColorRect.new()
+	underline.custom_minimum_size = Vector2(0, 3)
+	underline.color = Color(0.3, 0.85, 0.5)
+	header_container.add_child(underline)
 
 	var packs_row: HBoxContainer = HBoxContainer.new()
 	packs_row.add_theme_constant_override("separation", 10)
-	content_container.add_child(packs_row)
+	section_vbox.add_child(packs_row)
 
-	for pack: TackleBoxPackDefinition in packs:
-		var card: PanelContainer = _create_vending_card(pack)
-		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		packs_row.add_child(card)
+	var common_card: PanelContainer = _create_common_card()
+	common_card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	packs_row.add_child(common_card)
+
+	var premium_card: PanelContainer = _create_premium_card()
+	premium_card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	packs_row.add_child(premium_card)
 
 
-func _create_vending_card(pack: TackleBoxPackDefinition) -> PanelContainer:
-	var panel: PanelContainer = PanelContainer.new()
-
+func _make_card_style() -> StyleBoxFlat:
 	var style: StyleBoxFlat = StyleBoxFlat.new()
 	style.bg_color = Color(0.12, 0.13, 0.18)
 	style.corner_radius_top_left = 8
@@ -108,108 +117,217 @@ func _create_vending_card(pack: TackleBoxPackDefinition) -> PanelContainer:
 	style.border_width_top = 2
 	style.border_width_left = 2
 	style.border_width_right = 2
-	style.content_margin_top = 8
-	style.content_margin_bottom = 8
-	style.content_margin_left = 6
-	style.content_margin_right = 6
-	panel.add_theme_stylebox_override("panel", style)
+	style.content_margin_top = 10
+	style.content_margin_bottom = 10
+	style.content_margin_left = 8
+	style.content_margin_right = 8
+	return style
+
+
+func _make_green_btn_style() -> StyleBoxFlat:
+	var s: StyleBoxFlat = StyleBoxFlat.new()
+	s.bg_color = Color(0.2, 0.55, 0.3)
+	s.corner_radius_top_left = 6
+	s.corner_radius_top_right = 6
+	s.corner_radius_bottom_left = 6
+	s.corner_radius_bottom_right = 6
+	s.content_margin_left = 8
+	s.content_margin_right = 8
+	s.content_margin_top = 6
+	s.content_margin_bottom = 6
+	return s
+
+
+func _create_common_card() -> PanelContainer:
+	var panel: PanelContainer = PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", _make_card_style())
 
 	var vbox: VBoxContainer = VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 6)
 	panel.add_child(vbox)
 
-	var name_label: Label = Label.new()
-	name_label.text = pack.display_name.replace("Tackle Box", "").strip_edges()
-	if name_label.text == "":
-		name_label.text = pack.display_name
-	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_label.add_theme_font_size_override("font_size", 14)
-	name_label.add_theme_color_override("font_color", Color(0.95, 0.95, 0.95))
-	vbox.add_child(name_label)
+	var title: Label = Label.new()
+	title.text = "Common"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 16)
+	vbox.add_child(title)
 
-	var desc_label: Label = Label.new()
-	desc_label.text = pack.description
-	desc_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	desc_label.add_theme_font_size_override("font_size", 9)
-	desc_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
-	desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD
-	vbox.add_child(desc_label)
+	var desc: Label = Label.new()
+	desc.text = "Contains a Common or Uncommon item"
+	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	desc.add_theme_font_size_override("font_size", 11)
+	desc.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD
+	vbox.add_child(desc)
 
-	var icon_container: CenterContainer = CenterContainer.new()
-	icon_container.custom_minimum_size = Vector2(0, 80)
-	vbox.add_child(icon_container)
-
+	var icon_center: CenterContainer = CenterContainer.new()
+	icon_center.custom_minimum_size = Vector2(0, 80)
+	vbox.add_child(icon_center)
 	var chest_icon: TextureRect = TextureRect.new()
 	chest_icon.texture = preload("res://resources/spritesheet/tackle_box_chest.png")
-	chest_icon.custom_minimum_size = Vector2(72, 72)
+	chest_icon.custom_minimum_size = Vector2(64, 64)
 	chest_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	chest_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	chest_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	icon_container.add_child(chest_icon)
+	icon_center.add_child(chest_icon)
+
+	var spacer: Control = Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(spacer)
 
 	var open_label: Label = Label.new()
-	open_label.text = "Open x" + str(pack.items_per_pull)
+	open_label.text = "Open x1"
 	open_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	open_label.add_theme_font_size_override("font_size", 10)
+	open_label.add_theme_font_size_override("font_size", 11)
 	open_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.55))
 	vbox.add_child(open_label)
 
-	var pull_btn: Button = Button.new()
-	pull_btn.custom_minimum_size = Vector2(0, 36)
+	var ad_btn: Button = Button.new()
+	ad_btn.text = "  Watch Ad"
+	ad_btn.custom_minimum_size = Vector2(0, 36)
+	ad_btn.add_theme_font_size_override("font_size", 14)
+	var ad_style: StyleBoxFlat = _make_green_btn_style()
+	ad_btn.add_theme_stylebox_override("normal", ad_style)
+	var ad_hover: StyleBoxFlat = ad_style.duplicate()
+	ad_hover.bg_color = Color(0.25, 0.65, 0.35)
+	ad_btn.add_theme_stylebox_override("hover", ad_hover)
+	ad_btn.pressed.connect(_on_ad_pull_pressed)
+	vbox.add_child(ad_btn)
+
+	return panel
+
+
+func _create_premium_card() -> PanelContainer:
+	var panel: PanelContainer = PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", _make_card_style())
+
+	var vbox: VBoxContainer = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 6)
+	panel.add_child(vbox)
+
+	var title: Label = Label.new()
+	title.text = "Premium"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 16)
+	vbox.add_child(title)
+
+	var desc: Label = Label.new()
+	desc.text = "Contains a Uncommon, Rare, or Epic item"
+	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	desc.add_theme_font_size_override("font_size", 11)
+	desc.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD
+	vbox.add_child(desc)
+
+	var icon_center: CenterContainer = CenterContainer.new()
+	icon_center.custom_minimum_size = Vector2(0, 80)
+	vbox.add_child(icon_center)
+	var chest_icon: TextureRect = TextureRect.new()
+	chest_icon.texture = preload("res://resources/spritesheet/tackle_box_chest.png")
+	chest_icon.custom_minimum_size = Vector2(64, 64)
+	chest_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	chest_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	chest_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	icon_center.add_child(chest_icon)
+
+	var spacer: Control = Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(spacer)
+
+	var open_labels: HBoxContainer = HBoxContainer.new()
+	vbox.add_child(open_labels)
+	var ol1: Label = Label.new()
+	ol1.text = "Open x1"
+	ol1.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	ol1.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	ol1.add_theme_font_size_override("font_size", 11)
+	ol1.add_theme_color_override("font_color", Color(0.5, 0.5, 0.55))
+	open_labels.add_child(ol1)
+	var ol2: Label = Label.new()
+	ol2.text = "Open x10"
+	ol2.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	ol2.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	ol2.add_theme_font_size_override("font_size", 11)
+	ol2.add_theme_color_override("font_color", Color(0.5, 0.5, 0.55))
+	open_labels.add_child(ol2)
+
+	var btn_row: HBoxContainer = HBoxContainer.new()
+	btn_row.add_theme_constant_override("separation", 6)
+	vbox.add_child(btn_row)
 
 	var currency_sheet: Texture2D = preload("res://resources/spritesheet/currency_icons.png")
 	var gem_atlas: AtlasTexture = AtlasTexture.new()
 	gem_atlas.atlas = currency_sheet
 	gem_atlas.region = Rect2(96, 0, 32, 32)
-	pull_btn.icon = gem_atlas
-	pull_btn.text = " " + str(pack.gem_cost)
-	pull_btn.add_theme_font_size_override("font_size", 14)
-	pull_btn.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	pull_btn.expand_icon = true
 
-	var btn_style: StyleBoxFlat = StyleBoxFlat.new()
-	btn_style.bg_color = Color(0.2, 0.55, 0.3)
-	btn_style.corner_radius_top_left = 6
-	btn_style.corner_radius_top_right = 6
-	btn_style.corner_radius_bottom_left = 6
-	btn_style.corner_radius_bottom_right = 6
-	btn_style.content_margin_left = 8
-	btn_style.content_margin_right = 8
-	btn_style.content_margin_top = 4
-	btn_style.content_margin_bottom = 4
-	pull_btn.add_theme_stylebox_override("normal", btn_style)
+	var single_btn: Button = Button.new()
+	single_btn.custom_minimum_size = Vector2(0, 36)
+	single_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	single_btn.icon = gem_atlas
+	single_btn.text = " " + str(PREMIUM_SINGLE_COST)
+	single_btn.add_theme_font_size_override("font_size", 14)
+	single_btn.expand_icon = true
+	var s1: StyleBoxFlat = _make_green_btn_style()
+	single_btn.add_theme_stylebox_override("normal", s1)
+	var s1h: StyleBoxFlat = s1.duplicate()
+	s1h.bg_color = Color(0.25, 0.65, 0.35)
+	single_btn.add_theme_stylebox_override("hover", s1h)
+	single_btn.pressed.connect(_on_premium_single_pressed)
+	btn_row.add_child(single_btn)
 
-	var btn_hover: StyleBoxFlat = btn_style.duplicate()
-	btn_hover.bg_color = Color(0.25, 0.65, 0.35)
-	pull_btn.add_theme_stylebox_override("hover", btn_hover)
-
-	var btn_pressed: StyleBoxFlat = btn_style.duplicate()
-	btn_pressed.bg_color = Color(0.15, 0.45, 0.25)
-	pull_btn.add_theme_stylebox_override("pressed", btn_pressed)
-
-	pull_btn.pressed.connect(_on_pull_pressed.bind(pack.id, pack.items_per_pull))
-	vbox.add_child(pull_btn)
+	var mega_btn: Button = Button.new()
+	mega_btn.custom_minimum_size = Vector2(0, 36)
+	mega_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var gem_atlas2: AtlasTexture = AtlasTexture.new()
+	gem_atlas2.atlas = currency_sheet
+	gem_atlas2.region = Rect2(96, 0, 32, 32)
+	mega_btn.icon = gem_atlas2
+	mega_btn.text = " " + str(PREMIUM_MEGA_COST)
+	mega_btn.add_theme_font_size_override("font_size", 14)
+	mega_btn.expand_icon = true
+	var s2: StyleBoxFlat = _make_green_btn_style()
+	mega_btn.add_theme_stylebox_override("normal", s2)
+	var s2h: StyleBoxFlat = s2.duplicate()
+	s2h.bg_color = Color(0.25, 0.65, 0.35)
+	mega_btn.add_theme_stylebox_override("hover", s2h)
+	mega_btn.pressed.connect(_on_premium_mega_pressed)
+	btn_row.add_child(mega_btn)
 
 	return panel
 
 
-func _on_pull_pressed(pack_id: String, pull_count: int) -> void:
+func _on_ad_pull_pressed() -> void:
 	HapticManager.medium_tap()
-	if not CurrencyManager:
-		return
+	_do_pull(COMMON_PACK_PATH, 1)
 
-	var pack: TackleBoxPackDefinition = _find_pack_by_id(pack_id)
+
+func _on_premium_single_pressed() -> void:
+	HapticManager.medium_tap()
+	if not CurrencyManager.can_afford_gems(PREMIUM_SINGLE_COST):
+		SignalBus.show_notification.emit("Not enough gems!", Color.RED)
+		return
+	CurrencyManager.spend_gems(PREMIUM_SINGLE_COST)
+	_do_pull(PREMIUM_PACK_PATH, 1)
+
+
+func _on_premium_mega_pressed() -> void:
+	HapticManager.medium_tap()
+	if not CurrencyManager.can_afford_gems(PREMIUM_MEGA_COST):
+		SignalBus.show_notification.emit("Not enough gems!", Color.RED)
+		return
+	CurrencyManager.spend_gems(PREMIUM_MEGA_COST)
+	_do_pull(PREMIUM_PACK_PATH, PREMIUM_MEGA_COUNT)
+
+
+func _do_pull(pack_path: String, count: int) -> void:
+	if not ResourceLoader.exists(pack_path):
+		return
+	var pack: TackleBoxPackDefinition = load(pack_path) as TackleBoxPackDefinition
 	if not pack:
 		return
 
-	if not CurrencyManager.can_afford_gems(pack.gem_cost):
-		SignalBus.show_notification.emit("Not enough gems!", Color.RED)
-		return
-
-	CurrencyManager.spend_gems(pack.gem_cost)
-
 	var results: Array = []
-	for i: int in pull_count:
+	for i: int in count:
 		var weights: Dictionary = pack.get_quality_weights()
 		var total_weight: float = pack.get_total_weight()
 		var roll: float = randf() * total_weight
@@ -232,18 +350,9 @@ func _on_pull_pressed(pack_id: String, pull_count: int) -> void:
 		EquipmentManager.add_item(pulled_item_id, item_type, pulled_quality)
 		results.append({"item_id": pulled_item_id, "quality": pulled_quality})
 
-	SignalBus.tackle_box_pull_started.emit(pack_id)
+	SignalBus.tackle_box_pull_started.emit(pack.id)
 	state_machine.push_state(UIStateMachine.State.TACKLE_BOX_REVEAL, results)
 
-
-func _find_pack_by_id(pack_id: String) -> TackleBoxPackDefinition:
-	for path: String in TACKLE_BOX_PATHS:
-		if not ResourceLoader.exists(path):
-			continue
-		var pack: TackleBoxPackDefinition = load(path) as TackleBoxPackDefinition
-		if pack and pack.id == pack_id:
-			return pack
-	return null
 
 
 func _populate_sections() -> void:
