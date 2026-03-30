@@ -6,7 +6,6 @@ signal selected
 @onready var item_texture: TextureRect = $MarginContainer/TextureRect
 @onready var level_label: Label = %LevelLabel
 @onready var selection_highlight: ColorRect = %SelectionHighlight
-@onready var fill_panel: Panel = %FillPanel
 
 var item_id: String = ""
 var uuid: String = ""
