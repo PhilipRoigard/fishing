@@ -19,6 +19,15 @@ var _bait_green: Texture2D = preload("res://assets/sprites/items/Bait_01_green.p
 @onready var buttons: Control = %Buttons
 
 var selected_uuid: String = ""
+var _bait_quality: int = -1
+
+var _bait_textures: Dictionary = {
+	1: preload("res://assets/sprites/items/Bait_01.png"),
+	2: preload("res://assets/sprites/items/Bait_01_blue.png"),
+	3: preload("res://assets/sprites/items/Bait_01_pink.png"),
+	4: preload("res://assets/sprites/items/Bait_01_green.png"),
+}
+const _QUALITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
 
 
 func _ready() -> void:
@@ -33,9 +42,15 @@ func _on_background_input(event: InputEvent) -> void:
 
 func enter(meta: Variant = null) -> void:
 	super(meta)
+	_bait_quality = -1
+	selected_uuid = ""
 	if meta is Dictionary:
 		selected_uuid = meta.get("uuid", "")
-	_populate_data()
+		_bait_quality = meta.get("bait_quality", -1)
+	if _bait_quality >= 0:
+		_populate_bait_data()
+	else:
+		_populate_data()
 
 
 func _populate_data() -> void:
@@ -96,7 +111,34 @@ func _populate_data() -> void:
 	stats_label.text = stats_text
 
 
+func _populate_bait_data() -> void:
+	var quality_color: Color = Enums.QUALITY_COLORS.get(_bait_quality, Color.WHITE)
+	var quality_name: String = _QUALITY_NAMES[_bait_quality] if _bait_quality < _QUALITY_NAMES.size() else "Unknown"
+
+	equipment_name_label.text = quality_name + " Bait"
+	equipment_icon.texture = _bait_textures.get(_bait_quality, _bait_textures[1])
+	quality_fill.color = quality_color
+	level_label.text = ""
+
+	var state: PlayerState = null
+	if Main.instance and Main.instance.player_state_system:
+		state = Main.instance.player_state_system.get_state()
+
+	var count: int = state.bait_inventory.get(_bait_quality, 0) if state else 0
+	stats_label.text = "Quantity: x%d" % count
+	quality_label.text = "Catch %s quality fish" % quality_name
+
+	var bait_key: String = "bait_q" + str(_bait_quality)
+	var is_equipped: bool = state != null and state.equipped_bait_id == bait_key
+	equip_button.text = "Unequip" if is_equipped else "Equip"
+	level_up_button.visible = false
+
+
 func _on_equip_pressed() -> void:
+	if _bait_quality >= 0:
+		_equip_bait()
+		return
+
 	var entry: EquipmentManager.EquipmentEntry = EquipmentManager.get_item(selected_uuid)
 	if not entry:
 		return
@@ -107,6 +149,21 @@ func _on_equip_pressed() -> void:
 		EquipmentManager.unequip(slot)
 	else:
 		EquipmentManager.equip(slot, entry.uuid)
+	_back()
+
+
+func _equip_bait() -> void:
+	var state: PlayerState = null
+	if Main.instance and Main.instance.player_state_system:
+		state = Main.instance.player_state_system.get_state()
+	if not state:
+		return
+
+	var bait_key: String = "bait_q" + str(_bait_quality)
+	if state.equipped_bait_id == bait_key:
+		state.equipped_bait_id = ""
+	else:
+		state.equipped_bait_id = bait_key
 	_back()
 
 

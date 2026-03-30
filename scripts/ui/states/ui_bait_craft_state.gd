@@ -2,20 +2,28 @@ extends UIStateNode
 
 const MATERIALS_PER_CRAFT: int = 3
 
-const QUALITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic"]
-const QUALITY_COLORS: Array[Color] = [
-	Color(0.6, 0.6, 0.6),
-	Color(0.2, 0.8, 0.2),
-	Color(0.2, 0.6, 1.0),
-	Color(0.7, 0.3, 1.0),
-]
+const BAIT_QUALITIES: Array[int] = [1, 2, 3, 4]
+const QUALITY_NAMES: Dictionary = {
+	0: "Common",
+	1: "Uncommon",
+	2: "Rare",
+	3: "Epic",
+	4: "Legendary",
+}
+const QUALITY_COLORS: Dictionary = {
+	0: Color(0.6, 0.6, 0.6),
+	1: Color(0.2, 0.8, 0.2),
+	2: Color(0.2, 0.6, 1.0),
+	3: Color(0.7, 0.3, 1.0),
+	4: Color(1.0, 0.84, 0.0),
+}
 
-var _bait_textures: Array[Texture2D] = [
-	preload("res://assets/sprites/items/Bait_01.png"),
-	preload("res://assets/sprites/items/Bait_01_blue.png"),
-	preload("res://assets/sprites/items/Bait_01_pink.png"),
-	preload("res://assets/sprites/items/Bait_01_green.png"),
-]
+var _bait_textures: Dictionary = {
+	1: preload("res://assets/sprites/items/Bait_01.png"),
+	2: preload("res://assets/sprites/items/Bait_01_blue.png"),
+	3: preload("res://assets/sprites/items/Bait_01_pink.png"),
+	4: preload("res://assets/sprites/items/Bait_01_green.png"),
+}
 
 var material_labels: Array[Label] = []
 var bait_labels: Array[Label] = []
@@ -65,7 +73,6 @@ func _build_layout() -> void:
 	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(vbox)
 
-	_build_bait_section(vbox)
 	_build_materials_section(vbox)
 	_build_craft_section(vbox)
 
@@ -128,7 +135,7 @@ func _build_bait_section(parent: VBoxContainer) -> void:
 func _build_materials_section(parent: VBoxContainer) -> void:
 	_build_section_header(parent, "Fish Materials", Color(1.0, 0.84, 0.0))
 
-	for quality: int in QUALITY_NAMES.size():
+	for quality: int in [0, 1, 2, 3]:
 		var row: HBoxContainer = HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
 		row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -149,9 +156,9 @@ func _build_materials_section(parent: VBoxContainer) -> void:
 
 
 func _build_craft_section(parent: VBoxContainer) -> void:
-	_build_section_header(parent, "Craft", Color(0.3, 0.85, 0.5))
+	_build_section_header(parent, "Craft Bait", Color(0.3, 0.85, 0.5))
 
-	for quality: int in QUALITY_NAMES.size():
+	for quality: int in BAIT_QUALITIES:
 		var btn: Button = Button.new()
 		btn.text = "Craft " + QUALITY_NAMES[quality] + " Bait (3 materials)"
 		btn.custom_minimum_size = Vector2(0, 44)
@@ -170,17 +177,32 @@ func _refresh_display() -> void:
 	if not state:
 		return
 
-	for quality: int in QUALITY_NAMES.size():
-		var mat_count: int = state.kept_fish.get(quality, 0)
-		var bait_count: int = state.bait_inventory.get(quality, 0)
+	for i: int in 4:
+		var mat_count: int = state.kept_fish.get(i, 0)
+		if i < material_labels.size():
+			material_labels[i].text = str(mat_count)
 
-		if quality < material_labels.size():
-			material_labels[quality].text = str(mat_count)
-		if quality < bait_labels.size():
-			bait_labels[quality].text = str(bait_count)
-		if quality < craft_buttons.size():
-			craft_buttons[quality].disabled = mat_count < MATERIALS_PER_CRAFT
-			craft_buttons[quality].text = "Craft " + QUALITY_NAMES[quality] + " Bait (" + str(mat_count) + "/3)"
+	for i: int in BAIT_QUALITIES.size():
+		var quality: int = BAIT_QUALITIES[i]
+		var source: Dictionary = _get_craft_source(quality)
+		var source_count: int = _get_craft_source_count(state, quality)
+		if i < craft_buttons.size():
+			craft_buttons[i].disabled = source_count < MATERIALS_PER_CRAFT
+			craft_buttons[i].text = "Craft " + QUALITY_NAMES[quality] + " Bait (" + str(source_count) + "/3 " + source["name"] + ")"
+
+
+func _get_craft_source(quality: int) -> Dictionary:
+	if quality == 4:
+		return {"type": "bait", "key": 3, "name": "Epic Bait"}
+	var mat_q: int = quality - 1
+	return {"type": "material", "key": mat_q, "name": QUALITY_NAMES[mat_q]}
+
+
+func _get_craft_source_count(state: PlayerState, quality: int) -> int:
+	var source: Dictionary = _get_craft_source(quality)
+	if source["type"] == "bait":
+		return state.bait_inventory.get(source["key"], 0)
+	return state.kept_fish.get(source["key"], 0)
 
 
 func _on_craft_pressed(quality: int) -> void:
@@ -189,11 +211,16 @@ func _on_craft_pressed(quality: int) -> void:
 	if not state:
 		return
 
-	var mat_count: int = state.kept_fish.get(quality, 0)
-	if mat_count < MATERIALS_PER_CRAFT:
+	var source: Dictionary = _get_craft_source(quality)
+	var count: int = _get_craft_source_count(state, quality)
+	if count < MATERIALS_PER_CRAFT:
 		return
 
-	state.kept_fish[quality] = mat_count - MATERIALS_PER_CRAFT
+	if source["type"] == "bait":
+		state.bait_inventory[source["key"]] = count - MATERIALS_PER_CRAFT
+	else:
+		state.kept_fish[source["key"]] = count - MATERIALS_PER_CRAFT
+
 	var current_bait: int = state.bait_inventory.get(quality, 0)
 	state.bait_inventory[quality] = current_bait + 1
 	_refresh_display()

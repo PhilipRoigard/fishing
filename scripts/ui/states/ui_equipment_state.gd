@@ -1,6 +1,9 @@
 extends UIStateNode
 
 
+const _empty_slot_style: StyleBox = preload("res://resources/ui/Style Boxes/StyleBoxFlat/empty_slot.tres")
+const _item_card_scene: PackedScene = preload("res://scenes/ui/components/item_card.tscn")
+
 const SLOT_NAMES: Array[String] = ["Rod", "Hook", "Lure", "Bait"]
 const SLOT_TYPES: Array[Enums.EquipmentSlot] = [
 	Enums.EquipmentSlot.ROD,
@@ -18,6 +21,20 @@ var _bait_squid_texture: Texture2D = preload("res://assets/sprites/items/Bait_01
 var _bait_green_texture: Texture2D = preload("res://assets/sprites/items/Bait_01_green.png")
 var _rod_sheet_texture: Texture2D = preload("res://assets/sprites/character/fishing_rod_sheet.png")
 var _folley_sheet_texture: Texture2D = preload("res://assets/sprites/items/Folley_Sprite_Sheet.png")
+
+class BaitStack:
+	var quality: int
+	var count: int
+	func _init(p_quality: int = 0, p_count: int = 0) -> void:
+		quality = p_quality
+		count = p_count
+
+var _bait_textures: Dictionary = {
+	1: preload("res://assets/sprites/items/Bait_01.png"),
+	2: preload("res://assets/sprites/items/Bait_01_blue.png"),
+	3: preload("res://assets/sprites/items/Bait_01_pink.png"),
+	4: preload("res://assets/sprites/items/Bait_01_green.png"),
+}
 
 var item_grid: VirtualizedItemGrid
 var scroll: ScrollContainer
@@ -113,7 +130,11 @@ func _build_equipment_slots(parent: VBoxContainer) -> void:
 
 
 func _create_equipment_slot(slot_name: String, slot_type: Enums.EquipmentSlot) -> PanelContainer:
-	var item_card_scene: PackedScene = preload("res://scenes/ui/components/item_card.tscn")
+	var item_card_scene: PackedScene = _item_card_scene
+
+	if slot_type == Enums.EquipmentSlot.BAIT:
+		return _create_bait_slot(item_card_scene, slot_name)
+
 	var equipped: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(slot_type)
 
 	if equipped:
@@ -129,18 +150,38 @@ func _create_equipment_slot(slot_name: String, slot_type: Enums.EquipmentSlot) -
 
 	var empty_card: ItemCard = item_card_scene.instantiate() as ItemCard
 	empty_card.ready.connect(func() -> void:
-		var style: StyleBoxFlat = StyleBoxFlat.new()
-		style.bg_color = Color(0.08, 0.1, 0.15)
-		style.border_color = Color(0.25, 0.25, 0.3)
-		style.border_width_bottom = 1
-		style.border_width_top = 1
-		style.border_width_left = 1
-		style.border_width_right = 1
-		style.corner_radius_top_left = 4
-		style.corner_radius_top_right = 4
-		style.corner_radius_bottom_left = 4
-		style.corner_radius_bottom_right = 4
-		empty_card.add_theme_stylebox_override("panel", style)
+		empty_card.add_theme_stylebox_override("panel", _empty_slot_style)
+		empty_card.level_label.text = slot_name
+		empty_card.level_label.add_theme_color_override("font_color", Color(0.35, 0.35, 0.4))
+	)
+	return empty_card
+
+
+func _create_bait_slot(item_card_scene: PackedScene, slot_name: String) -> PanelContainer:
+	var state: PlayerState = null
+	if Main.instance and Main.instance.player_state_system:
+		state = Main.instance.player_state_system.get_state()
+
+	var equipped_key: String = state.equipped_bait_id if state else ""
+	var has_bait: bool = equipped_key.begins_with("bait_q")
+
+	if has_bait:
+		var quality: int = equipped_key.substr(6).to_int()
+		var count: int = state.bait_inventory.get(quality, 0) if state else 0
+		var card: ItemCard = item_card_scene.instantiate() as ItemCard
+		var quality_color: Color = Enums.QUALITY_COLORS.get(quality, Color.WHITE)
+		var tex: Texture2D = _bait_textures.get(quality, _bait_textures[1])
+		var q: int = quality
+		card.ready.connect(func() -> void:
+			card.set_item_data("bait", "", tex, 0, quality_color)
+			card.level_label.text = "x%d" % count
+			card.selected.connect(_on_bait_pressed.bind(q))
+		)
+		return card
+
+	var empty_card: ItemCard = item_card_scene.instantiate() as ItemCard
+	empty_card.ready.connect(func() -> void:
+		empty_card.add_theme_stylebox_override("panel", _empty_slot_style)
 		empty_card.level_label.text = slot_name
 		empty_card.level_label.add_theme_color_override("font_color", Color(0.35, 0.35, 0.4))
 	)
@@ -175,6 +216,10 @@ func _update_filter_buttons() -> void:
 func _refresh_grid() -> void:
 	var filter_type: String = FILTER_TYPES[active_filter]
 
+	if filter_type == "bait":
+		_populate_bait_grid()
+		return
+
 	var items: Array[EquipmentManager.EquipmentEntry] = []
 	items.assign(EquipmentManager.inventory)
 
@@ -182,14 +227,57 @@ func _refresh_grid() -> void:
 		var filtered: Array[EquipmentManager.EquipmentEntry] = []
 		filtered.assign(items.filter(func(e: EquipmentManager.EquipmentEntry) -> bool: return e.equipment_type == filter_type))
 		items = filtered
+	else:
+		var filtered: Array[EquipmentManager.EquipmentEntry] = []
+		filtered.assign(items.filter(func(e: EquipmentManager.EquipmentEntry) -> bool: return e.equipment_type != "bait"))
+		items = filtered
 
 	var unequipped: Array[EquipmentManager.EquipmentEntry] = []
 	unequipped.assign(items.filter(func(e: EquipmentManager.EquipmentEntry) -> bool: return not _is_item_equipped(e.uuid)))
 	unequipped.sort_custom(_sort_equipment)
-	item_grid.set_data(unequipped)
+
+	var grid_data: Array = []
+	grid_data.append_array(unequipped)
+
+	if filter_type == "":
+		var state: PlayerState = null
+		if Main.instance and Main.instance.player_state_system:
+			state = Main.instance.player_state_system.get_state()
+		if state:
+			for quality: int in [1, 2, 3, 4]:
+				var count: int = state.bait_inventory.get(quality, 0)
+				if count > 0:
+					grid_data.append(BaitStack.new(quality, count))
+
+	item_grid.set_data(grid_data)
+
+
+func _populate_bait_grid() -> void:
+	var state: PlayerState = null
+	if Main.instance and Main.instance.player_state_system:
+		state = Main.instance.player_state_system.get_state()
+	if not state:
+		item_grid.set_data([])
+		return
+
+	var stacks: Array = []
+	for quality: int in [1, 2, 3, 4]:
+		var count: int = state.bait_inventory.get(quality, 0)
+		if count > 0:
+			stacks.append(BaitStack.new(quality, count))
+	item_grid.set_data(stacks)
 
 
 func _configure_card(card: ItemCard, _index: int, data: Variant) -> void:
+	if data is BaitStack:
+		var bait: BaitStack = data as BaitStack
+		var quality_color: Color = Enums.QUALITY_COLORS.get(bait.quality, Color.WHITE)
+		var tex: Texture2D = _bait_textures.get(bait.quality, _bait_textures[1])
+		card.set_item_data("bait", "", tex, 0, quality_color)
+		card.level_label.text = "x%d" % bait.count
+		card.selected.connect(_on_bait_pressed.bind(bait.quality))
+		return
+
 	var entry: EquipmentManager.EquipmentEntry = data as EquipmentManager.EquipmentEntry
 	if not entry:
 		return
@@ -307,6 +395,11 @@ func _on_filter_pressed(index: int) -> void:
 func _on_item_pressed(uuid: String) -> void:
 	HapticManager.light_tap()
 	state_machine.push_state(UIStateMachine.State.EQUIPMENT_DETAILS, {"uuid": uuid})
+
+
+func _on_bait_pressed(quality: int) -> void:
+	HapticManager.light_tap()
+	state_machine.push_state(UIStateMachine.State.EQUIPMENT_DETAILS, {"bait_quality": quality})
 
 
 func _clear_children() -> void:

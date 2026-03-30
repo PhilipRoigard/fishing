@@ -96,11 +96,10 @@ func _grant_starter_items() -> void:
 	equip(_EnumsScript.EquipmentSlot.HOOK, hook_uuid)
 	equip(_EnumsScript.EquipmentSlot.LURE, lure_uuid)
 
-	add_item("worm", "bait", 0)
-	add_item("worm", "bait", 0)
-	add_item("worm", "bait", 0)
-	add_item("worm", "bait", 0)
-	add_item("worm", "bait", 0)
+	if Main.instance and Main.instance.player_state_system:
+		var state: Resource = Main.instance.player_state_system.get_state()
+		if state:
+			state.bait_inventory[1] = 5
 
 
 func add_item(item_id: String, equipment_type: String, quality: int = 0) -> String:

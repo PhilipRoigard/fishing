@@ -196,6 +196,46 @@ text = "Current: 0"
 [node name="HSeparator" type="HSeparator" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent"]
 layout_mode = 2
 
+[node name="MaterialsLabel" type="Label" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.9, 1, 1)
+text = "Add Materials (+10):"
+
+[node name="MaterialsRow" type="HBoxContainer" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="AddCommon" type="Button" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/MaterialsRow"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+text = "Com"
+
+[node name="AddUncommon" type="Button" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/MaterialsRow"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.2, 0.8, 0.2, 1)
+text = "Unc"
+
+[node name="AddRare" type="Button" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/MaterialsRow"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.2, 0.6, 1, 1)
+text = "Rare"
+
+[node name="AddEpic" type="Button" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/MaterialsRow"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.7, 0.3, 1, 1)
+text = "Epic"
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent"]
+layout_mode = 2
+
 [node name="ResetInventoryButton" type="Button" parent="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent"]
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
@@ -210,4 +250,8 @@ text = "Reset Inventory (clears save)"
 [connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/GemsRow/RemoveGems10" to="." method="_on_remove_gems_100"]
 [connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/GemsRow/AddGems10" to="." method="_on_add_gems_100"]
 [connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/GemsRow/AddGems100" to="." method="_on_add_gems_1000"]
+[connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/MaterialsRow/AddCommon" to="." method="_on_add_common_mats"]
+[connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/MaterialsRow/AddUncommon" to="." method="_on_add_uncommon_mats"]
+[connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/MaterialsRow/AddRare" to="." method="_on_add_rare_mats"]
+[connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/MaterialsRow/AddEpic" to="." method="_on_add_epic_mats"]
 [connection signal="pressed" from="MarginContainer/PanelContainer/ContentMargin/VBoxContainer/TabContainer/Currency/CurrencyContent/ResetInventoryButton" to="." method="_on_reset_inventory"]

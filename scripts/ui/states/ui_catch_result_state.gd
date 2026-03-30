@@ -33,6 +33,7 @@ var sell_button: Button
 var keep_button: Button
 var fish_sprite: TextureRect
 var caught_fish_id: String = ""
+var caught_quality: int = 0
 var discovery_tween: Tween
 
 
@@ -40,6 +41,7 @@ func enter(meta: Variant = null) -> void:
 	super(meta)
 	if meta is Dictionary:
 		caught_fish_id = meta.get("fish_id", "")
+		caught_quality = meta.get("caught_quality", 0)
 	_build_layout()
 	_populate_data()
 
@@ -222,15 +224,13 @@ func _on_sell_pressed() -> void:
 
 func _on_keep_pressed() -> void:
 	HapticManager.light_tap()
-	var fish_data: FishData = null
-	if Main.instance and Main.instance.database_system:
-		fish_data = Main.instance.database_system.get_fish_by_id(caught_fish_id)
-	if fish_data and Main.instance and Main.instance.player_state_system:
+	if Main.instance and Main.instance.player_state_system:
 		var state: PlayerState = Main.instance.player_state_system.get_state()
 		if state:
-			var quality: int = fish_data.rarity
-			var current_count: int = state.kept_fish.get(quality, 0)
-			state.kept_fish[quality] = current_count + 1
+			var max_material_tier: int = mini(caught_quality, 2)
+			for q: int in range(0, max_material_tier + 1):
+				var current: int = state.kept_fish.get(q, 0)
+				state.kept_fish[q] = current + 1
 	_back()
 
 

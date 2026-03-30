@@ -74,6 +74,27 @@ func _on_add_gems_1000() -> void:
 	CurrencyManager.add_gems(1000)
 
 
+func _add_materials(quality: int, amount: int) -> void:
+	if Main.instance and Main.instance.player_state_system:
+		var state: Resource = Main.instance.player_state_system.get_state()
+		if state:
+			var current: int = state.kept_fish.get(quality, 0)
+			state.kept_fish[quality] = maxi(current + amount, 0)
+
+
+func _on_add_common_mats() -> void:
+	_add_materials(0, 10)
+
+func _on_add_uncommon_mats() -> void:
+	_add_materials(1, 10)
+
+func _on_add_rare_mats() -> void:
+	_add_materials(2, 10)
+
+func _on_add_epic_mats() -> void:
+	_add_materials(3, 10)
+
+
 func _on_reset_inventory() -> void:
 	EquipmentManager.inventory.clear()
 	EquipmentManager.loadout.clear()

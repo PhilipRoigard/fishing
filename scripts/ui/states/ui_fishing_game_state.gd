@@ -551,7 +551,12 @@ func _on_fish_caught(fish_id: String) -> void:
 	var tree: SceneTree = Engine.get_main_loop() as SceneTree
 	if tree:
 		await tree.create_timer(1.0).timeout
-	state_machine.push_state(UIStateMachine.State.CATCH_RESULT, {"fish_id": fish_id})
+	var caught_quality: int = 0
+	if Main.instance and Main.instance.player_state_system:
+		var pstate: PlayerState = Main.instance.player_state_system.get_state()
+		if pstate and pstate.equipped_bait_id.begins_with("bait_q"):
+			caught_quality = pstate.equipped_bait_id.substr(6).to_int()
+	state_machine.push_state(UIStateMachine.State.CATCH_RESULT, {"fish_id": fish_id, "caught_quality": caught_quality})
 
 
 func _on_fish_escaped(_fish_id: String) -> void:
