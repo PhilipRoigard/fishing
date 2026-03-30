@@ -38,9 +38,6 @@ func _process(delta: float) -> void:
 	_advance_path(delta)
 	_update_wander(delta)
 
-	if _lifetime > MAX_LIFETIME:
-		school_despawn.emit()
-
 	if _is_fully_offscreen():
 		school_despawn.emit()
 

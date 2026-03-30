@@ -59,7 +59,7 @@ func _spawn_school(fish_data: FishData) -> void:
 		spawn_x = 370.0
 		target_x = -10.0
 
-	var spawn_y: float = randf_range(120.0, 550.0)
+	var spawn_y: float = randf_range(170.0, 550.0)
 
 	var path: PackedVector2Array = PackedVector2Array()
 	path.append(Vector2(spawn_x, spawn_y))
@@ -107,7 +107,7 @@ func _spawn_school(fish_data: FishData) -> void:
 		)
 		swimming_fish.position = offset
 
-		var initial_direction: float = 1.0 if not spawn_from_left else -1.0
+		var initial_direction: float = 1.0 if spawn_from_left else -1.0
 		swimming_fish.velocity = Vector2(initial_direction * fish_data.swim_speed * randf_range(0.8, 1.2), randf_range(-5.0, 5.0))
 
 		school.add_child(swimming_fish)

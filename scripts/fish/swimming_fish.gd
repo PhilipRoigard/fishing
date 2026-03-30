@@ -41,6 +41,7 @@ const CURIOSITY_RANGE: float = 180.0
 const CURIOSITY_SPEED_MULT: float = 0.8
 const CURIOSITY_CHANCE: float = 0.08
 const NIBBLE_DISTANCE: float = 20.0
+const WATER_SURFACE_Y: float = 155.0
 
 signal fish_despawned(fish: SwimmingFish)
 
@@ -97,17 +98,11 @@ func _physics_process(delta: float) -> void:
 	var swim_speed: float = (fish_data.swim_speed if fish_data else 50.0) * _speed_variation
 
 	_sine_time += delta
-	_direction_change_timer -= delta
 	_vertical_wander_timer -= delta
 
-	if _direction_change_timer <= 0.0:
-		_direction_change_timer = randf_range(3.0, 8.0)
-		if randf() < 0.15:
-			_swim_direction = -_swim_direction
-
 	if _vertical_wander_timer <= 0.0:
-		_vertical_wander_timer = randf_range(2.0, 5.0)
-		_vertical_wander_target = _base_y + randf_range(-30.0, 30.0)
+		_vertical_wander_timer = randf_range(3.0, 6.0)
+		_vertical_wander_target = maxf(_base_y + randf_range(-20.0, 20.0), WATER_SURFACE_Y)
 
 	_check_curiosity(delta)
 
@@ -139,6 +134,10 @@ func _physics_process(delta: float) -> void:
 	move_delta += separation * delta
 
 	position += move_delta
+
+	if global_position.y < WATER_SURFACE_Y:
+		global_position.y = WATER_SURFACE_Y
+
 	velocity = move_delta / maxf(delta, 0.001)
 
 	_update_facing()
