@@ -80,21 +80,16 @@ func _build_layout() -> void:
 	vbox.add_theme_constant_override("separation", 6)
 	margin.add_child(vbox)
 
-	var stats_panel: PanelContainer = PanelContainer.new()
-	stats_panel.add_theme_stylebox_override("panel", preload("res://resources/ui/Style Boxes/StyleBoxTexture/panels/panel_container.tres"))
-	vbox.add_child(stats_panel)
+	var header_style: StyleBox = preload("res://resources/ui/Style Boxes/StyleBoxTexture/panels/panel_container_header.tres")
 
-	var stats_margin: MarginContainer = MarginContainer.new()
-	stats_margin.add_theme_constant_override("margin_left", 8)
-	stats_margin.add_theme_constant_override("margin_right", 8)
-	stats_margin.add_theme_constant_override("margin_top", 4)
-	stats_margin.add_theme_constant_override("margin_bottom", 4)
-	stats_panel.add_child(stats_margin)
+	var stats_panel: PanelContainer = PanelContainer.new()
+	stats_panel.add_theme_stylebox_override("panel", header_style)
+	vbox.add_child(stats_panel)
 
 	var stats_hbox: HBoxContainer = HBoxContainer.new()
 	stats_hbox.add_theme_constant_override("separation", 8)
 	stats_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	stats_margin.add_child(stats_hbox)
+	stats_panel.add_child(stats_hbox)
 
 	var depth_label_title: Label = Label.new()
 	depth_label_title.text = "Cast Depth"
@@ -111,18 +106,11 @@ func _build_layout() -> void:
 	_build_equipment_slots(vbox)
 
 	var header_panel: PanelContainer = PanelContainer.new()
-	header_panel.add_theme_stylebox_override("panel", preload("res://resources/ui/Style Boxes/StyleBoxTexture/panels/panel_container.tres"))
+	header_panel.add_theme_stylebox_override("panel", header_style)
 	vbox.add_child(header_panel)
 
-	var header_margin: MarginContainer = MarginContainer.new()
-	header_margin.add_theme_constant_override("margin_left", 8)
-	header_margin.add_theme_constant_override("margin_right", 8)
-	header_margin.add_theme_constant_override("margin_top", 4)
-	header_margin.add_theme_constant_override("margin_bottom", 4)
-	header_panel.add_child(header_margin)
-
 	var header_hbox: HBoxContainer = HBoxContainer.new()
-	header_margin.add_child(header_hbox)
+	header_panel.add_child(header_hbox)
 
 	var items_label: Label = Label.new()
 	items_label.text = "Items"

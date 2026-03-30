@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/states/ui_fish_details_state.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/components/item_card.tscn" id="2_itemcard"]
+[ext_resource type="StyleBox" uid="uid://f2eyyygm4b4g" path="res://resources/ui/Style Boxes/StyleBoxTexture/panels/panel_container_header.tres" id="3_header"]
 
 [node name="FishDetails" type="Control"]
 layout_mode = 3
@@ -27,6 +28,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(320, 0)
 layout_mode = 1
 anchors_preset = 8
+theme_override_styles/panel = ExtResource("3_header")
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5

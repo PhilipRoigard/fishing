@@ -354,19 +354,11 @@ func _detect_item_type(item_id: String) -> String:
 
 
 func _create_section_header(title: String) -> PanelContainer:
-	var panel: PanelContainer = PanelContainer.new()
-	var margin: MarginContainer = MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 8)
-	margin.add_theme_constant_override("margin_right", 8)
-	margin.add_theme_constant_override("margin_top", 6)
-	margin.add_theme_constant_override("margin_bottom", 6)
-	panel.add_child(margin)
-	var label: Label = Label.new()
+	var header_scene: PackedScene = preload("res://scenes/ui/components/section_header.tscn")
+	var header: PanelContainer = header_scene.instantiate() as PanelContainer
+	var label: Label = header.get_node("%TitleLabel")
 	label.text = title
-	label.add_theme_font_size_override("font_size", 18)
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	margin.add_child(label)
-	return panel
+	return header
 
 
 func _populate_sections() -> void:
