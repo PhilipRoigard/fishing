@@ -11,8 +11,7 @@ var _bait_green: Texture2D = preload("res://assets/sprites/items/Bait_01_green.p
 @onready var level_label: Label = %LevelLabel
 @onready var stats_label: Label = %StatsLabel
 @onready var quality_label: Label = %QualityLabel
-@onready var equipment_icon: TextureRect = %EquipmentIcon
-@onready var item_container: PanelContainer = %ItemContainer
+@onready var item_card: ItemCard = %ItemCard
 @onready var equip_button: Button = %EquipButton
 @onready var level_up_button: Button = %LevelUpButton
 @onready var buttons: Control = %Buttons
@@ -62,8 +61,9 @@ func _populate_data() -> void:
 	var quality_color: Color = Enums.QUALITY_COLORS.get(entry.quality, Color.WHITE)
 
 	equipment_name_label.text = display_name
-	equipment_icon.texture = _get_item_icon(entry.item_id, entry.equipment_type)
-	item_container.self_modulate = quality_color
+	var icon_texture: Texture2D = _get_item_icon(entry.item_id, entry.equipment_type)
+	item_card.set_item_data(entry.item_id, entry.uuid, icon_texture, entry.level, quality_color)
+	item_card.level_label.visible = false
 	quality_label.text = quality_name
 
 	var stat_cfg: EquipmentStatConfig = null
@@ -121,8 +121,9 @@ func _populate_bait_data() -> void:
 	var quality_name: String = _QUALITY_NAMES[_bait_quality] if _bait_quality < _QUALITY_NAMES.size() else "Unknown"
 
 	equipment_name_label.text = quality_name + " Bait"
-	equipment_icon.texture = _bait_textures.get(_bait_quality, _bait_textures[1])
-	item_container.self_modulate = quality_color
+	var bait_tex: Texture2D = _bait_textures.get(_bait_quality, _bait_textures[1])
+	item_card.set_item_data("bait", "", bait_tex, 0, quality_color)
+	item_card.level_label.visible = false
 	level_label.text = ""
 
 	var state: PlayerState = null

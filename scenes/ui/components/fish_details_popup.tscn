@@ -1,8 +1,7 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/states/ui_fish_details_state.gd" id="1_script"]
-[ext_resource type="StyleBox" path="res://resources/ui/Style Boxes/StyleBoxTexture/panels/panel_container_item_card.tres" id="2_card"]
-[ext_resource type="StyleBox" uid="uid://fq5cq1ysw1ls" path="res://resources/ui/Style Boxes/StyleBoxFlat/item_card_panel_inner.tres" id="3_fill"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/item_card.tscn" id="2_itemcard"]
 
 [node name="FishDetails" type="Control"]
 layout_mode = 3
@@ -76,31 +75,8 @@ theme_override_constants/separation = 16
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="FishContainer" type="PanelContainer" parent="PopupPanel/MarginContainer/VBoxContainer/Details/LeftColumn"]
+[node name="FishCard" parent="PopupPanel/MarginContainer/VBoxContainer/Details/LeftColumn" instance=ExtResource("2_itemcard")]
 unique_name_in_owner = true
-layout_mode = 2
-theme_override_styles/panel = ExtResource("2_card")
-
-[node name="FillPanel" type="Panel" parent="PopupPanel/MarginContainer/VBoxContainer/Details/LeftColumn/FishContainer"]
-unique_name_in_owner = true
-show_behind_parent = true
-layout_mode = 2
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("3_fill")
-
-[node name="MarginContainer" type="MarginContainer" parent="PopupPanel/MarginContainer/VBoxContainer/Details/LeftColumn/FishContainer"]
-layout_mode = 2
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 4
-
-[node name="FishIcon" type="TextureRect" parent="PopupPanel/MarginContainer/VBoxContainer/Details/LeftColumn/FishContainer/MarginContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(64, 64)
-layout_mode = 2
-expand_mode = 5
-texture_filter = 1
 
 [node name="CaughtLabel" type="Label" parent="PopupPanel/MarginContainer/VBoxContainer/Details/LeftColumn"]
 unique_name_in_owner = true

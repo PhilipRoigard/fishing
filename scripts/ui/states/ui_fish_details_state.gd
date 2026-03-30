@@ -28,8 +28,7 @@ const QUALITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Leg
 
 @onready var background: ColorRect = %Background
 @onready var fish_name_label: Label = %FishName
-@onready var fish_icon: TextureRect = %FishIcon
-@onready var fish_container: PanelContainer = %FishContainer
+@onready var fish_card: ItemCard = %FishCard
 @onready var caught_label: Label = %CaughtLabel
 @onready var quality_label: Label = %QualityLabel
 @onready var depth_label: Label = %DepthLabel
@@ -69,7 +68,6 @@ func _populate_data() -> void:
 	var atlas_tex: AtlasTexture = AtlasTexture.new()
 	atlas_tex.atlas = FISH_ATLAS
 	atlas_tex.region = FISH_ATLAS_REGIONS.get(fish_data.id, Rect2(0, 0, 16, 16))
-	fish_icon.texture = atlas_tex
 
 	var state: PlayerState = null
 	if Main.instance and Main.instance.player_state_system:
@@ -82,7 +80,8 @@ func _populate_data() -> void:
 		best_quality = state.collection_best_quality.get(fish_id, 0)
 
 	var quality_color: Color = Enums.QUALITY_COLORS.get(best_quality, Color(0.6, 0.6, 0.6))
-	fish_container.self_modulate = quality_color
+	fish_card.set_item_data(fish_data.id, "", atlas_tex, 0, quality_color)
+	fish_card.level_label.visible = false
 
 	caught_label.text = "Caught: x%d" % times_caught
 	quality_label.text = "Best: %s" % QUALITY_NAMES[mini(best_quality, QUALITY_NAMES.size() - 1)]

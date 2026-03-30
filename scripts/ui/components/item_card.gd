@@ -50,5 +50,4 @@ func set_item_data(id: String, p_uuid: String, texture: Texture2D, level: int, q
 	uuid = p_uuid
 	item_texture.texture = texture
 	level_label.text = "Lv.%d" % level
-
 	self_modulate = quality_color
