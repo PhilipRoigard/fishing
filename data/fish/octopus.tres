@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="FishData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/fish_data.gd" id="1"]
+[ext_resource type="AtlasTexture" path="res://resources/sprites/fish/octopus.tres" id="2_atlas_tex"]
+
+[resource]
+script = ExtResource("1")
+id = "octopus"
+texture = ExtResource("2_atlas_tex")
+display_name = "Octopus"
+rarity = 1
+sell_value_coins = 30
+min_depth = 100.0
+max_depth = 600.0
+biome_flags = 3
+spawn_weight = 3.5
+min_school_size = 1
+max_school_size = 2
+swim_speed = 38.0
+separation_radius = 30.0
+scatter_on_catch = true
+fight_speed = 52.0
+fight_erratic = 0.6
+fight_stamina = 1.0
+tension_generation = 0.6
+phase_count = 1

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="FishData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/fish_data.gd" id="1"]
+[ext_resource type="AtlasTexture" path="res://resources/sprites/fish/sea_turtle.tres" id="2_atlas_tex"]
+
+[resource]
+script = ExtResource("1")
+id = "sea_turtle"
+texture = ExtResource("2_atlas_tex")
+display_name = "Sea Turtle"
+rarity = 1
+sell_value_coins = 20
+min_depth = 0.0
+max_depth = 400.0
+biome_flags = 3
+spawn_weight = 5.0
+min_school_size = 1
+max_school_size = 2
+swim_speed = 32.0
+separation_radius = 35.0
+scatter_on_catch = true
+fight_speed = 36.0
+fight_erratic = 0.3
+fight_stamina = 0.7
+tension_generation = 0.4
+phase_count = 1

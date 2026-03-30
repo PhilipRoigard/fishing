@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="FishData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/fish_data.gd" id="1"]
+[ext_resource type="AtlasTexture" path="res://resources/sprites/fish/giant_squid.tres" id="2_atlas_tex"]
+
+[resource]
+script = ExtResource("1")
+id = "giant_squid"
+texture = ExtResource("2_atlas_tex")
+display_name = "Giant Squid"
+rarity = 3
+sell_value_coins = 350
+min_depth = 600.0
+max_depth = 3000.0
+biome_flags = 3
+spawn_weight = 0.4
+min_school_size = 1
+max_school_size = 1
+swim_speed = 48.0
+separation_radius = 60.0
+scatter_on_catch = false
+fight_speed = 55.0
+fight_erratic = 0.5
+fight_stamina = 3.5
+tension_generation = 1.0
+phase_count = 3

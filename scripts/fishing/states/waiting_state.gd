@@ -52,8 +52,6 @@ func update(delta: float) -> void:
 			_trigger_bite_from_fish(biting_fish)
 			return
 
-	if force_bite_timer >= FORCE_BITE_TIME:
-		_trigger_fallback_bite()
 
 
 func _find_hook() -> void:
