@@ -151,17 +151,17 @@ func level_up(uuid: String) -> bool:
 	if not entry:
 		return false
 
-	var quality_cfg: Variant = null
+	var stat_cfg: EquipmentStatConfig = null
 	if GameResources.config:
-		quality_cfg = GameResources.config.quality_config
-	if not quality_cfg:
+		stat_cfg = GameResources.config.equipment_stat_config
+	if not stat_cfg:
 		return false
 
-	var cap: int = quality_cfg.get_level_cap(entry.quality)
+	var cap: int = stat_cfg.get_level_cap(entry.quality)
 	if entry.level >= cap:
 		return false
 
-	var cost: int = quality_cfg.get_level_up_cost(entry.quality, entry.level)
+	var cost: int = stat_cfg.get_level_up_cost(entry.level)
 	if not CurrencyManager.can_afford_coins(cost):
 		return false
 

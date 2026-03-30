@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RodData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/rod_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "tidecaller_rod"
+display_name = "Tidecaller Rod"
+description = "A mystical rod that attracts bounty from the sea. Earn more materials when saving fish."
+perk_name = "Bounty"
+perk_description = "+%d%% bonus materials"
+perk_id = "double_materials"
+perk_values = [25.0, 50.0, 75.0, 100.0]

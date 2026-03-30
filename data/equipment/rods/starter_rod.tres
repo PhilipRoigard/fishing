@@ -5,11 +5,15 @@
 [resource]
 script = ExtResource("1_script")
 id = "starter_rod"
-display_name = "Starter Rod"
-description = "A basic fishing rod. Reliable but nothing special."
-cast_depth_range = 500.0
+display_name = "Driftwood Rod"
+description = "A simple rod carved from driftwood. Reliable and balanced."
+cast_depth_range = 400.0
 reel_speed = 1.0
 tension_resistance = 1.0
-cast_depth_per_level = 25.0
-reel_speed_per_level = 0.02
-tension_resistance_per_level = 0.015
+perk_name = ""
+perk_description = ""
+perk_id = "none"
+perk_value = 0.0
+cast_depth_per_level = 20.0
+reel_speed_per_level = 0.015
+tension_resistance_per_level = 0.01

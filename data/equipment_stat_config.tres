@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EquipmentStatConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/equipment_stat_config.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+base_cast_depth = 100
+cast_depth_per_level = 10
+quality_stat_multiplier = 1.4
+common_level_cap = 15
+uncommon_level_cap = 35
+rare_level_cap = 60
+epic_level_cap = 90
+base_level_cost = 100
+level_cost_multiplier = 1.0544

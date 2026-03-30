@@ -11,6 +11,7 @@
 [ext_resource type="Resource" path="res://data/fish_database.tres" id="9"]
 [ext_resource type="Resource" path="res://data/store/iap_catalogue.tres" id="10"]
 [ext_resource type="Resource" path="res://data/equipment_catalogue.tres" id="11"]
+[ext_resource type="Resource" path="res://data/equipment_stat_config.tres" id="12"]
 
 [resource]
 script = ExtResource("1")
@@ -24,3 +25,4 @@ reward_config = ExtResource("8")
 fish_database = ExtResource("9")
 iap_catalogue = ExtResource("10")
 equipment_catalogue = ExtResource("11")
+equipment_stat_config = ExtResource("12")

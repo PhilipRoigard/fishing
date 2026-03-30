@@ -4,10 +4,10 @@
 
 [resource]
 script = ExtResource("1_script")
-id = "gold_rod"
-display_name = "Coral Rod"
-description = "A rod carved from deep-sea coral. Increases your chance of hooking rare fish."
-perk_name = "Lucky Catch"
-perk_description = "Rare fish chance +%d%%"
-perk_id = "rare_boost"
+id = "whalebone_rod"
+display_name = "Whalebone Rod"
+description = "Carved from ancient whalebone. Fish tire out faster during fights."
+perk_name = "Exhaustion"
+perk_description = "Fish tire %d%% faster"
+perk_id = "tire_faster"
 perk_values = [10.0, 15.0, 20.0, 25.0]

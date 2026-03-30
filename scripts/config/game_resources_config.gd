@@ -11,3 +11,4 @@ extends Resource
 @export var fish_database: FishDatabase
 @export var iap_catalogue: IAPCatalogue
 @export var equipment_catalogue: EquipmentCatalogue
+@export var equipment_stat_config: EquipmentStatConfig

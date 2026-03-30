@@ -5,11 +5,9 @@
 [resource]
 script = ExtResource("1_script")
 id = "bronze_rod"
-display_name = "Bronze Rod"
-description = "A sturdy bronze rod that reaches deeper waters with improved handling."
-cast_depth_range = 1000.0
-reel_speed = 1.1
-tension_resistance = 1.2
-cast_depth_per_level = 30.0
-reel_speed_per_level = 0.025
-tension_resistance_per_level = 0.02
+display_name = "Bamboo Rod"
+description = "A lightweight bamboo rod. Fish bite faster when using this rod."
+perk_name = "Quick Bites"
+perk_description = "Fish bite %d%% faster"
+perk_id = "faster_bites"
+perk_values = [10.0, 15.0, 20.0, 25.0]

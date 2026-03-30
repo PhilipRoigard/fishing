@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RodData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/rod_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "carbon_rod"
+display_name = "Carbon Rod"
+description = "An advanced carbon fibre rod. Extends your casting range even further."
+perk_name = "Deep Reach"
+perk_description = "Cast depth +%d%%"
+perk_id = "depth_bonus"
+perk_values = [15.0, 20.0, 25.0, 30.0]

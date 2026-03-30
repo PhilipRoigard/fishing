@@ -67,19 +67,25 @@ func _populate_data() -> void:
 	quality_fill.color = quality_color
 	quality_label.text = quality_name
 
-	var quality_cfg: Variant = null
+	var stat_cfg: EquipmentStatConfig = null
 	if GameResources.config:
-		quality_cfg = GameResources.config.quality_config
-	var cap: int = 10
-	if quality_cfg:
-		cap = quality_cfg.get_level_cap(entry.quality)
+		stat_cfg = GameResources.config.equipment_stat_config
+
+	var cap: int = 15
+	if stat_cfg:
+		cap = stat_cfg.get_level_cap(entry.quality)
 	level_label.text = "Lv. %d/%d" % [entry.level, cap]
 
 	var is_equipped: bool = _is_item_equipped(entry.uuid)
-	equip_button.text = "Unequip" if is_equipped else "Equip"
+	if is_equipped:
+		equip_button.text = "Equipped"
+		equip_button.disabled = true
+	else:
+		equip_button.text = "Equip"
+		equip_button.disabled = false
 
-	if quality_cfg:
-		var cost: int = quality_cfg.get_level_up_cost(entry.quality, entry.level)
+	if stat_cfg:
+		var cost: int = stat_cfg.get_level_up_cost(entry.level)
 		if entry.level >= cap:
 			level_up_button.text = "Max Level"
 			level_up_button.disabled = true
@@ -88,26 +94,26 @@ func _populate_data() -> void:
 			level_up_button.disabled = not CurrencyManager.can_afford_coins(cost)
 
 	var stats_text: String = ""
+	if stat_cfg:
+		var depth: int = stat_cfg.get_cast_depth_at_level(entry.level, entry.quality)
+		stats_text = "Cast Depth: %dm" % depth
+
 	var cat: Variant = null
 	if GameResources.config:
 		cat = GameResources.config.equipment_catalogue
 	if cat:
-		var quality_mult: float = Enums.QUALITY_MULTIPLIERS.get(entry.quality, 1.0)
 		var rod: Variant = cat.get_rod_by_id(entry.item_id)
 		var hook: Variant = cat.get_hook_by_id(entry.item_id)
 		var lure: Variant = cat.get_lure_by_id(entry.item_id)
-		if rod:
-			var depth: float = rod.cast_depth_range + rod.cast_depth_per_level * entry.level * quality_mult
-			var reel: float = rod.reel_speed + rod.reel_speed_per_level * entry.level * quality_mult
-			stats_text = "Cast: %dm\nReel: %sx" % [int(depth), str(snapped(reel, 0.1))]
+		if rod and rod.perk_id != "none" and rod.perk_values.size() > 0:
+			var perk_idx: int = mini(entry.quality, rod.perk_values.size() - 1)
+			var perk_val: float = rod.perk_values[perk_idx]
+			stats_text += "\n" + rod.perk_name + ": " + rod.perk_description % int(perk_val)
 		elif hook:
-			stats_text = "Bite: +%ss\nCatch: +%s%%" % [str(snapped(hook.bite_window_bonus, 0.1)), str(int(hook.catch_rate_bonus * 100))]
+			stats_text += "\nBite: +%ss\nCatch: +%d%%" % [str(snapped(hook.bite_window_bonus, 0.1)), int(hook.catch_rate_bonus * 100)]
 		elif lure:
-			stats_text = "Rare: +%s%%" % str(int(lure.rare_fish_chance_bonus * 100))
-		else:
-			stats_text = "Type: %s\nID: %s" % [entry.equipment_type, entry.item_id]
-	else:
-		stats_text = "No catalogue loaded"
+			stats_text += "\nRare: +%d%%" % int(lure.rare_fish_chance_bonus * 100)
+
 	stats_label.text = stats_text
 
 
@@ -146,9 +152,8 @@ func _on_equip_pressed() -> void:
 	if slot < 0:
 		return
 	if _is_item_equipped(entry.uuid):
-		EquipmentManager.unequip(slot)
-	else:
-		EquipmentManager.equip(slot, entry.uuid)
+		return
+	EquipmentManager.equip(slot, entry.uuid)
 	_back()
 
 

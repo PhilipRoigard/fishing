@@ -5,11 +5,9 @@
 [resource]
 script = ExtResource("1_script")
 id = "silver_rod"
-display_name = "Silver Rod"
-description = "An advanced silver rod built for deep ocean fishing with superior tension control."
-cast_depth_range = 2000.0
-reel_speed = 1.2
-tension_resistance = 1.5
-cast_depth_per_level = 40.0
-reel_speed_per_level = 0.03
-tension_resistance_per_level = 0.025
+display_name = "Iron Rod"
+description = "A heavy iron rod. Tension builds slower, letting you fight bigger fish."
+perk_name = "Ironline"
+perk_description = "Tension builds %d%% slower"
+perk_id = "reduced_tension"
+perk_values = [10.0, 15.0, 20.0, 25.0]
