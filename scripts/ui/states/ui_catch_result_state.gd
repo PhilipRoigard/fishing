@@ -124,7 +124,7 @@ func _build_layout() -> void:
 	button_row.add_child(sell_button)
 
 	keep_button = Button.new()
-	keep_button.text = "Keep for Bait"
+	keep_button.text = "Save as Material"
 	keep_button.custom_minimum_size = Vector2(130, 50)
 	keep_button.pressed.connect(_on_keep_pressed)
 	button_row.add_child(keep_button)
@@ -222,11 +222,15 @@ func _on_sell_pressed() -> void:
 
 func _on_keep_pressed() -> void:
 	HapticManager.light_tap()
-	if Main.instance and Main.instance.player_state_system:
+	var fish_data: FishData = null
+	if Main.instance and Main.instance.database_system:
+		fish_data = Main.instance.database_system.get_fish_by_id(caught_fish_id)
+	if fish_data and Main.instance and Main.instance.player_state_system:
 		var state: PlayerState = Main.instance.player_state_system.get_state()
 		if state:
-			var current_count: int = state.kept_fish.get(caught_fish_id, 0)
-			state.kept_fish[caught_fish_id] = current_count + 1
+			var quality: int = fish_data.rarity
+			var current_count: int = state.kept_fish.get(quality, 0)
+			state.kept_fish[quality] = current_count + 1
 	_back()
 
 
