@@ -27,7 +27,8 @@ var _bait_green_texture: Texture2D = preload("res://assets/sprites/items/Bait_01
 var _rod_sheet_texture: Texture2D = preload("res://assets/sprites/character/fishing_rod_sheet.png")
 var _folley_sheet_texture: Texture2D = preload("res://assets/sprites/items/Folley_Sprite_Sheet.png")
 
-var grid: GridContainer
+var item_grid: VirtualizedItemGrid
+var scroll: ScrollContainer
 var filter_container: HBoxContainer
 var active_filter: int = 0
 var slot_containers: Array[PanelContainer] = []
@@ -84,6 +85,13 @@ func enter(_meta: Variant = null) -> void:
 	_refresh_all()
 
 
+func focus() -> void:
+	super()
+	_clear_children()
+	_build_layout()
+	_refresh_all()
+
+
 func exit() -> void:
 	super()
 	_clear_children()
@@ -125,7 +133,7 @@ func _build_layout() -> void:
 		btn.pressed.connect(_on_filter_pressed.bind(i))
 		filter_container.add_child(btn)
 
-	var scroll: ScrollContainer = ScrollContainer.new()
+	scroll = ScrollContainer.new()
 	scroll.add_theme_stylebox_override("scroll", StyleBoxEmpty.new())
 	scroll.get_v_scroll_bar().add_theme_stylebox_override("scroll", StyleBoxEmpty.new())
 	scroll.get_v_scroll_bar().add_theme_stylebox_override("grabber", StyleBoxEmpty.new())
@@ -135,18 +143,11 @@ func _build_layout() -> void:
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	vbox.add_child(scroll)
 
-	var grid_margin: MarginContainer = MarginContainer.new()
-	grid_margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	grid_margin.add_theme_constant_override("margin_left", 2)
-	grid_margin.add_theme_constant_override("margin_right", 2)
-	scroll.add_child(grid_margin)
-
-	grid = GridContainer.new()
-	grid.columns = 3
-	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	grid.add_theme_constant_override("h_separation", 6)
-	grid.add_theme_constant_override("v_separation", 6)
-	grid_margin.add_child(grid)
+	item_grid = VirtualizedItemGrid.new()
+	item_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(item_grid)
+	item_grid.setup(scroll, _configure_card)
+	scroll.resized.connect(func() -> void: item_grid.update_columns(scroll.size.x - 24.0))
 
 	_build_bottom_bar(vbox)
 
@@ -166,78 +167,38 @@ func _build_equipment_slots(parent: VBoxContainer) -> void:
 
 
 func _create_equipment_slot(slot_name: String, slot_type: Enums.EquipmentSlot) -> PanelContainer:
-	var panel: PanelContainer = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(80, 95)
-
-	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = Color(0.08, 0.1, 0.15)
-	style.border_color = Color(0.25, 0.25, 0.3)
-	style.border_width_bottom = 1
-	style.border_width_top = 1
-	style.border_width_left = 1
-	style.border_width_right = 1
-	style.corner_radius_top_left = 6
-	style.corner_radius_top_right = 6
-	style.corner_radius_bottom_left = 6
-	style.corner_radius_bottom_right = 6
-	style.content_margin_top = 4
-	style.content_margin_bottom = 4
-	style.content_margin_left = 4
-	style.content_margin_right = 4
-	panel.add_theme_stylebox_override("panel", style)
-
-	var inner_vbox: VBoxContainer = VBoxContainer.new()
-	inner_vbox.add_theme_constant_override("separation", 2)
-	inner_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	panel.add_child(inner_vbox)
-
-	var slot_label: Label = Label.new()
-	slot_label.text = slot_name
-	slot_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	slot_label.add_theme_font_size_override("font_size", 10)
-	slot_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.6))
-	inner_vbox.add_child(slot_label)
-
+	var item_card_scene: PackedScene = preload("res://scenes/ui/components/item_card.tscn")
 	var equipped: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(slot_type)
 
 	if equipped:
+		var card: ItemCard = item_card_scene.instantiate() as ItemCard
 		var quality_color: Color = Enums.QUALITY_COLORS.get(equipped.quality, Color.WHITE)
-		var quality_bg: Color = QUALITY_BG_COLORS.get(equipped.quality, Color(0.15, 0.15, 0.15))
-		style.border_color = quality_color
-		style.border_width_bottom = 2
-		style.border_width_top = 2
-		style.border_width_left = 2
-		style.border_width_right = 2
-		style.bg_color = quality_bg.darkened(0.3)
+		var icon_texture: Texture2D = _get_item_icon(equipped.item_id, equipped.equipment_type)
+		var eq_uuid: String = equipped.uuid
+		card.ready.connect(func() -> void:
+			card.set_item_data(equipped.item_id, eq_uuid, icon_texture, equipped.level, quality_color)
+			card.selected.connect(_on_item_pressed.bind(eq_uuid))
+		)
+		return card
 
-		var icon_container: CenterContainer = CenterContainer.new()
-		icon_container.custom_minimum_size = Vector2(56, 56)
-		inner_vbox.add_child(icon_container)
-
-		var icon: TextureRect = TextureRect.new()
-		icon.custom_minimum_size = Vector2(52, 52)
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		icon.texture = _get_item_icon(equipped.item_id, equipped.equipment_type)
-		icon_container.add_child(icon)
-
-		var level_label: Label = Label.new()
-		level_label.text = "Lv." + str(equipped.level)
-		level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		level_label.add_theme_font_size_override("font_size", 9)
-		level_label.add_theme_color_override("font_color", quality_color)
-		inner_vbox.add_child(level_label)
-	else:
-		var empty_label: Label = Label.new()
-		empty_label.text = "Empty"
-		empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		empty_label.add_theme_font_size_override("font_size", 11)
-		empty_label.add_theme_color_override("font_color", Color(0.35, 0.35, 0.4))
-		empty_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		empty_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		inner_vbox.add_child(empty_label)
-
-	return panel
+	var empty_card: ItemCard = item_card_scene.instantiate() as ItemCard
+	empty_card.ready.connect(func() -> void:
+		var style: StyleBoxFlat = StyleBoxFlat.new()
+		style.bg_color = Color(0.08, 0.1, 0.15)
+		style.border_color = Color(0.25, 0.25, 0.3)
+		style.border_width_bottom = 1
+		style.border_width_top = 1
+		style.border_width_left = 1
+		style.border_width_right = 1
+		style.corner_radius_top_left = 4
+		style.corner_radius_top_right = 4
+		style.corner_radius_bottom_left = 4
+		style.corner_radius_bottom_right = 4
+		empty_card.add_theme_stylebox_override("panel", style)
+		empty_card.level_label.text = slot_name
+		empty_card.level_label.add_theme_color_override("font_color", Color(0.35, 0.35, 0.4))
+	)
+	return empty_card
 
 
 func _build_bottom_bar(parent: VBoxContainer) -> void:
@@ -305,9 +266,6 @@ func _update_filter_buttons() -> void:
 
 
 func _refresh_grid() -> void:
-	for child: Node in grid.get_children():
-		child.queue_free()
-
 	var filter_type: String = FILTER_TYPES[active_filter]
 
 	if filter_type == "shop":
@@ -322,95 +280,38 @@ func _refresh_grid() -> void:
 		filtered.assign(items.filter(func(e: EquipmentManager.EquipmentEntry) -> bool: return e.equipment_type == filter_type))
 		items = filtered
 
-	items.sort_custom(_sort_equipment)
+	var unequipped: Array[EquipmentManager.EquipmentEntry] = []
+	unequipped.assign(items.filter(func(e: EquipmentManager.EquipmentEntry) -> bool: return not _is_item_equipped(e.uuid)))
+	unequipped.sort_custom(_sort_equipment)
+	item_grid.set_data(unequipped)
 
-	for entry: EquipmentManager.EquipmentEntry in items:
-		var cell: Control = _create_item_card(entry)
-		grid.add_child(cell)
+
+func _configure_card(card: ItemCard, _index: int, data: Variant) -> void:
+	if data is ShopItem:
+		var shop_item: ShopItem = data as ShopItem
+		var quality_color: Color = Enums.QUALITY_COLORS.get(shop_item.quality, Color.WHITE)
+		var icon_texture: Texture2D = _get_item_icon(shop_item.item_id, shop_item.equipment_type)
+		card.set_item_data(shop_item.item_id, "", icon_texture, 0, quality_color)
+		card.level_label.text = str(shop_item.cost_coins) + "c"
+		card.selected.connect(_on_shop_card_pressed.bind(shop_item))
+		return
+
+	var entry: EquipmentManager.EquipmentEntry = data as EquipmentManager.EquipmentEntry
+	if not entry:
+		return
+	var quality_color: Color = Enums.QUALITY_COLORS.get(entry.quality, Color.WHITE)
+	var icon_texture: Texture2D = _get_item_icon(entry.item_id, entry.equipment_type)
+	card.set_item_data(entry.item_id, entry.uuid, icon_texture, entry.level, quality_color)
+	card.selected.connect(_on_item_pressed.bind(entry.uuid))
 
 
 func _populate_shop_grid() -> void:
 	var player_level: int = ProgressManager.get_current_level()
+	var shop_data: Array = []
 	for shop_item: ShopItem in shop_items:
-		var cell: Button = _create_shop_card(shop_item, player_level)
-		grid.add_child(cell)
+		shop_data.append(shop_item)
+	item_grid.set_data(shop_data)
 
-
-func _create_shop_card(shop_item: ShopItem, player_level: int) -> Button:
-	var meets_level: bool = player_level >= shop_item.required_level
-	var can_afford: bool = CurrencyManager.can_afford_coins(shop_item.cost_coins)
-	var quality_bg: Color = QUALITY_BG_COLORS.get(shop_item.quality, Color(0.3, 0.3, 0.3))
-
-	var card_btn: Button = Button.new()
-	card_btn.custom_minimum_size = Vector2(0, 120)
-	card_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	card_btn.clip_text = true
-
-	var card_style: StyleBoxFlat = StyleBoxFlat.new()
-	card_style.bg_color = quality_bg
-	card_style.corner_radius_top_left = 6
-	card_style.corner_radius_top_right = 6
-	card_style.corner_radius_bottom_left = 6
-	card_style.corner_radius_bottom_right = 6
-	card_style.border_color = quality_bg.lightened(0.3)
-	card_style.border_width_bottom = 2
-	card_style.border_width_top = 2
-	card_style.border_width_left = 2
-	card_style.border_width_right = 2
-	card_style.content_margin_top = 4
-	card_style.content_margin_bottom = 4
-	card_style.content_margin_left = 4
-	card_style.content_margin_right = 4
-	card_btn.add_theme_stylebox_override("normal", card_style)
-
-	var hover_style: StyleBoxFlat = card_style.duplicate()
-	hover_style.bg_color = quality_bg.lightened(0.15)
-	card_btn.add_theme_stylebox_override("hover", hover_style)
-
-	var pressed_style: StyleBoxFlat = card_style.duplicate()
-	pressed_style.bg_color = quality_bg.darkened(0.15)
-	card_btn.add_theme_stylebox_override("pressed", pressed_style)
-
-	card_btn.pressed.connect(_on_shop_card_pressed.bind(shop_item))
-
-	var card_vbox: VBoxContainer = VBoxContainer.new()
-	card_vbox.add_theme_constant_override("separation", 2)
-	card_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	card_vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card_btn.add_child(card_vbox)
-
-	var icon: TextureRect = TextureRect.new()
-	icon.custom_minimum_size = Vector2(56, 56)
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	icon.texture = _get_item_icon(shop_item.item_id, shop_item.equipment_type)
-	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card_vbox.add_child(icon)
-
-	var name_label: Label = Label.new()
-	name_label.text = shop_item.display_name
-	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_label.add_theme_font_size_override("font_size", 10)
-	name_label.add_theme_color_override("font_color", Color.WHITE)
-	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card_vbox.add_child(name_label)
-
-	var price_label: Label = Label.new()
-	if not meets_level:
-		price_label.text = "Lv." + str(shop_item.required_level) + " | " + str(shop_item.cost_coins)
-		price_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8))
-	elif can_afford:
-		price_label.text = str(shop_item.cost_coins) + " coins"
-		price_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3))
-	else:
-		price_label.text = str(shop_item.cost_coins) + " coins"
-		price_label.add_theme_color_override("font_color", Color(0.7, 0.4, 0.4))
-	price_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	price_label.add_theme_font_size_override("font_size", 9)
-	price_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card_vbox.add_child(price_label)
-
-	return card_btn
 
 
 func _on_shop_card_pressed(shop_item: ShopItem) -> void:
@@ -472,102 +373,6 @@ func _sort_equipment(a: EquipmentManager.EquipmentEntry, b: EquipmentManager.Equ
 	return a.level > b.level
 
 
-func _create_item_card(entry: EquipmentManager.EquipmentEntry) -> PanelContainer:
-	var panel: PanelContainer = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(100, 110)
-	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-
-	var quality_bg: Color = QUALITY_BG_COLORS.get(entry.quality, Color(0.2, 0.2, 0.2))
-	var quality_color: Color = Enums.QUALITY_COLORS.get(entry.quality, Color.WHITE)
-	var is_equipped: bool = _is_item_equipped(entry.uuid)
-
-	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = quality_bg
-	style.corner_radius_top_left = 6
-	style.corner_radius_top_right = 6
-	style.corner_radius_bottom_left = 6
-	style.corner_radius_bottom_right = 6
-	style.content_margin_top = 6
-	style.content_margin_bottom = 6
-	style.content_margin_left = 6
-	style.content_margin_right = 6
-
-	if is_equipped:
-		style.border_color = quality_color
-		style.border_width_bottom = 2
-		style.border_width_top = 2
-		style.border_width_left = 2
-		style.border_width_right = 2
-	else:
-		style.border_color = quality_bg.lightened(0.2)
-		style.border_width_bottom = 1
-		style.border_width_top = 1
-		style.border_width_left = 1
-		style.border_width_right = 1
-
-	panel.add_theme_stylebox_override("panel", style)
-
-	var card_vbox: VBoxContainer = VBoxContainer.new()
-	card_vbox.add_theme_constant_override("separation", 2)
-	card_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	panel.add_child(card_vbox)
-
-	var icon_center: CenterContainer = CenterContainer.new()
-	icon_center.custom_minimum_size = Vector2(64, 64)
-	card_vbox.add_child(icon_center)
-
-	var icon: TextureRect = TextureRect.new()
-	icon.custom_minimum_size = Vector2(64, 64)
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	icon.texture = _get_item_icon(entry.item_id, entry.equipment_type)
-	icon_center.add_child(icon)
-
-	var display_name: String = _get_display_name_for_entry(entry)
-	var name_label: Label = Label.new()
-	name_label.text = display_name
-	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_label.add_theme_font_size_override("font_size", 11)
-	name_label.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))
-	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD
-	name_label.custom_minimum_size = Vector2(0, 16)
-	card_vbox.add_child(name_label)
-
-	var bottom_row: HBoxContainer = HBoxContainer.new()
-	bottom_row.alignment = BoxContainer.ALIGNMENT_END
-	card_vbox.add_child(bottom_row)
-
-	if is_equipped:
-		var equipped_badge: Label = Label.new()
-		equipped_badge.text = "EQ"
-		equipped_badge.add_theme_font_size_override("font_size", 9)
-		equipped_badge.add_theme_color_override("font_color", Color(0.3, 1.0, 0.3))
-		equipped_badge.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		bottom_row.add_child(equipped_badge)
-
-	var level_badge: Label = Label.new()
-	level_badge.text = "Lv." + str(entry.level)
-	level_badge.add_theme_font_size_override("font_size", 10)
-	level_badge.add_theme_color_override("font_color", quality_color)
-	level_badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	if not is_equipped:
-		level_badge.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	bottom_row.add_child(level_badge)
-
-	var click_btn: Button = Button.new()
-	click_btn.set_anchors_preset(Control.PRESET_FULL_RECT)
-	click_btn.flat = true
-	click_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-
-	var transparent_style: StyleBoxEmpty = StyleBoxEmpty.new()
-	click_btn.add_theme_stylebox_override("normal", transparent_style)
-	click_btn.add_theme_stylebox_override("hover", transparent_style)
-	click_btn.add_theme_stylebox_override("pressed", transparent_style)
-	click_btn.add_theme_stylebox_override("focus", transparent_style)
-	click_btn.pressed.connect(_on_item_pressed.bind(entry.uuid))
-	panel.add_child(click_btn)
-
-	return panel
 
 
 func _get_item_icon(item_id: String, equipment_type: String) -> Texture2D:

@@ -20,7 +20,7 @@ func _ready() -> void:
 func _build_theme() -> Theme:
 	var t: Theme = Theme.new()
 
-	var font: FontFile = load("res://assets/fonts/PixelifySans-Regular.ttf")
+	var font: FontFile = load("res://resources/ui/Fonts/bytebounce.medium.ttf")
 	t.default_font = font
 	t.default_font_size = 16
 

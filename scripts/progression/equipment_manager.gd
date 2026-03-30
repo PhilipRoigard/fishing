@@ -1,6 +1,6 @@
 extends Node
 
-const SAVE_PATH: String = "user://equipment_inventory.tres"
+const SAVE_PATH: String = "user://equipment_inventory.cfg"
 const _FightModifiersScript: GDScript = preload("res://scripts/fishing/fight/fight_modifiers.gd")
 const _EnumsScript: GDScript = preload("res://scripts/config/enums.gd")
 
@@ -17,12 +17,71 @@ class EquipmentEntry:
 
 
 func _ready() -> void:
-	_load_inventory()
+	_load_data()
 	_grant_starter_items()
 
 
-func _load_inventory() -> void:
-	pass
+func _load_data() -> void:
+	var config: ConfigFile = ConfigFile.new()
+	if config.load(SAVE_PATH) != OK:
+		return
+
+	var item_count: int = config.get_value("inventory", "count", 0)
+	for i: int in item_count:
+		var section: String = "item_" + str(i)
+		var entry: EquipmentEntry = EquipmentEntry.new()
+		entry.uuid = config.get_value(section, "uuid", "")
+		entry.item_id = config.get_value(section, "item_id", "")
+		entry.equipment_type = config.get_value(section, "equipment_type", "")
+		entry.quality = config.get_value(section, "quality", 0)
+		entry.level = config.get_value(section, "level", 1)
+		if entry.uuid != "":
+			inventory.append(entry)
+
+	for slot_key: String in ["rod", "hook", "lure", "bait"]:
+		var uuid: String = config.get_value("loadout", slot_key, "")
+		if uuid != "":
+			var slot_index: int = _slot_key_to_index(slot_key)
+			loadout[slot_index] = uuid
+
+
+func _save_data() -> void:
+	var config: ConfigFile = ConfigFile.new()
+
+	config.set_value("inventory", "count", inventory.size())
+	for i: int in inventory.size():
+		var entry: EquipmentEntry = inventory[i] as EquipmentEntry
+		var section: String = "item_" + str(i)
+		config.set_value(section, "uuid", entry.uuid)
+		config.set_value(section, "item_id", entry.item_id)
+		config.set_value(section, "equipment_type", entry.equipment_type)
+		config.set_value(section, "quality", entry.quality)
+		config.set_value(section, "level", entry.level)
+
+	for slot_index: int in [0, 1, 2, 3]:
+		var slot_key: String = _slot_index_to_key(slot_index)
+		var uuid: String = loadout.get(slot_index, "")
+		config.set_value("loadout", slot_key, uuid)
+
+	config.save(SAVE_PATH)
+
+
+func _slot_key_to_index(key: String) -> int:
+	match key:
+		"rod": return 0
+		"hook": return 1
+		"lure": return 2
+		"bait": return 3
+	return -1
+
+
+func _slot_index_to_key(index: int) -> String:
+	match index:
+		0: return "rod"
+		1: return "hook"
+		2: return "lure"
+		3: return "bait"
+	return ""
 
 
 func _grant_starter_items() -> void:
@@ -53,11 +112,13 @@ func add_item(item_id: String, equipment_type: String, quality: int = 0) -> Stri
 	entry.level = 1
 	inventory.append(entry)
 	SignalBus.equipment_item_acquired.emit(entry.uuid, item_id, quality)
+	_save_data()
 	return entry.uuid
 
 
 func remove_item(uuid: String) -> void:
 	inventory.assign(inventory.filter(func(e: EquipmentEntry) -> bool: return e.uuid != uuid))
+	_save_data()
 
 
 func get_item(uuid: String) -> EquipmentEntry:
@@ -68,17 +129,19 @@ func get_item(uuid: String) -> EquipmentEntry:
 
 
 func equip(slot: int, uuid: String) -> void:
-	loadout[slot] = uuid
+	loadout[int(slot)] = uuid
+	_save_data()
 	SignalBus.equipment_changed.emit(slot)
 
 
 func unequip(slot: int) -> void:
-	loadout.erase(slot)
+	loadout.erase(int(slot))
+	_save_data()
 	SignalBus.equipment_changed.emit(slot)
 
 
 func get_equipped(slot: int) -> EquipmentEntry:
-	var uuid: String = loadout.get(slot, "")
+	var uuid: String = loadout.get(int(slot), "")
 	if uuid == "":
 		return null
 	return get_item(uuid)
@@ -105,6 +168,7 @@ func level_up(uuid: String) -> bool:
 
 	CurrencyManager.spend_coins(cost)
 	entry.level += 1
+	_save_data()
 	SignalBus.equipment_leveled_up.emit(uuid, entry.level)
 	return true
 
@@ -149,6 +213,7 @@ func merge(uuids: Array[String]) -> String:
 	if new_entry:
 		new_entry.level = best_level
 
+	_save_data()
 	SignalBus.equipment_merged.emit(new_uuid, first.item_id, first.quality, req.to_quality)
 	return new_uuid
 

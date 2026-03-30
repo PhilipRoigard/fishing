@@ -240,15 +240,15 @@ func _on_level_up_pressed() -> void:
 
 func _get_slot_for_type(equipment_type: String) -> int:
 	match equipment_type:
-		"rod": return 0
-		"hook": return 1
-		"lure": return 2
-		"bait": return 3
+		"rod": return Enums.EquipmentSlot.ROD
+		"hook": return Enums.EquipmentSlot.HOOK
+		"lure": return Enums.EquipmentSlot.LURE
+		"bait": return Enums.EquipmentSlot.BAIT
 	return -1
 
 
 func _is_item_equipped(uuid: String) -> bool:
-	for slot: int in [0, 1, 2, 3]:
+	for slot: Enums.EquipmentSlot in [Enums.EquipmentSlot.ROD, Enums.EquipmentSlot.HOOK, Enums.EquipmentSlot.LURE, Enums.EquipmentSlot.BAIT]:
 		var equipped: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(slot)
 		if equipped and equipped.uuid == uuid:
 			return true
