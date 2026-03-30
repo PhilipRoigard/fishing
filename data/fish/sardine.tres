@@ -8,7 +8,6 @@ script = ExtResource("1")
 id = "sardine"
 texture = ExtResource("2_atlas_tex")
 display_name = "Sardine"
-rarity = 0
 sell_value_coins = 5
 min_depth = 0.0
 max_depth = 250.0

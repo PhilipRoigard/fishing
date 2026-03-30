@@ -226,8 +226,8 @@ func _on_fish_caught(fish_id: String) -> void:
 	session_fish_count += 1
 	if Main.instance and Main.instance.database_system:
 		var fish_data: Variant = Main.instance.database_system.get_fish_by_id(fish_id)
-		if fish_data and fish_data.rarity > session_best_rarity:
-			session_best_rarity = fish_data.rarity
+		if fish_data:
+			session_best_rarity = maxi(session_best_rarity, 0)
 			session_best_fish_id = fish_id
 	_refresh_display()
 

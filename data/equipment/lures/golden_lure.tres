@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1_script")
 id = "golden_lure"
-display_name = "Golden Lure"
-description = "A gleaming golden lure that significantly boosts rare fish encounters."
-rare_fish_chance_bonus = 0.2
-bite_speed_bonus = -1.0
-rare_fish_chance_per_level = 0.01
-bite_speed_per_level = 0.05
+display_name = "Golden Jig"
+description = "A gleaming golden jig. Greatly increases bite chance."
+perk_name = "Irresistible"
+perk_description = "Bite chance +%d%%"
+perk_id = "bite_chance"
+perk_values = [10.0, 15.0, 20.0, 25.0]

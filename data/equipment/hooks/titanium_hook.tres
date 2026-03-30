@@ -6,8 +6,8 @@
 script = ExtResource("1_script")
 id = "titanium_hook"
 display_name = "Titanium Hook"
-description = "Lightweight titanium with razor-sharp edges for maximum catch potential."
-bite_window_bonus = 0.5
-catch_rate_bonus = 0.1
-bite_window_per_level = 0.03
-catch_rate_per_level = 0.015
+description = "A lightweight titanium hook. Fish tire faster when hooked."
+perk_name = "Sharp Edge"
+perk_description = "Fish tire %d%% faster"
+perk_id = "tire_faster"
+perk_values = [10.0, 15.0, 20.0, 25.0]

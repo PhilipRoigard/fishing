@@ -246,13 +246,10 @@ func _update_stats() -> void:
 	if not stat_cfg:
 		return
 
+	var rod: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(Enums.EquipmentSlot.ROD)
 	var total_depth: int = 0
-	for slot: Enums.EquipmentSlot in SLOT_TYPES:
-		if slot == Enums.EquipmentSlot.BAIT:
-			continue
-		var equipped: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(slot)
-		if equipped:
-			total_depth += stat_cfg.get_cast_depth_at_level(equipped.level, equipped.quality)
+	if rod:
+		total_depth = stat_cfg.get_cast_depth_at_level(rod.level, rod.quality)
 	cast_depth_label.text = "%dm" % total_depth
 
 

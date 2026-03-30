@@ -8,7 +8,6 @@ script = ExtResource("1")
 id = "perch"
 texture = ExtResource("2_atlas_tex")
 display_name = "Perch"
-rarity = 0
 sell_value_coins = 6
 min_depth = 0.0
 max_depth = 250.0

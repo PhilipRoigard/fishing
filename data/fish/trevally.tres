@@ -8,7 +8,6 @@ script = ExtResource("1")
 id = "trevally"
 texture = ExtResource("2_atlas_tex")
 display_name = "Trevally"
-rarity = 1
 sell_value_coins = 20
 min_depth = 100.0
 max_depth = 800.0

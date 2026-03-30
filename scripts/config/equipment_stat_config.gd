@@ -1,9 +1,13 @@
 class_name EquipmentStatConfig
 extends Resource
 
-@export_group("Cast Depth")
+@export_group("Rod - Cast Depth")
 @export var base_cast_depth: int = 100
 @export var cast_depth_per_level: int = 10
+
+@export_group("Hook - Bite Chance")
+@export var base_bite_bonus: float = 5.0
+@export var bite_bonus_per_level: float = 0.5
 
 @export_group("Quality Scaling")
 @export var quality_stat_multiplier: float = 1.4
@@ -22,6 +26,11 @@ extends Resource
 func get_cast_depth_at_level(level: int, quality: int) -> int:
 	var raw: int = base_cast_depth + (level - 1) * cast_depth_per_level
 	return int(raw * get_quality_multiplier(quality))
+
+
+func get_bite_bonus_at_level(level: int, quality: int) -> float:
+	var raw: float = base_bite_bonus + (level - 1) * bite_bonus_per_level
+	return raw * get_quality_multiplier(quality)
 
 
 func get_quality_multiplier(quality: int) -> float:

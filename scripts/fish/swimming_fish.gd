@@ -37,16 +37,15 @@ const SINE_AMPLITUDE: float = 8.0
 const SINE_PERIOD: float = 2.5
 const SEPARATION_RADIUS: float = 25.0
 const SEPARATION_STRENGTH: float = 30.0
-const CURIOSITY_RANGE: float = 180.0
-const CURIOSITY_SPEED_MULT: float = 0.8
-const CURIOSITY_CHANCE: float = 0.08
-const NIBBLE_DISTANCE: float = 20.0
 const WATER_SURFACE_Y: float = 155.0
+var _fishing_config: FishingConfig
 
 signal fish_despawned(fish: SwimmingFish)
 
 
 func _ready() -> void:
+	if GameResources.config:
+		_fishing_config = GameResources.config.fishing_config
 	_sine_offset = randf() * TAU
 	_base_y = position.y
 	rotation = 0.0
@@ -112,13 +111,14 @@ func _physics_process(delta: float) -> void:
 		var to_target: Vector2 = _curiosity_target - global_position
 		var dist: float = to_target.length()
 
-		if dist < NIBBLE_DISTANCE:
+		var nibble_dist: float = _fishing_config.nibble_distance if _fishing_config else 30.0
+		if dist < nibble_dist:
 			_nibble_timer -= delta
 			if _nibble_timer <= 0.0:
 				_nibble_timer = randf_range(0.5, 1.5)
 				move_delta = Vector2(randf_range(-10.0, 10.0), randf_range(-10.0, 10.0)) * delta
 		else:
-			var approach_speed: float = swim_speed * CURIOSITY_SPEED_MULT
+			var approach_speed: float = swim_speed * (_fishing_config.curiosity_speed_mult if _fishing_config else 0.8)
 			move_delta = to_target.normalized() * approach_speed * delta
 
 		_curiosity_timer -= delta
@@ -151,14 +151,20 @@ func _check_curiosity(delta: float) -> void:
 	if not hook:
 		return
 
+	var curiosity_range: float = _fishing_config.curiosity_range if _fishing_config else 180.0
+	var curiosity_chance: float = _fishing_config.curiosity_chance if _fishing_config else 0.08
+	var target_offset: float = _fishing_config.curiosity_target_offset if _fishing_config else 5.0
+	var dur_min: float = _fishing_config.curiosity_duration_min if _fishing_config else 3.0
+	var dur_max: float = _fishing_config.curiosity_duration_max if _fishing_config else 8.0
+
 	var dist: float = global_position.distance_to(hook.global_position)
-	if dist > CURIOSITY_RANGE:
+	if dist > curiosity_range:
 		return
 
-	if randf() < CURIOSITY_CHANCE * delta:
+	if randf() < curiosity_chance * delta:
 		_is_curious = true
-		_curiosity_target = hook.global_position + Vector2(randf_range(-15.0, 15.0), randf_range(-15.0, 15.0))
-		_curiosity_timer = randf_range(3.0, 8.0)
+		_curiosity_target = hook.global_position + Vector2(randf_range(-target_offset, target_offset), randf_range(-target_offset, target_offset))
+		_curiosity_timer = randf_range(dur_min, dur_max)
 		_nibble_timer = randf_range(0.5, 1.5)
 
 

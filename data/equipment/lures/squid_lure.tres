@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="LureData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/lure_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "squid_lure"
+display_name = "Squid Jig"
+description = "A multi-armed squid jig. Fish approach faster."
+perk_name = "Fast Approach"
+perk_description = "Fish approach %d%% faster"
+perk_id = "approach_speed"
+perk_values = [20.0, 30.0, 40.0, 50.0]

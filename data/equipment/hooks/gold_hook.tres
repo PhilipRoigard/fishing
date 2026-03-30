@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="HookData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/hook_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "gold_hook"
+display_name = "Gold Hook"
+description = "A gleaming gold hook. Increases coin value of caught fish."
+perk_name = "Golden Catch"
+perk_description = "Sell value +%d%%"
+perk_id = "sell_bonus"
+perk_values = [25.0, 50.0, 75.0, 100.0]

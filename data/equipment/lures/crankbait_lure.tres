@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="LureData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/lure_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "crankbait_lure"
+display_name = "Crankbait"
+description = "A diving lure with erratic movement. Wider bite radius."
+perk_name = "Wide Hook"
+perk_description = "Bite radius +%d%%"
+perk_id = "bite_radius"
+perk_values = [30.0, 45.0, 60.0, 80.0]

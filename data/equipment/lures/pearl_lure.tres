@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="LureData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/lure_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "pearl_lure"
+display_name = "Pearl Drop"
+description = "A rare pearl lure. Doubles the sell value of caught fish."
+perk_name = "Treasure Hunter"
+perk_description = "Sell value +%d%%"
+perk_id = "sell_bonus"
+perk_values = [25.0, 50.0, 75.0, 100.0]

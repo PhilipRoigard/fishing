@@ -224,14 +224,9 @@ func compute_fight_modifiers() -> RefCounted:
 	if GameResources.config:
 		stat_cfg = GameResources.config.equipment_stat_config
 
-	var total_depth: float = 0.0
-	for slot: int in [_EnumsScript.EquipmentSlot.ROD, _EnumsScript.EquipmentSlot.HOOK, _EnumsScript.EquipmentSlot.LURE]:
-		var entry: EquipmentEntry = get_equipped(slot)
-		if entry and stat_cfg:
-			total_depth += stat_cfg.get_cast_depth_at_level(entry.level, entry.quality)
-
-	if total_depth > 0.0:
-		mods.max_cast_depth = total_depth
+	var rod: EquipmentEntry = get_equipped(_EnumsScript.EquipmentSlot.ROD)
+	if rod and stat_cfg:
+		mods.max_cast_depth = stat_cfg.get_cast_depth_at_level(rod.level, rod.quality)
 
 	return mods
 

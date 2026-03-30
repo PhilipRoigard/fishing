@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1_script")
 id = "shiny_lure"
-display_name = "Shiny Lure"
-description = "A polished lure that catches light and attracts rarer fish faster."
-rare_fish_chance_bonus = 0.1
-bite_speed_bonus = -0.5
-rare_fish_chance_per_level = 0.008
-bite_speed_per_level = 0.04
+display_name = "Glowfin"
+description = "A bioluminescent lure. Fish are attracted from further away."
+perk_name = "Wide Attract"
+perk_description = "Attract range +%d%%"
+perk_id = "attract_range"
+perk_values = [25.0, 35.0, 45.0, 55.0]

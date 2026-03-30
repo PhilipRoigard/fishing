@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1_script")
 id = "basic_hook"
-display_name = "Basic Hook"
-description = "A simple iron hook. Gets the job done."
-bite_window_bonus = 0.0
-catch_rate_bonus = 0.0
-bite_window_per_level = 0.02
-catch_rate_per_level = 0.01
+display_name = "Iron Hook"
+description = "A simple iron hook. No special properties."
+perk_name = ""
+perk_description = ""
+perk_id = "none"
+perk_values = [0.0, 0.0, 0.0, 0.0]

@@ -146,16 +146,16 @@ func _populate_data() -> void:
 
 	_set_fish_sprite(caught_fish_id)
 
-	var rarity_color: Color = _get_rarity_color(fish_data.rarity)
+	var quality_color: Color = Enums.QUALITY_COLORS.get(caught_quality, Color(0.6, 0.6, 0.6))
+	var quality_names: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
 
 	if fish_name_label:
 		fish_name_label.text = fish_data.display_name
-		fish_name_label.add_theme_color_override("font_color", rarity_color)
+		fish_name_label.add_theme_color_override("font_color", quality_color)
 
-	var rarity_name: String = Enums.RARITY_NAMES.get(fish_data.rarity, "Common")
 	if rarity_label:
-		rarity_label.text = rarity_name
-		rarity_label.add_theme_color_override("font_color", rarity_color)
+		rarity_label.text = quality_names[mini(caught_quality, 4)]
+		rarity_label.add_theme_color_override("font_color", quality_color)
 
 	if coins_label:
 		coins_label.text = "Coins: +" + str(fish_data.sell_value_coins)
@@ -168,7 +168,7 @@ func _populate_data() -> void:
 	if GameResources.config:
 		reward_cfg = GameResources.config.reward_config
 	if xp_label and reward_cfg:
-		xp_label.text = "XP: +" + str(reward_cfg.get_xp_for_rarity(fish_data.rarity))
+		xp_label.text = "XP: +" + str(reward_cfg.get_xp_for_rarity(caught_quality))
 		xp_label.add_theme_color_override("font_color", Color(0.4, 0.8, 1.0))
 
 	_check_new_discovery()

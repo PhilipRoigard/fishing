@@ -8,7 +8,6 @@ script = ExtResource("1")
 id = "clownfish"
 texture = ExtResource("2_atlas_tex")
 display_name = "Clownfish"
-rarity = 1
 sell_value_coins = 15
 min_depth = 50.0
 max_depth = 300.0

@@ -4,7 +4,6 @@ extends Resource
 @export var id: String = ""
 @export var display_name: String = ""
 @export var texture: Texture2D
-@export var rarity: Enums.Rarity = Enums.Rarity.COMMON
 @export var sell_value_coins: int = 10
 
 @export_group("Depth and Spawning")

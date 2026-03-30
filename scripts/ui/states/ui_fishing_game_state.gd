@@ -484,7 +484,6 @@ func _show_fish_name(fish_id: String) -> void:
 		var fd: Variant = Main.instance.database_system.get_fish_by_id(fish_id)
 		if fd:
 			fish_name = fd.display_name
-			rarity_color = _get_rarity_color(fd.rarity)
 	fish_name_label.text = "Fighting: " + fish_name
 	fish_name_label.add_theme_color_override("font_color", rarity_color)
 	fish_name_label.visible = true
@@ -564,11 +563,6 @@ func _on_fish_caught(fish_id: String) -> void:
 			else:
 				pstate.bait_inventory[bait_q] = remaining
 			SignalBus.save_requested.emit()
-	var fish_data: FishData = null
-	if Main.instance and Main.instance.database_system:
-		fish_data = Main.instance.database_system.get_fish_by_id(fish_id)
-	if fish_data:
-		caught_quality = mini(caught_quality, fish_data.rarity)
 	state_machine.push_state(UIStateMachine.State.CATCH_RESULT, {"fish_id": fish_id, "caught_quality": caught_quality})
 
 

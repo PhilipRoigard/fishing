@@ -30,7 +30,7 @@ func _grant_rewards() -> void:
 	if GameResources.config:
 		reward_cfg = GameResources.config.reward_config
 	if reward_cfg:
-		var xp_amount: int = reward_cfg.get_xp_for_rarity(fish_data.rarity)
+		var xp_amount: int = reward_cfg.get_xp_for_rarity(0)
 		SignalBus.xp_gained.emit(xp_amount)
 
 	SignalBus.collection_updated.emit(fish_id, 1)

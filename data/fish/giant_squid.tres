@@ -8,7 +8,6 @@ script = ExtResource("1")
 id = "giant_squid"
 texture = ExtResource("2_atlas_tex")
 display_name = "Giant Squid"
-rarity = 3
 sell_value_coins = 350
 min_depth = 600.0
 max_depth = 3000.0

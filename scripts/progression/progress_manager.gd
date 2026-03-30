@@ -18,7 +18,11 @@ func _on_fish_caught(fish_id: String) -> void:
 		return
 
 	_add_to_collection(fish_id)
-	_grant_xp(fish_data.rarity)
+	var caught_quality: int = 0
+	var state: Variant = main_node.player_state_system.get_state()
+	if state and state.equipped_bait_id.begins_with("bait_q"):
+		caught_quality = state.equipped_bait_id.substr(6).to_int()
+	_grant_xp(caught_quality)
 
 
 func _add_to_collection(fish_id: String) -> void:
@@ -34,12 +38,12 @@ func _add_to_collection(fish_id: String) -> void:
 	state.collection_log[fish_id] = count
 	state.total_fish_caught += 1
 
-	var caught_quality: int = 0
+	var cq: int = 0
 	if state.equipped_bait_id.begins_with("bait_q"):
-		caught_quality = state.equipped_bait_id.substr(6).to_int()
+		cq = state.equipped_bait_id.substr(6).to_int()
 	var best_quality: int = state.collection_best_quality.get(fish_id, -1)
-	if caught_quality > best_quality:
-		state.collection_best_quality[fish_id] = caught_quality
+	if cq > best_quality:
+		state.collection_best_quality[fish_id] = cq
 
 	SignalBus.collection_updated.emit(fish_id, count)
 	SignalBus.save_requested.emit()

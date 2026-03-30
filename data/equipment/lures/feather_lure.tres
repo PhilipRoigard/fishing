@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="LureData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/lure_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "feather_lure"
+display_name = "Feather Fly"
+description = "A delicate feather fly. Fish stay curious longer."
+perk_name = "Mesmerize"
+perk_description = "Curiosity duration +%d%%"
+perk_id = "curiosity_duration"
+perk_values = [30.0, 50.0, 70.0, 100.0]

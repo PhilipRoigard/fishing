@@ -93,25 +93,29 @@ func _populate_data() -> void:
 			level_up_button.disabled = not CurrencyManager.can_afford_coins(cost)
 
 	var stats_text: String = ""
-	if stat_cfg:
-		var depth: int = stat_cfg.get_cast_depth_at_level(entry.level, entry.quality)
-		stats_text = "Cast Depth: %dm" % depth
-
 	var cat: Variant = null
 	if GameResources.config:
 		cat = GameResources.config.equipment_catalogue
-	if cat:
-		var rod: Variant = cat.get_rod_by_id(entry.item_id)
-		var hook: Variant = cat.get_hook_by_id(entry.item_id)
-		var lure: Variant = cat.get_lure_by_id(entry.item_id)
-		if rod and rod.perk_id != "none" and rod.perk_values.size() > 0:
+
+	var rod: Variant = cat.get_rod_by_id(entry.item_id) if cat else null
+	var hook: Variant = cat.get_hook_by_id(entry.item_id) if cat else null
+	var lure: Variant = cat.get_lure_by_id(entry.item_id) if cat else null
+
+	if rod and stat_cfg:
+		stats_text = "Cast Depth: %dm" % stat_cfg.get_cast_depth_at_level(entry.level, entry.quality)
+		if rod.perk_id != "none" and rod.perk_values.size() > 0:
 			var perk_idx: int = mini(entry.quality, rod.perk_values.size() - 1)
-			var perk_val: float = rod.perk_values[perk_idx]
-			stats_text += "\n" + rod.perk_name + ": " + rod.perk_description % int(perk_val)
-		elif hook:
-			stats_text += "\nBite: +%ss\nCatch: +%d%%" % [str(snapped(hook.bite_window_bonus, 0.1)), int(hook.catch_rate_bonus * 100)]
-		elif lure:
-			stats_text += "\nRare: +%d%%" % int(lure.rare_fish_chance_bonus * 100)
+			stats_text += "\n" + rod.perk_name + ": " + rod.perk_description % int(rod.perk_values[perk_idx])
+	elif hook and stat_cfg:
+		stats_text = "Bite Chance: +%.0f%%" % stat_cfg.get_bite_bonus_at_level(entry.level, entry.quality)
+		if hook.perk_id != "none" and hook.perk_values.size() > 0:
+			var perk_idx: int = mini(entry.quality, hook.perk_values.size() - 1)
+			stats_text += "\n" + hook.perk_name + ": " + hook.perk_description % int(hook.perk_values[perk_idx])
+	elif lure:
+		stats_text = "Lure"
+		if lure.perk_id != "none" and lure.perk_values.size() > 0:
+			var perk_idx: int = mini(entry.quality, lure.perk_values.size() - 1)
+			stats_text += "\n" + lure.perk_name + ": " + lure.perk_description % int(lure.perk_values[perk_idx])
 
 	stats_label.text = stats_text
 

@@ -8,7 +8,6 @@ script = ExtResource("1")
 id = "sea_turtle"
 texture = ExtResource("2_atlas_tex")
 display_name = "Sea Turtle"
-rarity = 1
 sell_value_coins = 20
 min_depth = 0.0
 max_depth = 400.0

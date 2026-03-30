@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1_script")
 id = "basic_lure"
-display_name = "Basic Lure"
-description = "A plain metal lure. Nothing fancy but it works."
-rare_fish_chance_bonus = 0.0
-bite_speed_bonus = 0.0
-rare_fish_chance_per_level = 0.005
-bite_speed_per_level = 0.03
+display_name = "Spinner"
+description = "A basic spinning lure. No special properties."
+perk_name = ""
+perk_description = ""
+perk_id = "none"
+perk_values = [0.0, 0.0, 0.0, 0.0]
