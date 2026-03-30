@@ -97,8 +97,8 @@ func _build_layout() -> void:
 
 	var margin: MarginContainer = MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_top", SafeZoneManager.get_top_margin() + 8)
-	margin.add_theme_constant_override("margin_bottom", SafeZoneManager.get_bottom_margin() + 78)
+	margin.add_theme_constant_override("margin_top", SafeZoneManager.get_top_margin() + 40)
+	margin.add_theme_constant_override("margin_bottom", 78)
 	margin.add_theme_constant_override("margin_left", 12)
 	margin.add_theme_constant_override("margin_right", 12)
 	add_child(margin)
@@ -106,8 +106,6 @@ func _build_layout() -> void:
 	var vbox: VBoxContainer = VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 6)
 	margin.add_child(vbox)
-
-	_build_currency_bar(vbox)
 
 	_build_equipment_slots(vbox)
 
@@ -152,34 +150,6 @@ func _build_layout() -> void:
 
 	_build_bottom_bar(vbox)
 
-
-func _build_currency_bar(parent: VBoxContainer) -> void:
-	var currency_hbox: HBoxContainer = HBoxContainer.new()
-	currency_hbox.add_theme_constant_override("separation", 8)
-	parent.add_child(currency_hbox)
-
-	var back_btn: Button = Button.new()
-	back_btn.text = "<"
-	back_btn.custom_minimum_size = Vector2(32, 32)
-	back_btn.add_theme_font_size_override("font_size", 16)
-	back_btn.pressed.connect(_back)
-	currency_hbox.add_child(back_btn)
-
-	var spacer: Control = Control.new()
-	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	currency_hbox.add_child(spacer)
-
-	var coin_label: Label = Label.new()
-	coin_label.text = "Coins: " + str(CurrencyManager.coins)
-	coin_label.add_theme_font_size_override("font_size", 12)
-	coin_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0))
-	currency_hbox.add_child(coin_label)
-
-	var gem_label: Label = Label.new()
-	gem_label.text = "Gems: " + str(CurrencyManager.gems)
-	gem_label.add_theme_font_size_override("font_size", 12)
-	gem_label.add_theme_color_override("font_color", Color(0.4, 0.8, 1.0))
-	currency_hbox.add_child(gem_label)
 
 
 func _build_equipment_slots(parent: VBoxContainer) -> void:

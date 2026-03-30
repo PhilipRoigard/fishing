@@ -23,7 +23,7 @@ func focus() -> void:
 	var parent: Node = get_parent()
 	parent.move_child.call_deferred(self, parent.get_child_count() - 1)
 	if ui_manager:
-		ui_manager.raise_tab_bar()
+		ui_manager.raise_overlays()
 
 
 func unfocus() -> void:

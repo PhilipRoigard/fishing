@@ -13,8 +13,6 @@ const TACKLE_BOX_PATHS: Array[String] = [
 	"res://data/gacha/legendary_tackle_box.tres",
 ]
 
-var coin_label: Label
-var gem_label: Label
 var content_container: VBoxContainer
 
 
@@ -29,15 +27,11 @@ func exit() -> void:
 
 
 func _setup_connections() -> void:
-	SignalBus.coins_changed.connect(_on_coins_changed)
-	SignalBus.gems_changed.connect(_on_gems_changed)
+	pass
 
 
 func _cleanup_connections() -> void:
-	if SignalBus.coins_changed.is_connected(_on_coins_changed):
-		SignalBus.coins_changed.disconnect(_on_coins_changed)
-	if SignalBus.gems_changed.is_connected(_on_gems_changed):
-		SignalBus.gems_changed.disconnect(_on_gems_changed)
+	pass
 
 
 func _build_layout() -> void:
@@ -48,8 +42,8 @@ func _build_layout() -> void:
 
 	var margin: MarginContainer = MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_top", SafeZoneManager.get_top_margin() + 8)
-	margin.add_theme_constant_override("margin_bottom", SafeZoneManager.get_bottom_margin() + 78)
+	margin.add_theme_constant_override("margin_top", SafeZoneManager.get_top_margin() + 40)
+	margin.add_theme_constant_override("margin_bottom", 78)
 	margin.add_theme_constant_override("margin_left", 16)
 	margin.add_theme_constant_override("margin_right", 16)
 	add_child(margin)
@@ -57,8 +51,6 @@ func _build_layout() -> void:
 	var root_vbox: VBoxContainer = VBoxContainer.new()
 	root_vbox.add_theme_constant_override("separation", 10)
 	margin.add_child(root_vbox)
-
-	_build_top_bar(root_vbox)
 
 	var scroll: ScrollContainer = ScrollContainer.new()
 	scroll.add_theme_stylebox_override("scroll", StyleBoxEmpty.new())
@@ -78,34 +70,6 @@ func _build_layout() -> void:
 	_populate_tackle_box_section()
 	_populate_sections()
 
-
-func _build_top_bar(parent: VBoxContainer) -> void:
-	var bar: HBoxContainer = HBoxContainer.new()
-	bar.add_theme_constant_override("separation", 8)
-	parent.add_child(bar)
-
-	var back_btn: Button = Button.new()
-	back_btn.text = "<"
-	back_btn.custom_minimum_size = Vector2(32, 32)
-	back_btn.add_theme_font_size_override("font_size", 16)
-	back_btn.pressed.connect(_back)
-	bar.add_child(back_btn)
-
-	var spacer: Control = Control.new()
-	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	bar.add_child(spacer)
-
-	coin_label = Label.new()
-	coin_label.text = "Coins: " + str(CurrencyManager.coins)
-	coin_label.add_theme_font_size_override("font_size", 12)
-	coin_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0))
-	bar.add_child(coin_label)
-
-	gem_label = Label.new()
-	gem_label.text = "Gems: " + str(CurrencyManager.gems)
-	gem_label.add_theme_font_size_override("font_size", 12)
-	gem_label.add_theme_color_override("font_color", Color(0.4, 0.8, 1.0))
-	bar.add_child(gem_label)
 
 
 func _populate_tackle_box_section() -> void:
@@ -389,15 +353,6 @@ func _on_buy_pressed(product_id: String) -> void:
 	state_machine.push_state(UIStateMachine.State.PURCHASING, {"product_id": product_id})
 	PurchaseManager.purchase(product_id)
 
-
-func _on_coins_changed(_previous: int, current: int) -> void:
-	if coin_label:
-		coin_label.text = "Coins: " + str(current)
-
-
-func _on_gems_changed(_previous: int, current: int) -> void:
-	if gem_label:
-		gem_label.text = "Gems: " + str(current)
 
 
 func _clear_children() -> void:

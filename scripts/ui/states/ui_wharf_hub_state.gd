@@ -2,11 +2,10 @@ extends UIStateNode
 
 var cast_button: Button
 var level_label: Label
-var equipment_label: Label
 var session_catch_label: Label
 var best_catch_label: Label
 var tab_bar_instance: HBoxContainer
-var currency_bar_instance: HBoxContainer
+var currency_bar_instance: PanelContainer
 
 var session_fish_count: int = 0
 var session_best_fish_id: String = ""
@@ -24,111 +23,130 @@ func enter(_meta: Variant = null) -> void:
 	_build_layout()
 	_refresh_display()
 	ui_manager.show_tab_bar(true)
+	ui_manager.show_currency_bar(true)
 
 
 func exit() -> void:
 	super()
 	ui_manager.show_tab_bar(false)
+	ui_manager.show_currency_bar(false)
 	_clear_children()
 
 
 func _build_layout() -> void:
-	var top_panel: PanelContainer = PanelContainer.new()
-	top_panel.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	top_panel.offset_bottom = 105
-	var top_style: StyleBoxFlat = StyleBoxFlat.new()
-	top_style.bg_color = Color(0.05, 0.08, 0.15, 0.75)
-	top_panel.add_theme_stylebox_override("panel", top_style)
-	top_panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	add_child(top_panel)
+	if not currency_bar_instance or not is_instance_valid(currency_bar_instance):
+		currency_bar_instance = CurrencyBarScript.new()
+		currency_bar_instance.mouse_filter = Control.MOUSE_FILTER_STOP
+		ui_manager.set_currency_bar(currency_bar_instance)
 
-	var top_margin: MarginContainer = MarginContainer.new()
-	top_margin.add_theme_constant_override("margin_top", 6)
-	top_margin.add_theme_constant_override("margin_left", 12)
-	top_margin.add_theme_constant_override("margin_right", 12)
-	top_margin.add_theme_constant_override("margin_bottom", 6)
-	top_panel.add_child(top_margin)
-
-	var top_vbox: VBoxContainer = VBoxContainer.new()
-	top_vbox.add_theme_constant_override("separation", 2)
-	top_margin.add_child(top_vbox)
-
-	var level_currency_row: HBoxContainer = HBoxContainer.new()
-	level_currency_row.add_theme_constant_override("separation", 12)
-	top_vbox.add_child(level_currency_row)
+	var center_container: VBoxContainer = VBoxContainer.new()
+	center_container.set_anchors_preset(Control.PRESET_CENTER)
+	center_container.custom_minimum_size = Vector2(280, 200)
+	center_container.offset_left = -140
+	center_container.offset_right = 140
+	center_container.offset_top = -60
+	center_container.offset_bottom = 140
+	center_container.add_theme_constant_override("separation", 12)
+	center_container.alignment = BoxContainer.ALIGNMENT_CENTER
+	add_child(center_container)
 
 	level_label = Label.new()
-	level_label.text = "Level 1"
-	level_label.add_theme_font_size_override("font_size", 13)
-	level_currency_row.add_child(level_label)
-
-	currency_bar_instance = CurrencyBarScript.new()
-	currency_bar_instance.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	level_currency_row.add_child(currency_bar_instance)
-
-	var settings_btn: Button = Button.new()
-	settings_btn.text = ""
-	settings_btn.custom_minimum_size = Vector2(36, 36)
-	var gear_atlas: AtlasTexture = AtlasTexture.new()
-	gear_atlas.atlas = preload("res://assets/sprites/ui/sweeper/ui_spritesheet_02.png")
-	gear_atlas.region = Rect2(224, 240, 16, 16)
-	settings_btn.icon = gear_atlas
-	settings_btn.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	settings_btn.expand_icon = true
-	settings_btn.pressed.connect(func() -> void: state_machine.push_state(UIStateMachine.State.SETTINGS))
-	level_currency_row.add_child(settings_btn)
-
-	equipment_label = Label.new()
-	equipment_label.text = "No rod equipped"
-	equipment_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	equipment_label.add_theme_font_size_override("font_size", 11)
-	equipment_label.add_theme_color_override("font_color", Color(0.7, 0.75, 0.85))
-	top_vbox.add_child(equipment_label)
+	level_label.text = "Fisherman Lv.1"
+	level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	level_label.add_theme_font_size_override("font_size", 16)
+	level_label.add_theme_color_override("font_color", Color(0.95, 0.9, 0.8))
+	center_container.add_child(level_label)
 
 	var catch_row: HBoxContainer = HBoxContainer.new()
 	catch_row.add_theme_constant_override("separation", 16)
 	catch_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	top_vbox.add_child(catch_row)
+	center_container.add_child(catch_row)
 
 	session_catch_label = Label.new()
 	session_catch_label.text = "Today: 0 fish"
-	session_catch_label.add_theme_font_size_override("font_size", 11)
-	session_catch_label.add_theme_color_override("font_color", Color(0.6, 0.85, 1.0))
+	session_catch_label.add_theme_font_size_override("font_size", 12)
+	session_catch_label.add_theme_color_override("font_color", Color(0.7, 0.85, 0.95))
 	catch_row.add_child(session_catch_label)
 
 	best_catch_label = Label.new()
 	best_catch_label.text = "Best: None yet"
-	best_catch_label.add_theme_font_size_override("font_size", 11)
+	best_catch_label.add_theme_font_size_override("font_size", 12)
 	best_catch_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0))
 	catch_row.add_child(best_catch_label)
 
-	var bottom_panel: PanelContainer = PanelContainer.new()
-	bottom_panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	bottom_panel.offset_top = -215
-	var bottom_style: StyleBoxFlat = StyleBoxFlat.new()
-	bottom_style.bg_color = Color(0.05, 0.08, 0.15, 0.75)
-	bottom_panel.add_theme_stylebox_override("panel", bottom_style)
-	bottom_panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	add_child(bottom_panel)
-
-	var bottom_vbox: VBoxContainer = VBoxContainer.new()
-	bottom_vbox.add_theme_constant_override("separation", 8)
-	bottom_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	bottom_panel.add_child(bottom_vbox)
-
-	var craft_bait_button: Button = Button.new()
-	craft_bait_button.text = "Craft Bait"
-	craft_bait_button.custom_minimum_size = Vector2(200, 44)
-	craft_bait_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	craft_bait_button.pressed.connect(_on_craft_bait_pressed)
-	bottom_vbox.add_child(craft_bait_button)
+	var spacer: Control = Control.new()
+	spacer.custom_minimum_size.y = 8
+	center_container.add_child(spacer)
 
 	cast_button = Button.new()
 	cast_button.text = "CAST"
-	cast_button.custom_minimum_size = Vector2(200, 60)
+	cast_button.custom_minimum_size = Vector2(220, 64)
 	cast_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	cast_button.add_theme_font_size_override("font_size", 22)
+
+	var cast_style: StyleBoxFlat = StyleBoxFlat.new()
+	cast_style.bg_color = Color(0.45, 0.32, 0.18)
+	cast_style.border_color = Color(0.6, 0.45, 0.25)
+	cast_style.border_width_top = 2
+	cast_style.border_width_bottom = 3
+	cast_style.border_width_left = 2
+	cast_style.border_width_right = 2
+	cast_style.corner_radius_top_left = 10
+	cast_style.corner_radius_top_right = 10
+	cast_style.corner_radius_bottom_left = 10
+	cast_style.corner_radius_bottom_right = 10
+	cast_style.content_margin_top = 12
+	cast_style.content_margin_bottom = 12
+	cast_style.content_margin_left = 24
+	cast_style.content_margin_right = 24
+	cast_button.add_theme_stylebox_override("normal", cast_style)
+
+	var cast_hover: StyleBoxFlat = cast_style.duplicate()
+	cast_hover.bg_color = Color(0.55, 0.4, 0.22)
+	cast_button.add_theme_stylebox_override("hover", cast_hover)
+
+	var cast_pressed: StyleBoxFlat = cast_style.duplicate()
+	cast_pressed.bg_color = Color(0.35, 0.25, 0.14)
+	cast_button.add_theme_stylebox_override("pressed", cast_pressed)
+
+	cast_button.add_theme_color_override("font_color", Color(0.95, 0.9, 0.8))
 	cast_button.pressed.connect(_on_cast_pressed)
-	bottom_vbox.add_child(cast_button)
+	center_container.add_child(cast_button)
+
+	var craft_bait_button: Button = Button.new()
+	craft_bait_button.text = "Craft Bait"
+	craft_bait_button.custom_minimum_size = Vector2(180, 44)
+	craft_bait_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	craft_bait_button.add_theme_font_size_override("font_size", 14)
+
+	var craft_style: StyleBoxFlat = StyleBoxFlat.new()
+	craft_style.bg_color = Color(0.3, 0.22, 0.13)
+	craft_style.border_color = Color(0.45, 0.35, 0.2)
+	craft_style.border_width_top = 1
+	craft_style.border_width_bottom = 2
+	craft_style.border_width_left = 1
+	craft_style.border_width_right = 1
+	craft_style.corner_radius_top_left = 8
+	craft_style.corner_radius_top_right = 8
+	craft_style.corner_radius_bottom_left = 8
+	craft_style.corner_radius_bottom_right = 8
+	craft_style.content_margin_top = 8
+	craft_style.content_margin_bottom = 8
+	craft_style.content_margin_left = 16
+	craft_style.content_margin_right = 16
+	craft_bait_button.add_theme_stylebox_override("normal", craft_style)
+
+	var craft_hover: StyleBoxFlat = craft_style.duplicate()
+	craft_hover.bg_color = Color(0.38, 0.28, 0.16)
+	craft_bait_button.add_theme_stylebox_override("hover", craft_hover)
+
+	var craft_pressed: StyleBoxFlat = craft_style.duplicate()
+	craft_pressed.bg_color = Color(0.22, 0.16, 0.1)
+	craft_bait_button.add_theme_stylebox_override("pressed", craft_pressed)
+
+	craft_bait_button.add_theme_color_override("font_color", Color(0.85, 0.8, 0.7))
+	craft_bait_button.pressed.connect(_on_craft_bait_pressed)
+	center_container.add_child(craft_bait_button)
 
 	if not tab_bar_instance or not is_instance_valid(tab_bar_instance):
 		tab_bar_instance = TabBarScene.instantiate()
@@ -143,16 +161,6 @@ func _refresh_display() -> void:
 	if level_label:
 		level_label.text = "Fisherman Lv." + str(current_level)
 
-	if equipment_label:
-		var rod_entry: Variant = EquipmentManager.get_equipped(Enums.EquipmentSlot.ROD) if EquipmentManager else null
-		var hook_entry: Variant = EquipmentManager.get_equipped(Enums.EquipmentSlot.HOOK) if EquipmentManager else null
-		var lure_entry: Variant = EquipmentManager.get_equipped(Enums.EquipmentSlot.LURE) if EquipmentManager else null
-		var parts: Array[String] = []
-		parts.append(_get_equip_display(rod_entry, "rod"))
-		parts.append(_get_equip_display(hook_entry, "hook"))
-		parts.append(_get_equip_display(lure_entry, "lure"))
-		equipment_label.text = " | ".join(parts)
-
 	if session_catch_label:
 		session_catch_label.text = "Today: " + str(session_fish_count) + " fish"
 
@@ -166,25 +174,6 @@ func _refresh_display() -> void:
 			best_catch_label.text = "Best: " + best_name
 		else:
 			best_catch_label.text = "Best: None yet"
-
-
-func _get_equip_display(entry: Variant, equipment_type: String) -> String:
-	if not entry:
-		return "None"
-	var display_name: String = entry.item_id
-	if GameResources.config and GameResources.config.equipment_catalogue:
-		var catalogue: Variant = GameResources.config.equipment_catalogue
-		var data: Variant = null
-		match equipment_type:
-			"rod":
-				data = catalogue.get_rod_by_id(entry.item_id)
-			"hook":
-				data = catalogue.get_hook_by_id(entry.item_id)
-			"lure":
-				data = catalogue.get_lure_by_id(entry.item_id)
-		if data and data.display_name != "":
-			display_name = data.display_name
-	return display_name + " Lv." + str(entry.level)
 
 
 func _on_craft_bait_pressed() -> void:
@@ -206,6 +195,7 @@ func focus() -> void:
 	if tab_bar_instance and tab_bar_instance.is_inside_tree():
 		tab_bar_instance.select_home()
 	ui_manager.show_tab_bar(true)
+	ui_manager.show_currency_bar(true)
 
 
 func _on_tab_changed(tab_index: int) -> void:

@@ -47,8 +47,8 @@ func _build_layout() -> void:
 
 	var margin: MarginContainer = MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_top", SafeZoneManager.get_top_margin() + 10)
-	margin.add_theme_constant_override("margin_bottom", SafeZoneManager.get_bottom_margin() + 78)
+	margin.add_theme_constant_override("margin_top", SafeZoneManager.get_top_margin() + 40)
+	margin.add_theme_constant_override("margin_bottom", 78)
 	margin.add_theme_constant_override("margin_left", 16)
 	margin.add_theme_constant_override("margin_right", 16)
 	add_child(margin)
@@ -81,13 +81,6 @@ func _build_layout() -> void:
 	grid.add_theme_constant_override("h_separation", 8)
 	grid.add_theme_constant_override("v_separation", 8)
 	scroll.add_child(grid)
-
-	var back_button: Button = Button.new()
-	back_button.text = "Back"
-	back_button.custom_minimum_size = Vector2(140, 44)
-	back_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	back_button.pressed.connect(_back)
-	vbox.add_child(back_button)
 
 
 func _refresh_grid() -> void:
