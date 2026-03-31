@@ -1,9 +1,18 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/states/ui_merge_state.gd" id="1_script"]
-[ext_resource type="StyleBox" uid="uid://dlva7w51sxolv" path="res://resources/ui/Style Boxes/StyleBoxTexture/panels/panel_container.tres" id="2_panel"]
-[ext_resource type="PackedScene" path="res://scenes/ui/components/item_card.tscn" id="3_itemcard"]
-[ext_resource type="Script" path="res://scripts/ui/components/virtualized_item_grid.gd" id="4_vgrid"]
+[ext_resource type="StyleBox" uid="uid://f2eyyygm4b4g" path="res://resources/ui/Style Boxes/StyleBoxTexture/panels/panel_container_header.tres" id="2_header"]
+[ext_resource type="Script" path="res://scripts/ui/components/virtualized_item_grid.gd" id="3_vgrid"]
+[ext_resource type="Script" path="res://scripts/ui/components/auto_size_button.gd" id="4_autobtn"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
+
+[sub_resource type="Theme" id="Theme_scroll"]
+VScrollBar/styles/grabber = SubResource("StyleBoxEmpty_scroll")
+VScrollBar/styles/grabber_highlight = SubResource("StyleBoxEmpty_scroll")
+VScrollBar/styles/grabber_pressed = SubResource("StyleBoxEmpty_scroll")
+VScrollBar/styles/scroll = SubResource("StyleBoxEmpty_scroll")
+VScrollBar/styles/scroll_focus = SubResource("StyleBoxEmpty_scroll")
 
 [node name="MergeState" type="Control"]
 layout_mode = 3
@@ -23,7 +32,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.03, 0.06, 0.12, 1)
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MainMargin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -31,114 +40,201 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 40
 theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 78
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="MainVBox" type="VBoxContainer" parent="MainMargin"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 0
 
-[node name="PreviewPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
+[node name="TopSpacer" type="Control" parent="MainMargin/MainVBox"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
-theme_override_styles/panel = ExtResource("2_panel")
+mouse_filter = 2
 
-[node name="PreviewMargin" type="MarginContainer" parent="MarginContainer/VBoxContainer/PreviewPanel"]
-layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
-
-[node name="PreviewVBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="TopRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin/PreviewVBox"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="SelectedSlot" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin/PreviewVBox/TopRow" instance=ExtResource("3_itemcard")]
-unique_name_in_owner = true
-
-[node name="InfoLabel" type="Label" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin/PreviewVBox/TopRow"]
-unique_name_in_owner = true
+[node name="ContentMargin" type="MarginContainer" parent="MainMargin/MainVBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 14
-text = "Select equipment
-to merge!"
-autowrap_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
 
-[node name="BottomRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin/PreviewVBox"]
+[node name="ContentVBox" type="VBoxContainer" parent="MainMargin/MainVBox/ContentMargin"]
 layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
 theme_override_constants/separation = 8
-alignment = 1
 
-[node name="MaterialSlot1" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin/PreviewVBox/BottomRow" instance=ExtResource("3_itemcard")]
+[node name="PreviewPanel" type="Panel" parent="MainMargin/MainVBox/ContentMargin/ContentVBox"]
 unique_name_in_owner = true
-modulate = Color(1, 1, 1, 0.3)
-
-[node name="MaterialSlot2" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin/PreviewVBox/BottomRow" instance=ExtResource("3_itemcard")]
-unique_name_in_owner = true
-modulate = Color(1, 1, 1, 0.3)
-
-[node name="ArrowLabel" type="Label" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin/PreviewVBox/BottomRow"]
+custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = ">"
+theme_override_styles/panel = ExtResource("2_header")
 
-[node name="ResultSlot" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewMargin/PreviewVBox/BottomRow" instance=ExtResource("3_itemcard")]
+[node name="ResultSlot" type="PanelContainer" parent="MainMargin/MainVBox/ContentMargin/ContentVBox/PreviewPanel"]
 unique_name_in_owner = true
-modulate = Color(1, 1, 1, 0.3)
+layout_mode = 0
+offset_left = 21.0
+offset_top = 19.0
+offset_right = 121.0
+offset_bottom = 119.0
+pivot_offset = Vector2(50, 50)
 
-[node name="HeaderPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+[node name="ResultTexture" type="TextureRect" parent="MainMargin/MainVBox/ContentMargin/ContentVBox/PreviewPanel/ResultSlot"]
+unique_name_in_owner = true
 layout_mode = 2
-theme_override_styles/panel = ExtResource("2_panel")
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+texture_filter = 1
 
-[node name="HeaderMargin" type="MarginContainer" parent="MarginContainer/VBoxContainer/HeaderPanel"]
+[node name="SelectedItemSlot" type="PanelContainer" parent="MainMargin/MainVBox/ContentMargin/ContentVBox/PreviewPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 37.0
+offset_top = 136.0
+offset_right = 101.0
+offset_bottom = 200.0
+
+[node name="SelectedTexture" type="TextureRect" parent="MainMargin/MainVBox/ContentMargin/ContentVBox/PreviewPanel/SelectedItemSlot"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+texture_filter = 1
+
+[node name="PlusSign" type="Label" parent="MainMargin/MainVBox/ContentMargin/ContentVBox/PreviewPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 116.0
+offset_top = 152.0
+offset_right = 146.0
+offset_bottom = 185.0
+theme_override_font_sizes/font_size = 40
+text = "+"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MaterialSlot1" type="PanelContainer" parent="MainMargin/MainVBox/ContentMargin/ContentVBox/PreviewPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 159.0
+offset_top = 136.0
+offset_right = 223.0
+offset_bottom = 200.0
+
+[node name="Material1Texture" type="TextureRect" parent="MainMargin/MainVBox/ContentMargin/ContentVBox/PreviewPanel/MaterialSlot1"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+texture_filter = 1
+
+[node name="MaterialSlot2" type="PanelContainer" parent="MainMargin/MainVBox/ContentMargin/ContentVBox/PreviewPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 236.0
+offset_top = 136.0
+offset_right = 300.0
+offset_bottom = 200.0
+
+[node name="Material2Texture" type="TextureRect" parent="MainMargin/MainVBox/ContentMargin/ContentVBox/PreviewPanel/MaterialSlot2"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+texture_filter = 1
+
+[node name="StatsLabel" type="RichTextLabel" parent="MainMargin/MainVBox/ContentMargin/ContentVBox/PreviewPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 143.0
+offset_top = 19.0
+offset_right = 315.0
+offset_bottom = 130.0
+bbcode_enabled = true
+text = "Select items
+to merge!"
+fit_content = true
+scroll_active = false
+
+[node name="Header" type="PanelContainer" parent="MainMargin/MainVBox/ContentMargin/ContentVBox"]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("2_header")
+
+[node name="HeaderMargin" type="MarginContainer" parent="MainMargin/MainVBox/ContentMargin/ContentVBox/Header"]
 layout_mode = 2
 theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 8
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_bottom = 5
 
-[node name="HeaderHBox" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HeaderPanel/HeaderMargin"]
+[node name="HeaderBar" type="HBoxContainer" parent="MainMargin/MainVBox/ContentMargin/ContentVBox/Header/HeaderMargin"]
+custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
+theme_override_constants/separation = 8
 
-[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer/HeaderPanel/HeaderMargin/HeaderHBox"]
+[node name="TitleLabel" type="Label" parent="MainMargin/MainVBox/ContentMargin/ContentVBox/Header/HeaderMargin/HeaderBar"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 16
 text = "My Equipment"
 horizontal_alignment = 1
 
-[node name="LoadoutButton" type="Button" parent="MarginContainer/VBoxContainer/HeaderPanel/HeaderMargin/HeaderHBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(80, 32)
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "Loadout"
-
-[node name="MergeAllButton" type="Button" parent="MarginContainer/VBoxContainer/HeaderPanel/HeaderMargin/HeaderHBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(80, 32)
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "Merge All"
-
-[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-
-[node name="ItemsGrid" type="Control" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+[node name="LoadoutButton" type="Button" parent="MainMargin/MainVBox/ContentMargin/ContentVBox/Header/HeaderMargin/HeaderBar"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-script = ExtResource("4_vgrid")
+text = "Loadout"
 
-[connection signal="pressed" from="MarginContainer/VBoxContainer/HeaderPanel/HeaderMargin/HeaderHBox/LoadoutButton" to="." method="_on_loadout_pressed"]
-[connection signal="pressed" from="MarginContainer/VBoxContainer/HeaderPanel/HeaderMargin/HeaderHBox/MergeAllButton" to="." method="_on_merge_all_pressed"]
+[node name="MergeAllButton" type="Button" parent="MainMargin/MainVBox/ContentMargin/ContentVBox/Header/HeaderMargin/HeaderBar"]
+unique_name_in_owner = true
+clip_contents = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "Merge"
+script = ExtResource("4_autobtn")
+max_font_size = 20
+
+[node name="EmptyLabel" type="Label" parent="MainMargin/MainVBox/ContentMargin/ContentVBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "No items to merge"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ItemsScrollContainer" type="ScrollContainer" parent="MainMargin/MainVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme = SubResource("Theme_scroll")
+horizontal_scroll_mode = 0
+
+[node name="ScrollMargin" type="MarginContainer" parent="MainMargin/MainVBox/ItemsScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 80
+
+[node name="ItemsGrid" type="Control" parent="MainMargin/MainVBox/ItemsScrollContainer/ScrollMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("3_vgrid")
+
+[node name="BottomSpacer" type="Control" parent="MainMargin/MainVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+mouse_filter = 2
+
+[connection signal="pressed" from="MainMargin/MainVBox/ContentMargin/ContentVBox/Header/HeaderMargin/HeaderBar/LoadoutButton" to="." method="_on_loadout_pressed"]
+[connection signal="pressed" from="MainMargin/MainVBox/ContentMargin/ContentVBox/Header/HeaderMargin/HeaderBar/MergeAllButton" to="." method="_on_merge_all_pressed"]

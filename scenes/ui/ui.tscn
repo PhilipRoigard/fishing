@@ -6,7 +6,7 @@
 [ext_resource type="Script" path="res://scripts/ui/states/ui_wharf_hub_state.gd" id="4_hub"]
 [ext_resource type="Script" path="res://scripts/ui/states/ui_fishing_game_state.gd" id="5_fishing"]
 [ext_resource type="Script" path="res://scripts/ui/states/ui_catch_result_state.gd" id="6_catch"]
-[ext_resource type="Script" path="res://scripts/ui/states/ui_equipment_state.gd" id="7_equip"]
+[ext_resource type="PackedScene" path="res://scenes/ui/states/equipment_state.tscn" id="7_equip_scene"]
 [ext_resource type="PackedScene" path="res://scenes/ui/components/equipment_details_popup.tscn" id="8_equipdetails"]
 [ext_resource type="Script" path="res://scripts/ui/states/ui_collection_log_state.gd" id="9_collection"]
 [ext_resource type="PackedScene" path="res://scenes/ui/components/fish_details_popup.tscn" id="10_fishdetails"]
@@ -75,15 +75,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("6_catch")
 
-[node name="EquipmentStateNode" type="Control" parent="."]
+[node name="EquipmentStateNode" parent="." instance=ExtResource("7_equip_scene")]
 visible = false
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("7_equip")
 
 [node name="EquipmentDetailsStateNode" parent="." instance=ExtResource("8_equipdetails")]
 visible = false

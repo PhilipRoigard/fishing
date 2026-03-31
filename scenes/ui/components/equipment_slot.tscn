@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="StyleBox" path="res://resources/ui/Style Boxes/StyleBoxTexture/panels/panel_container_lunchbox_inner.tres" id="1_style"]
+[ext_resource type="Script" path="res://scripts/ui/components/equipment_slot_container.gd" id="2_script"]
+
+[node name="EquipmentSlotContainer" type="PanelContainer"]
+custom_minimum_size = Vector2(70, 70)
+offset_right = 70.0
+offset_bottom = 70.0
+mouse_filter = 1
+theme_override_styles/panel = ExtResource("1_style")
+script = ExtResource("2_script")
+
+[node name="EquipmentIcon" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 2
