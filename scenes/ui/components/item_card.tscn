@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/components/item_card.gd" id="1_script"]
-[ext_resource type="StyleBox" uid="uid://dlva7w51sxolv" path="res://resources/ui/Style Boxes/StyleBoxTexture/panels/panel_container.tres" id="2_panel"]
+[ext_resource type="StyleBox" uid="uid://b7f7xfg5gy5wu" path="res://resources/ui/Style Boxes/StyleBoxTexture/panels/panel_container_item_card.tres" id="2_panel"]
 
 [node name="ItemCard" type="PanelContainer"]
 custom_minimum_size = Vector2(70, 70)

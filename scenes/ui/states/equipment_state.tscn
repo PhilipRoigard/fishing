@@ -49,33 +49,40 @@ layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="ContentVBox" type="VBoxContainer" parent="MainMargin/MainVBox/ItemsScrollContainer"]
+[node name="ContentMargin" type="MarginContainer" parent="MainMargin/MainVBox/ItemsScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+
+[node name="ContentVBox" type="VBoxContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="StatsHeader" type="PanelContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox"]
+[node name="StatsHeader" type="PanelContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox"]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("2_header")
 
-[node name="StatsMargin" type="MarginContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/StatsHeader"]
+[node name="StatsMargin" type="MarginContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/StatsHeader"]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 6
 
-[node name="StatsHBox" type="HBoxContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/StatsHeader/StatsMargin"]
+[node name="StatsHBox" type="HBoxContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/StatsHeader/StatsMargin"]
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
 
-[node name="DepthTitle" type="Label" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/StatsHeader/StatsMargin/StatsHBox"]
+[node name="DepthTitle" type="Label" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/StatsHeader/StatsMargin/StatsHBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Cast Depth"
 
-[node name="CastDepthLabel" type="Label" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/StatsHeader/StatsMargin/StatsHBox"]
+[node name="CastDepthLabel" type="Label" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/StatsHeader/StatsMargin/StatsHBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -83,93 +90,93 @@ theme_override_font_sizes/font_size = 24
 text = "100m"
 horizontal_alignment = 2
 
-[node name="SlotsPanel" type="PanelContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox"]
+[node name="SlotsPanel" type="PanelContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox"]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("3_lunchbox")
 
-[node name="SlotsMargin" type="MarginContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/SlotsPanel"]
+[node name="SlotsMargin" type="MarginContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/SlotsPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="SlotsHBox" type="HBoxContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/SlotsPanel/SlotsMargin"]
+[node name="SlotsHBox" type="HBoxContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/SlotsPanel/SlotsMargin"]
 layout_mode = 2
 theme_override_constants/separation = 6
 alignment = 1
 
-[node name="RodSlot" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/SlotsPanel/SlotsMargin/SlotsHBox" instance=ExtResource("4_slot")]
+[node name="RodSlot" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/SlotsPanel/SlotsMargin/SlotsHBox" instance=ExtResource("4_slot")]
 unique_name_in_owner = true
 
-[node name="HookSlot" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/SlotsPanel/SlotsMargin/SlotsHBox" instance=ExtResource("4_slot")]
+[node name="HookSlot" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/SlotsPanel/SlotsMargin/SlotsHBox" instance=ExtResource("4_slot")]
 unique_name_in_owner = true
 
-[node name="LureSlot" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/SlotsPanel/SlotsMargin/SlotsHBox" instance=ExtResource("4_slot")]
+[node name="LureSlot" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/SlotsPanel/SlotsMargin/SlotsHBox" instance=ExtResource("4_slot")]
 unique_name_in_owner = true
 
-[node name="BaitSlot" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/SlotsPanel/SlotsMargin/SlotsHBox" instance=ExtResource("4_slot")]
+[node name="BaitSlot" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/SlotsPanel/SlotsMargin/SlotsHBox" instance=ExtResource("4_slot")]
 unique_name_in_owner = true
 
-[node name="FilterBar" type="HBoxContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox"]
+[node name="FilterBar" type="HBoxContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="AllFilter" type="Button" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/FilterBar"]
+[node name="AllFilter" type="Button" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/FilterBar"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "All"
 
-[node name="RodFilter" type="Button" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/FilterBar"]
+[node name="RodFilter" type="Button" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/FilterBar"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Rod"
 
-[node name="HookFilter" type="Button" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/FilterBar"]
+[node name="HookFilter" type="Button" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/FilterBar"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Hook"
 
-[node name="LureFilter" type="Button" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/FilterBar"]
+[node name="LureFilter" type="Button" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/FilterBar"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Lure"
 
-[node name="BaitFilter" type="Button" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/FilterBar"]
+[node name="BaitFilter" type="Button" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/FilterBar"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Bait"
 
-[node name="ItemsHeader" type="PanelContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox"]
+[node name="ItemsHeader" type="PanelContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox"]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("2_header")
 
-[node name="HeaderMargin" type="MarginContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/ItemsHeader"]
+[node name="HeaderMargin" type="MarginContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/ItemsHeader"]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 4
 
-[node name="HeaderHBox" type="HBoxContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/ItemsHeader/HeaderMargin"]
+[node name="HeaderHBox" type="HBoxContainer" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/ItemsHeader/HeaderMargin"]
 layout_mode = 2
 
-[node name="ItemsTitle" type="Label" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/ItemsHeader/HeaderMargin/HeaderHBox"]
+[node name="ItemsTitle" type="Label" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/ItemsHeader/HeaderMargin/HeaderHBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "Items"
 horizontal_alignment = 1
 
-[node name="MergeButton" type="Button" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/ItemsHeader/HeaderMargin/HeaderHBox"]
+[node name="MergeButton" type="Button" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/ItemsHeader/HeaderMargin/HeaderHBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 32)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Merge"
 
-[node name="EmptyLabel" type="Label" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox"]
+[node name="EmptyLabel" type="Label" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -177,20 +184,20 @@ theme_override_font_sizes/font_size = 14
 text = "No items"
 horizontal_alignment = 1
 
-[node name="ItemsGrid" type="Control" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox"]
+[node name="ItemsGrid" type="Control" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("5_vgrid")
 
-[node name="BottomSpacer" type="Control" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox"]
+[node name="BottomSpacer" type="Control" parent="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
 
-[connection signal="pressed" from="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/FilterBar/AllFilter" to="." method="_on_filter_pressed" binds= [0]]
-[connection signal="pressed" from="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/FilterBar/RodFilter" to="." method="_on_filter_pressed" binds= [1]]
-[connection signal="pressed" from="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/FilterBar/HookFilter" to="." method="_on_filter_pressed" binds= [2]]
-[connection signal="pressed" from="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/FilterBar/LureFilter" to="." method="_on_filter_pressed" binds= [3]]
-[connection signal="pressed" from="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/FilterBar/BaitFilter" to="." method="_on_filter_pressed" binds= [4]]
-[connection signal="pressed" from="MainMargin/MainVBox/ItemsScrollContainer/ContentVBox/ItemsHeader/HeaderMargin/HeaderHBox/MergeButton" to="." method="_on_merge_pressed"]
+[connection signal="pressed" from="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/FilterBar/AllFilter" to="." method="_on_filter_pressed" binds= [0]]
+[connection signal="pressed" from="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/FilterBar/RodFilter" to="." method="_on_filter_pressed" binds= [1]]
+[connection signal="pressed" from="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/FilterBar/HookFilter" to="." method="_on_filter_pressed" binds= [2]]
+[connection signal="pressed" from="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/FilterBar/LureFilter" to="." method="_on_filter_pressed" binds= [3]]
+[connection signal="pressed" from="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/FilterBar/BaitFilter" to="." method="_on_filter_pressed" binds= [4]]
+[connection signal="pressed" from="MainMargin/MainVBox/ItemsScrollContainer/ContentMargin/ContentVBox/ItemsHeader/HeaderMargin/HeaderHBox/MergeButton" to="." method="_on_merge_pressed"]

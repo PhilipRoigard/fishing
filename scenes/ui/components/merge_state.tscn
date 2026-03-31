@@ -257,12 +257,8 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("3_vgrid")
+top_padding = 8
 
-[node name="BottomSpacer" type="Control" parent="MainMargin/MainVBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 78)
-layout_mode = 2
-mouse_filter = 2
 
 [connection signal="pressed" from="MainMargin/MainVBox/ContentMargin/ContentVBox/Header/HeaderMargin/HeaderBar/LoadoutButton" to="." method="_on_loadout_pressed"]
 [connection signal="pressed" from="MainMargin/MainVBox/ContentMargin/ContentVBox/Header/HeaderMargin/HeaderBar/MergeAllButton" to="." method="_on_merge_all_pressed"]
