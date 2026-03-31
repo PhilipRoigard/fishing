@@ -6,6 +6,7 @@ signal card_selected(card: ItemCard, index: int)
 @export var h_separation: int = 6
 @export var v_separation: int = 6
 @export var buffer_rows: int = 2
+@export var top_padding: int = 0
 
 var _item_card_scene: PackedScene = preload("res://scenes/ui/components/item_card.tscn")
 var _card_pool: Array[ItemCard] = []
@@ -66,7 +67,7 @@ func update_columns(available_width: float) -> void:
 func _update_layout() -> void:
 	var total_rows: int = ceili(float(_data_items.size()) / float(_columns)) if _columns > 0 else 0
 	var row_height: float = _card_size.y + v_separation
-	var total_height: float = total_rows * row_height - (v_separation if total_rows > 0 else 0)
+	var total_height: float = total_rows * row_height - (v_separation if total_rows > 0 else 0) + top_padding
 	custom_minimum_size = Vector2(0, maxf(total_height, 0.0))
 	var cell_width: float = _card_size.x + h_separation
 	var total_grid_width: float = _columns * cell_width - h_separation
@@ -137,7 +138,7 @@ func _show_card(index: int) -> void:
 	var cell_width: float = _card_size.x + h_separation
 	var row_height: float = _card_size.y + v_separation
 
-	card.position = Vector2(_cached_offset_x + col * cell_width, row * row_height)
+	card.position = Vector2(_cached_offset_x + col * cell_width, top_padding + row * row_height)
 	card.size = _card_size
 	card.visible = true
 
@@ -207,4 +208,4 @@ func _reposition_active_cards() -> void:
 		var card: ItemCard = _active_cards[idx] as ItemCard
 		var row: int = idx / _columns
 		var col: int = idx % _columns
-		card.position = Vector2(_cached_offset_x + col * cell_width, row * row_height)
+		card.position = Vector2(_cached_offset_x + col * cell_width, top_padding + row * row_height)

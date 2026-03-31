@@ -46,6 +46,8 @@ signal fish_despawned(fish: SwimmingFish)
 func _ready() -> void:
 	if GameResources.config:
 		_fishing_config = GameResources.config.fishing_config
+	if not SignalBus.fishing_state_changed.is_connected(_on_fishing_state_changed_static):
+		SignalBus.fishing_state_changed.connect(_on_fishing_state_changed_static)
 	_sine_offset = randf() * TAU
 	_base_y = position.y
 	rotation = 0.0
@@ -145,8 +147,20 @@ func _physics_process(delta: float) -> void:
 	_update_facing()
 
 
+static var _current_fishing_state: int = 0
+
+static func _on_fishing_state_changed_static(state: int) -> void:
+	_current_fishing_state = state
+
+
 func _check_curiosity(delta: float) -> void:
 	if _is_curious:
+		return
+
+	if _current_fishing_state == Enums.FishingState.FIGHTING or _current_fishing_state == Enums.FishingState.BITE_ALERT:
+		return
+
+	if _count_curious_fish() >= 2:
 		return
 
 	var hook: Node2D = _find_hook()
@@ -172,6 +186,20 @@ func _check_curiosity(delta: float) -> void:
 		var faster_bites_timer_mult: float = 1.0 / (1.0 + faster_bites_bonus / 100.0)
 		_curiosity_timer = randf_range(dur_min, dur_max) * faster_bites_timer_mult
 		_nibble_timer = randf_range(0.5, 1.5)
+
+
+func _count_curious_fish() -> int:
+	var fish_layer: Node = null
+	if Main.instance:
+		fish_layer = Main.instance.get_node_or_null("FishingLevel/FishLayer")
+	if not fish_layer:
+		return 0
+	var count: int = 0
+	for school_node: Node in fish_layer.get_children():
+		for child: Node in school_node.get_children():
+			if child is SwimmingFish and (child as SwimmingFish)._is_curious:
+				count += 1
+	return count
 
 
 func _find_hook() -> Node2D:
@@ -203,9 +231,11 @@ func _calculate_separation() -> Vector2:
 func _update_facing() -> void:
 	if not sprite:
 		return
-	if velocity.x < -1.0:
+	if _is_curious:
+		return
+	if velocity.x < -5.0:
 		sprite.flip_h = true
-	elif velocity.x > 1.0:
+	elif velocity.x > 5.0:
 		sprite.flip_h = false
 
 

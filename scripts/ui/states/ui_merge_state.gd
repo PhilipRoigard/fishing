@@ -93,7 +93,7 @@ func _configure_card(card: ItemCard, _index: int, data: Variant) -> void:
 
 	var is_selected: bool = entry.uuid in _selected_uuids
 	card.set_dimmed(false)
-	card.set_selected(is_selected)
+	card.set_selected(false)
 	card.z_as_relative = false
 	card.z_index = 1 if is_selected else 0
 	card.selected.connect(_on_card_selected.bind(entry.uuid))
@@ -239,7 +239,7 @@ func _update_card_visuals() -> void:
 		if is_instance_valid(card):
 			var is_selected: bool = card.uuid in _selected_uuids
 			card.set_dimmed(false)
-			card.set_selected(is_selected)
+			card.set_selected(false)
 			card.z_as_relative = false
 			card.z_index = 1 if is_selected else 0
 	_update_grid_darkenator()
