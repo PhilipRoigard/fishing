@@ -6,8 +6,8 @@
 script = ExtResource("1_script")
 id = "barbed_hook"
 display_name = "Barbed Hook"
-description = "A barbed hook that grips tighter. Reduces tension buildup during fights."
-perk_name = "Grip"
-perk_description = "Tension builds %d%% slower"
-perk_id = "reduced_tension"
-perk_values = [10.0, 15.0, 20.0, 25.0]
+description = "A barbed hook that grips tight. Fish escape less often during fights."
+perk_name = "Barbed Grip"
+perk_description = "Fight progress decays %d%% slower"
+perk_id = "decay_reduction"
+perk_values = [15.0, 25.0, 35.0, 45.0]

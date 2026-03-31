@@ -9,7 +9,7 @@ extends Resource
 @export var hook_wobble_amplitude: float = 3.0
 
 @export_group("Bite Detection")
-@export var base_bite_radius: float = 20.0
+@export var base_bite_radius: float = 35.0
 @export var base_bite_chance: float = 0.15
 @export var base_attract_range: float = 250.0
 @export var bite_check_interval: float = 0.3
@@ -20,13 +20,13 @@ extends Resource
 @export var bite_window: float = 1.0
 
 @export_group("Fish Curiosity")
-@export var curiosity_range: float = 180.0
-@export var curiosity_chance: float = 0.08
-@export var curiosity_speed_mult: float = 0.8
-@export var curiosity_target_offset: float = 5.0
-@export var curiosity_duration_min: float = 3.0
-@export var curiosity_duration_max: float = 8.0
-@export var nibble_distance: float = 30.0
+@export var curiosity_range: float = 200.0
+@export var curiosity_chance: float = 0.15
+@export var curiosity_speed_mult: float = 1.2
+@export var curiosity_target_offset: float = 3.0
+@export var curiosity_duration_min: float = 8.0
+@export var curiosity_duration_max: float = 15.0
+@export var nibble_distance: float = 15.0
 
 @export_group("Fight - Progress")
 @export var starting_progress: float = 30.0

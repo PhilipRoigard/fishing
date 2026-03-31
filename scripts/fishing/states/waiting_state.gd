@@ -108,19 +108,19 @@ func _get_bite_radius() -> float:
 func _get_bite_chance() -> float:
 	var chance: float = fishing_config.base_bite_chance
 
-	var hook_entry: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(Enums.EquipmentSlot.HOOK)
-	if hook_entry:
+	var lure_entry: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(Enums.EquipmentSlot.LURE)
+	if lure_entry:
 		var stat_cfg: EquipmentStatConfig = GameResources.config.equipment_stat_config if GameResources.config else null
 		if stat_cfg:
-			chance += stat_cfg.get_bite_bonus_at_level(hook_entry.level, hook_entry.quality) / 100.0
-
-		var hook_perk: Dictionary = _get_hook_perk()
-		if hook_perk["id"] == "bite_chance":
-			chance += hook_perk["value"] / 100.0
+			chance += stat_cfg.get_bite_bonus_at_level(lure_entry.level, lure_entry.quality) / 100.0
 
 	var lure_perk: Dictionary = _get_lure_perk()
 	if lure_perk["id"] == "bite_chance":
 		chance += lure_perk["value"] / 100.0
+
+	var hook_perk: Dictionary = _get_hook_perk()
+	if hook_perk["id"] == "bite_chance":
+		chance += hook_perk["value"] / 100.0
 
 	return clampf(chance, 0.05, 0.95)
 

@@ -563,6 +563,15 @@ func _on_fish_caught(fish_id: String) -> void:
 			else:
 				pstate.bait_inventory[bait_q] = remaining
 			SignalBus.save_requested.emit()
+
+	var double_catch_pct: float = _get_hook_perk_value("double_catch")
+	var is_double_catch: bool = double_catch_pct > 0.0 and randf() * 100.0 < double_catch_pct
+	if is_double_catch:
+		SignalBus.fish_caught.emit(fish_id)
+		_show_feedback("DOUBLE CATCH!", Color(1.0, 0.84, 0.0), 1.5)
+		if tree:
+			await tree.create_timer(0.5).timeout
+
 	state_machine.push_state(UIStateMachine.State.CATCH_RESULT, {"fish_id": fish_id, "caught_quality": caught_quality})
 
 
@@ -615,6 +624,17 @@ func _on_return_pressed() -> void:
 	SignalBus.fishing_session_ended.emit()
 	SignalBus.game_mode_changed.emit(Enums.GameMode.WHARF_HUB)
 	state_machine.change_state(UIStateMachine.State.WHARF_HUB)
+
+
+func _get_hook_perk_value(perk_id: String) -> float:
+	var hook_entry: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(Enums.EquipmentSlot.HOOK)
+	if not hook_entry or not GameResources.config or not GameResources.config.equipment_catalogue:
+		return 0.0
+	var hook_data: HookData = GameResources.config.equipment_catalogue.get_hook_by_id(hook_entry.item_id)
+	if not hook_data or hook_data.perk_id != perk_id:
+		return 0.0
+	var perk_idx: int = mini(hook_entry.quality, hook_data.perk_values.size() - 1)
+	return hook_data.perk_values[perk_idx]
 
 
 func _clear_children() -> void:

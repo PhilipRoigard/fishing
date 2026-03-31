@@ -157,18 +157,24 @@ func _populate_data() -> void:
 		rarity_label.text = quality_names[mini(caught_quality, 4)]
 		rarity_label.add_theme_color_override("font_color", quality_color)
 
+	var sell_bonus_pct: float = _get_hook_perk_value("sell_bonus") + _get_lure_perk_value("sell_bonus")
+	var display_sell_value: int = int(float(fish_data.sell_value_coins) * (1.0 + sell_bonus_pct / 100.0))
+
 	if coins_label:
-		coins_label.text = "Coins: +" + str(fish_data.sell_value_coins)
+		coins_label.text = "Coins: +" + str(display_sell_value)
 		coins_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0))
 
 	if sell_button:
-		sell_button.text = "Sell (+" + str(fish_data.sell_value_coins) + ")"
+		sell_button.text = "Sell (+" + str(display_sell_value) + ")"
 
 	var reward_cfg: RewardConfig = null
 	if GameResources.config:
 		reward_cfg = GameResources.config.reward_config
 	if xp_label and reward_cfg:
-		xp_label.text = "XP: +" + str(reward_cfg.get_xp_for_rarity(caught_quality))
+		var base_xp: int = reward_cfg.get_xp_for_rarity(caught_quality)
+		var xp_bonus_pct: float = _get_rod_perk_value("bonus_xp")
+		var display_xp: int = int(float(base_xp) * (1.0 + xp_bonus_pct / 100.0))
+		xp_label.text = "XP: +" + str(display_xp)
 		xp_label.add_theme_color_override("font_color", Color(0.4, 0.8, 1.0))
 
 	_check_new_discovery()
@@ -219,7 +225,10 @@ func _on_sell_pressed() -> void:
 	if Main.instance and Main.instance.database_system:
 		fish_data = Main.instance.database_system.get_fish_by_id(caught_fish_id)
 	if fish_data:
-		CurrencyManager.add_coins(fish_data.sell_value_coins)
+		var base_value: float = float(fish_data.sell_value_coins)
+		var sell_bonus_pct: float = _get_hook_perk_value("sell_bonus") + _get_lure_perk_value("sell_bonus")
+		var final_value: int = int(base_value * (1.0 + sell_bonus_pct / 100.0))
+		CurrencyManager.add_coins(final_value)
 	_back()
 
 
@@ -229,10 +238,47 @@ func _on_keep_pressed() -> void:
 		var state: PlayerState = Main.instance.player_state_system.get_state()
 		if state:
 			var max_material_tier: int = mini(caught_quality, 2)
+			var double_materials_pct: float = _get_rod_perk_value("double_materials")
 			for q: int in range(0, max_material_tier + 1):
+				var base_amount: int = 1
+				if double_materials_pct > 0.0 and randf() * 100.0 < double_materials_pct:
+					base_amount += 1
 				var current: int = state.kept_fish.get(q, 0)
-				state.kept_fish[q] = current + 1
+				state.kept_fish[q] = current + base_amount
 	_back()
+
+
+func _get_rod_perk_value(perk_id: String) -> float:
+	var rod_entry: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(Enums.EquipmentSlot.ROD)
+	if not rod_entry or not GameResources.config or not GameResources.config.equipment_catalogue:
+		return 0.0
+	var rod_data: RodData = GameResources.config.equipment_catalogue.get_rod_by_id(rod_entry.item_id)
+	if not rod_data or rod_data.perk_id != perk_id:
+		return 0.0
+	var perk_idx: int = mini(rod_entry.quality, rod_data.perk_values.size() - 1)
+	return rod_data.perk_values[perk_idx]
+
+
+func _get_hook_perk_value(perk_id: String) -> float:
+	var hook_entry: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(Enums.EquipmentSlot.HOOK)
+	if not hook_entry or not GameResources.config or not GameResources.config.equipment_catalogue:
+		return 0.0
+	var hook_data: HookData = GameResources.config.equipment_catalogue.get_hook_by_id(hook_entry.item_id)
+	if not hook_data or hook_data.perk_id != perk_id:
+		return 0.0
+	var perk_idx: int = mini(hook_entry.quality, hook_data.perk_values.size() - 1)
+	return hook_data.perk_values[perk_idx]
+
+
+func _get_lure_perk_value(perk_id: String) -> float:
+	var lure_entry: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(Enums.EquipmentSlot.LURE)
+	if not lure_entry or not GameResources.config or not GameResources.config.equipment_catalogue:
+		return 0.0
+	var lure_data: LureData = GameResources.config.equipment_catalogue.get_lure_by_id(lure_entry.item_id)
+	if not lure_data or lure_data.perk_id != perk_id:
+		return 0.0
+	var perk_idx: int = mini(lure_entry.quality, lure_data.perk_values.size() - 1)
+	return lure_data.perk_values[perk_idx]
 
 
 func _clear_children() -> void:

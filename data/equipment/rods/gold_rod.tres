@@ -6,8 +6,8 @@
 script = ExtResource("1_script")
 id = "gold_rod"
 display_name = "Coral Rod"
-description = "A rod carved from deep-sea coral. Increases your chance of hooking rare fish."
-perk_name = "Lucky Catch"
-perk_description = "Rare fish chance +%d%%"
-perk_id = "rare_boost"
+description = "A rod carved from deep-sea coral. Grants bonus XP from every catch."
+perk_name = "Scholar"
+perk_description = "+%d%% XP from catches"
+perk_id = "bonus_xp"
 perk_values = [10.0, 15.0, 20.0, 25.0]

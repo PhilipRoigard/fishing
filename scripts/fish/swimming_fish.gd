@@ -118,7 +118,9 @@ func _physics_process(delta: float) -> void:
 				_nibble_timer = randf_range(0.5, 1.5)
 				move_delta = Vector2(randf_range(-10.0, 10.0), randf_range(-10.0, 10.0)) * delta
 		else:
-			var approach_speed: float = swim_speed * (_fishing_config.curiosity_speed_mult if _fishing_config else 0.8)
+			var base_curiosity_mult: float = _fishing_config.curiosity_speed_mult if _fishing_config else 0.8
+			var approach_speed_bonus: float = _get_lure_perk_value("approach_speed")
+			var approach_speed: float = swim_speed * base_curiosity_mult * (1.0 + approach_speed_bonus / 100.0)
 			move_delta = to_target.normalized() * approach_speed * delta
 
 		_curiosity_timer -= delta
@@ -161,10 +163,14 @@ func _check_curiosity(delta: float) -> void:
 	if dist > curiosity_range:
 		return
 
-	if randf() < curiosity_chance * delta:
+	var faster_bites_bonus: float = _get_rod_perk_value("faster_bites")
+	var adjusted_curiosity_chance: float = curiosity_chance * (1.0 + faster_bites_bonus / 100.0)
+
+	if randf() < adjusted_curiosity_chance * delta:
 		_is_curious = true
 		_curiosity_target = hook.global_position + Vector2(randf_range(-target_offset, target_offset), randf_range(-target_offset, target_offset))
-		_curiosity_timer = randf_range(dur_min, dur_max)
+		var faster_bites_timer_mult: float = 1.0 / (1.0 + faster_bites_bonus / 100.0)
+		_curiosity_timer = randf_range(dur_min, dur_max) * faster_bites_timer_mult
 		_nibble_timer = randf_range(0.5, 1.5)
 
 
@@ -237,3 +243,25 @@ func set_fish_data(data: FishData) -> void:
 	fish_data = data
 	if is_inside_tree():
 		_apply_fish_data()
+
+
+func _get_rod_perk_value(perk_id: String) -> float:
+	var rod_entry: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(Enums.EquipmentSlot.ROD)
+	if not rod_entry or not GameResources.config or not GameResources.config.equipment_catalogue:
+		return 0.0
+	var rod_data: RodData = GameResources.config.equipment_catalogue.get_rod_by_id(rod_entry.item_id)
+	if not rod_data or rod_data.perk_id != perk_id:
+		return 0.0
+	var perk_idx: int = mini(rod_entry.quality, rod_data.perk_values.size() - 1)
+	return rod_data.perk_values[perk_idx]
+
+
+func _get_lure_perk_value(perk_id: String) -> float:
+	var lure_entry: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(Enums.EquipmentSlot.LURE)
+	if not lure_entry or not GameResources.config or not GameResources.config.equipment_catalogue:
+		return 0.0
+	var lure_data: LureData = GameResources.config.equipment_catalogue.get_lure_by_id(lure_entry.item_id)
+	if not lure_data or lure_data.perk_id != perk_id:
+		return 0.0
+	var perk_idx: int = mini(lure_entry.quality, lure_data.perk_values.size() - 1)
+	return lure_data.perk_values[perk_idx]

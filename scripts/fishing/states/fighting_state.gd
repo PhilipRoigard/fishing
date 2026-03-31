@@ -57,7 +57,8 @@ var caught_fish_node: Node = null
 func enter(meta: Dictionary = {}) -> void:
 	fish_id = meta.get("fish_id", "")
 	depth = meta.get("depth", 0.0)
-	caught_fish_node = meta.get("fish_node", null)
+	var fish_ref: Variant = meta.get("fish_node", null)
+	caught_fish_node = fish_ref if fish_ref != null and is_instance_valid(fish_ref) else null
 
 	if GameResources.config:
 		fishing_config = GameResources.config.fishing_config
@@ -120,7 +121,7 @@ func update(delta: float) -> void:
 	SignalBus.fight_tension_changed.emit(tension)
 
 	if progress >= 100.0:
-		state_machine.change_state(&"success", {"fish_id": fish_id})
+		state_machine.change_state(&"success", {"fish_id": fish_id, "fish_node": caught_fish_node})
 	elif progress <= 0.0 or tension >= _get_tension_cap():
 		if tension >= _get_tension_cap():
 			SignalBus.line_snapped.emit()
@@ -169,12 +170,14 @@ func _update_progress(delta: float) -> void:
 	if is_reeling:
 		var gain_rate: float = fishing_config.catch_increase_rate if fishing_config else 40.0
 		var gain_multiplier: float = _get_effect_multiplier(Enums.ConsumableEffect.INCREASE_PROGRESS_GAIN)
-		progress += gain_rate * gain_multiplier * delta
+		var tire_bonus: float = _get_tire_faster_multiplier()
+		progress += gain_rate * gain_multiplier * tire_bonus * delta
 	else:
 		var decay_rate: float = fishing_config.catch_decrease_rate if fishing_config else 20.0
 		var decay_multiplier: float = _get_effect_multiplier(Enums.ConsumableEffect.REDUCE_DECAY)
 		var stamina: float = fish_data.fight_stamina if fish_data else 1.0
-		progress -= decay_rate * stamina * decay_multiplier * delta
+		var decay_reduction_perk: float = _get_decay_reduction_multiplier()
+		progress -= decay_rate * stamina * decay_multiplier * decay_reduction_perk * delta
 
 	progress = clampf(progress, 0.0, 100.0)
 
@@ -188,7 +191,15 @@ func _update_tension(delta: float) -> void:
 		if not fish_stopped and fishing_config:
 			fighting_multiplier = fishing_config.tension_fighting_fish_multiplier
 
-		tension += tension_rate * fish_tension_mod * fighting_multiplier * delta
+		var hook_reduction: float = 0.0
+		var hook_entry: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(Enums.EquipmentSlot.HOOK)
+		if hook_entry and GameResources.config and GameResources.config.equipment_stat_config:
+			hook_reduction = GameResources.config.equipment_stat_config.get_tension_reduction_at_level(hook_entry.level, hook_entry.quality) / 100.0
+
+		var rod_tension_perk: float = _get_rod_perk_value("reduced_tension")
+		var rod_tension_mult: float = 1.0 - rod_tension_perk / 100.0
+
+		tension += tension_rate * fish_tension_mod * fighting_multiplier * (1.0 - hook_reduction) * rod_tension_mult * delta
 	else:
 		var relief_rate: float = fishing_config.tension_relief_rate if fishing_config else 35.0
 		tension -= relief_rate * delta
@@ -360,3 +371,36 @@ func _spawn_splash_at_fish() -> void:
 	splash.set_script(SplashEffectScript)
 	splash.position = hook_node.global_position + Vector2(20.0, (fish_position - 0.5) * fish_y_range)
 	fishing_level.add_child(splash)
+
+
+func _get_rod_perk_value(perk_id: String) -> float:
+	var rod_entry: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(Enums.EquipmentSlot.ROD)
+	if not rod_entry or not GameResources.config or not GameResources.config.equipment_catalogue:
+		return 0.0
+	var rod_data: RodData = GameResources.config.equipment_catalogue.get_rod_by_id(rod_entry.item_id)
+	if not rod_data or rod_data.perk_id != perk_id:
+		return 0.0
+	var perk_idx: int = mini(rod_entry.quality, rod_data.perk_values.size() - 1)
+	return rod_data.perk_values[perk_idx]
+
+
+func _get_hook_perk_value(perk_id: String) -> float:
+	var hook_entry: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(Enums.EquipmentSlot.HOOK)
+	if not hook_entry or not GameResources.config or not GameResources.config.equipment_catalogue:
+		return 0.0
+	var hook_data: HookData = GameResources.config.equipment_catalogue.get_hook_by_id(hook_entry.item_id)
+	if not hook_data or hook_data.perk_id != perk_id:
+		return 0.0
+	var perk_idx: int = mini(hook_entry.quality, hook_data.perk_values.size() - 1)
+	return hook_data.perk_values[perk_idx]
+
+
+func _get_tire_faster_multiplier() -> float:
+	var rod_bonus: float = _get_rod_perk_value("tire_faster")
+	var hook_bonus: float = _get_hook_perk_value("tire_faster")
+	return 1.0 + (rod_bonus + hook_bonus) / 100.0
+
+
+func _get_decay_reduction_multiplier() -> float:
+	var hook_bonus: float = _get_hook_perk_value("decay_reduction")
+	return 1.0 - hook_bonus / 100.0

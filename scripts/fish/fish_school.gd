@@ -45,6 +45,8 @@ func _process(delta: float) -> void:
 func _advance_path(delta: float) -> void:
 	if _path.is_empty() or _current_waypoint_index >= _path.size():
 		return
+	if _has_curious_members():
+		return
 
 	var target: Vector2 = _path[_current_waypoint_index] + _wander_offset
 	var direction: Vector2 = target - global_position
@@ -58,7 +60,10 @@ func _advance_path(delta: float) -> void:
 	else:
 		_current_waypoint_index += 1
 		if _current_waypoint_index >= _path.size():
-			school_despawn.emit()
+			if _has_curious_members():
+				_current_waypoint_index = _path.size() - 1
+			else:
+				school_despawn.emit()
 
 
 func _update_wander(delta: float) -> void:
@@ -77,6 +82,8 @@ func _is_fully_offscreen() -> bool:
 	var view_bottom: float = view_top + viewport.get_visible_rect().size.y + SCREEN_MARGIN * 2.0
 	for member: SwimmingFish in members:
 		if is_instance_valid(member) and not member.is_caught:
+			if member._is_curious:
+				return false
 			var gp: Vector2 = member.global_position
 			if gp.x > -SCREEN_MARGIN and gp.x < 360 + SCREEN_MARGIN and gp.y > view_top and gp.y < view_bottom:
 				return false
@@ -107,6 +114,13 @@ func on_member_caught(caught_fish: SwimmingFish) -> void:
 	if fish_data:
 		SignalBus.school_member_caught.emit(fish_data, get_member_count())
 		SignalBus.school_scattered.emit(catch_pos)
+
+
+func _has_curious_members() -> bool:
+	for member: SwimmingFish in members:
+		if is_instance_valid(member) and not member.is_caught and member._is_curious:
+			return true
+	return false
 
 
 func get_member_count() -> int:

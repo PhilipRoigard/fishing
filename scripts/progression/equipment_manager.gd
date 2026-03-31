@@ -228,6 +228,13 @@ func compute_fight_modifiers() -> RefCounted:
 	if rod and stat_cfg:
 		mods.max_cast_depth = stat_cfg.get_cast_depth_at_level(rod.level, rod.quality)
 
+		if GameResources.config and GameResources.config.equipment_catalogue:
+			var rod_data: RodData = GameResources.config.equipment_catalogue.get_rod_by_id(rod.item_id)
+			if rod_data and rod_data.perk_id == "depth_bonus":
+				var perk_idx: int = mini(rod.quality, rod_data.perk_values.size() - 1)
+				var depth_bonus_pct: float = rod_data.perk_values[perk_idx]
+				mods.max_cast_depth *= 1.0 + depth_bonus_pct / 100.0
+
 	return mods
 
 

@@ -16,6 +16,8 @@ func enter(meta: Dictionary = {}) -> void:
 	window_timer = 0.0
 	if GameResources.config and GameResources.config.fishing_config:
 		bite_window = GameResources.config.fishing_config.bite_window
+	var bite_window_bonus: float = _get_hook_perk_value("bite_window")
+	bite_window *= 1.0 + bite_window_bonus / 100.0
 	SignalBus.bite_occurred.emit(fish_id)
 	SignalBus.fishing_state_changed.emit(Enums.FishingState.BITE_ALERT)
 	SignalBus.reel_input_started.connect(_on_reel_input)
@@ -44,3 +46,14 @@ func _on_reel_input() -> void:
 		"depth": depth,
 		"fish_node": fish_node,
 	})
+
+
+func _get_hook_perk_value(perk_id: String) -> float:
+	var hook_entry: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(Enums.EquipmentSlot.HOOK)
+	if not hook_entry or not GameResources.config or not GameResources.config.equipment_catalogue:
+		return 0.0
+	var hook_data: HookData = GameResources.config.equipment_catalogue.get_hook_by_id(hook_entry.item_id)
+	if not hook_data or hook_data.perk_id != perk_id:
+		return 0.0
+	var perk_idx: int = mini(hook_entry.quality, hook_data.perk_values.size() - 1)
+	return hook_data.perk_values[perk_idx]

@@ -1,10 +1,11 @@
-[gd_scene load_steps=21 format=3 uid="uid://fishing_level"]
+[gd_scene load_steps=22 format=3 uid="uid://fishing_level"]
 
 [ext_resource type="Script" path="res://scripts/environment/depth_background.gd" id="1_depth_bg"]
 [ext_resource type="Script" path="res://scripts/environment/fishing_line.gd" id="2_fishing_line"]
 [ext_resource type="Script" path="res://scripts/character/fisherman.gd" id="3_fisherman"]
 [ext_resource type="Script" path="res://scripts/environment/bobber.gd" id="14_bobber"]
 [ext_resource type="Script" path="res://scripts/environment/fishing_level_controller.gd" id="15_controller"]
+[ext_resource type="Script" path="res://scripts/environment/bite_radius_indicator.gd" id="16_bite_radius"]
 [ext_resource type="Texture2D" path="res://assets/sprites/character/naked_body_sprite_sheet.png" id="4_body"]
 [ext_resource type="Texture2D" path="res://assets/sprites/character/overalls_sprite_sheet.png" id="5_overalls"]
 [ext_resource type="Texture2D" path="res://assets/sprites/character/arms_sprite_sheet.png" id="6_arms"]
@@ -73,6 +74,10 @@ shape = SubResource("CircleShape2D_hook")
 texture = SubResource("GradientTexture2D_hook")
 position = Vector2(0, 4)
 visible = false
+
+[node name="BiteRadiusIndicator" type="Node2D" parent="HookLayer/Hook"]
+z_index = -1
+script = ExtResource("16_bite_radius")
 
 [node name="Bobber" type="Node2D" parent="HookLayer/Hook"]
 script = ExtResource("14_bobber")

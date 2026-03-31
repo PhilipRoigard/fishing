@@ -57,14 +57,12 @@ func _populate_data() -> void:
 		return
 
 	var display_name: String = _get_display_name(entry)
-	var quality_name: String = Enums.QUALITY_NAMES.get(entry.quality, "Common")
 	var quality_color: Color = Enums.QUALITY_COLORS.get(entry.quality, Color.WHITE)
 
 	equipment_name_label.text = display_name
 	var icon_texture: Texture2D = _get_item_icon(entry.item_id, entry.equipment_type)
 	item_card.set_item_data(entry.item_id, entry.uuid, icon_texture, entry.level, quality_color)
 	item_card.level_label.visible = false
-	quality_label.text = quality_name
 
 	var stat_cfg: EquipmentStatConfig = null
 	if GameResources.config:
@@ -92,7 +90,8 @@ func _populate_data() -> void:
 			level_up_button.text = "Level Up  " + str(cost)
 			level_up_button.disabled = not CurrencyManager.can_afford_coins(cost)
 
-	var stats_text: String = ""
+	var base_stat_text: String = ""
+	var perk_text: String = ""
 	var cat: Variant = null
 	if GameResources.config:
 		cat = GameResources.config.equipment_catalogue
@@ -102,22 +101,23 @@ func _populate_data() -> void:
 	var lure: Variant = cat.get_lure_by_id(entry.item_id) if cat else null
 
 	if rod and stat_cfg:
-		stats_text = "Cast Depth: %dm" % stat_cfg.get_cast_depth_at_level(entry.level, entry.quality)
+		base_stat_text = "Cast Depth: %dm" % stat_cfg.get_cast_depth_at_level(entry.level, entry.quality)
 		if rod.perk_id != "none" and rod.perk_values.size() > 0:
 			var perk_idx: int = mini(entry.quality, rod.perk_values.size() - 1)
-			stats_text += "\n" + rod.perk_name + ": " + rod.perk_description % int(rod.perk_values[perk_idx])
+			perk_text = rod.perk_name + ": " + rod.perk_description % int(rod.perk_values[perk_idx])
 	elif hook and stat_cfg:
-		stats_text = "Bite Chance: +%.0f%%" % stat_cfg.get_bite_bonus_at_level(entry.level, entry.quality)
+		base_stat_text = "Tension: -%.0f%%" % stat_cfg.get_tension_reduction_at_level(entry.level, entry.quality)
 		if hook.perk_id != "none" and hook.perk_values.size() > 0:
 			var perk_idx: int = mini(entry.quality, hook.perk_values.size() - 1)
-			stats_text += "\n" + hook.perk_name + ": " + hook.perk_description % int(hook.perk_values[perk_idx])
-	elif lure:
-		stats_text = "Lure"
+			perk_text = hook.perk_name + ": " + hook.perk_description % int(hook.perk_values[perk_idx])
+	elif lure and stat_cfg:
+		base_stat_text = "Bite Chance: +%.0f%%" % stat_cfg.get_bite_bonus_at_level(entry.level, entry.quality)
 		if lure.perk_id != "none" and lure.perk_values.size() > 0:
 			var perk_idx: int = mini(entry.quality, lure.perk_values.size() - 1)
-			stats_text += "\n" + lure.perk_name + ": " + lure.perk_description % int(lure.perk_values[perk_idx])
+			perk_text = lure.perk_name + ": " + lure.perk_description % int(lure.perk_values[perk_idx])
 
-	stats_label.text = stats_text
+	stats_label.text = base_stat_text
+	quality_label.text = perk_text
 
 
 func _populate_bait_data() -> void:

@@ -56,7 +56,9 @@ func _grant_xp(rarity: int) -> void:
 	if not reward_cfg:
 		return
 
-	var xp_amount: int = reward_cfg.get_xp_for_rarity(rarity)
+	var base_xp: int = reward_cfg.get_xp_for_rarity(rarity)
+	var xp_bonus_pct: float = _get_rod_perk_value("bonus_xp")
+	var xp_amount: int = int(float(base_xp) * (1.0 + xp_bonus_pct / 100.0))
 	var main_node: Node = _get_main_instance()
 	if not main_node or not main_node.player_state_system:
 		return
@@ -100,6 +102,17 @@ func get_xp_progress() -> float:
 			if needed > 0:
 				return float(state.fisherman_xp) / float(needed)
 	return 0.0
+
+
+func _get_rod_perk_value(perk_id: String) -> float:
+	var rod_entry: EquipmentManager.EquipmentEntry = EquipmentManager.get_equipped(Enums.EquipmentSlot.ROD)
+	if not rod_entry or not GameResources.config or not GameResources.config.equipment_catalogue:
+		return 0.0
+	var rod_data: RodData = GameResources.config.equipment_catalogue.get_rod_by_id(rod_entry.item_id)
+	if not rod_data or rod_data.perk_id != perk_id:
+		return 0.0
+	var perk_idx: int = mini(rod_entry.quality, rod_data.perk_values.size() - 1)
+	return rod_data.perk_values[perk_idx]
 
 
 func _get_main_instance() -> Node:
