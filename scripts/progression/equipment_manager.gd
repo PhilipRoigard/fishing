@@ -193,28 +193,43 @@ func merge(uuids: Array[String]) -> String:
 	if uuids.size() < req.copies_required:
 		return ""
 
-	if not CurrencyManager.can_afford_coins(req.coin_cost):
-		return ""
+	var item_id: String = first.item_id
+	var equipment_type: String = first.equipment_type
+	var from_quality: int = first.quality
 
-	CurrencyManager.spend_coins(req.coin_cost)
-
-	var best_level: int = 0
+	var best_level: int = 1
 	for uuid: String in uuids:
 		var entry: EquipmentEntry = get_item(uuid)
 		if entry and entry.level > best_level:
 			best_level = entry.level
 
-	for uuid: String in uuids:
-		remove_item(uuid)
+	var consumed_uuids: Array[String] = uuids.duplicate()
+	for uuid: String in consumed_uuids:
+		inventory.assign(inventory.filter(func(e: EquipmentEntry) -> bool: return e.uuid != uuid))
 
-	var new_uuid: String = add_item(first.item_id, first.equipment_type, req.to_quality)
-	var new_entry: EquipmentEntry = get_item(new_uuid)
-	if new_entry:
-		new_entry.level = best_level
+	var new_entry: EquipmentEntry = EquipmentEntry.new()
+	new_entry.uuid = _generate_uuid()
+	new_entry.item_id = item_id
+	new_entry.equipment_type = equipment_type
+	new_entry.quality = req.to_quality
+	new_entry.level = best_level
+	inventory.append(new_entry)
+
+	_auto_replace_equipped(consumed_uuids, new_entry.uuid)
 
 	_save_data()
-	SignalBus.equipment_merged.emit(new_uuid, first.item_id, first.quality, req.to_quality)
-	return new_uuid
+	SignalBus.equipment_item_acquired.emit(new_entry.uuid, item_id, req.to_quality)
+	SignalBus.equipment_merged.emit(new_entry.uuid, item_id, from_quality, req.to_quality)
+	return new_entry.uuid
+
+
+func _auto_replace_equipped(consumed_uuids: Array[String], new_uuid: String) -> void:
+	for slot_index: int in loadout:
+		var equipped_uuid: String = loadout[slot_index]
+		if equipped_uuid in consumed_uuids:
+			loadout[slot_index] = new_uuid
+			SignalBus.equipment_changed.emit(slot_index)
+			break
 
 
 func compute_fight_modifiers() -> RefCounted:

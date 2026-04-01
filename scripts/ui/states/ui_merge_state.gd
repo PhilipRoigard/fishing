@@ -13,7 +13,7 @@ extends UIStateNode
 @onready var stats_label: RichTextLabel = %StatsLabel
 @onready var plus_sign: Label = %PlusSign
 @onready var loadout_button: Button = %LoadoutButton
-@onready var merge_all_button: Button = %MergeAllButton
+@onready var action_button: Button = %MergeAllButton
 @onready var empty_label: Label = %EmptyLabel
 
 var _folley_texture: Texture2D = preload("res://assets/sprites/items/Folley_Sprite_Sheet.png")
@@ -63,6 +63,7 @@ func _clear_selection() -> void:
 
 	stats_label.text = "Select items\nto merge!"
 	stats_label.scroll_active = false
+	_update_action_button()
 	_update_grid_darkenator()
 
 
@@ -211,14 +212,25 @@ func _update_merge_preview() -> void:
 			copies,
 		]
 
-		if _selected_uuids.size() >= copies:
-			_execute_merge()
+		_update_action_button()
 	else:
 		result_texture.texture = icon
 		result_slot.self_modulate = quality_color
 		material_slot_1.visible = false
 		material_slot_2.visible = false
 		stats_label.text = "[b]%s[/b]\nMax Quality!" % _get_display_name(_merge_item_id)
+
+
+func _update_action_button() -> void:
+	if not action_button:
+		return
+	if _merge_item_id == "":
+		action_button.text = "Merge All"
+		action_button.disabled = not _can_merge_all()
+	else:
+		action_button.text = "Merge"
+		var copies: int = _get_copies_required()
+		action_button.disabled = _selected_uuids.size() < copies
 
 
 func _execute_merge() -> void:
@@ -232,6 +244,8 @@ func _execute_merge() -> void:
 		SignalBus.show_notification.emit("Merged into %s!" % quality_names[mini(req.to_quality, 4)], Enums.QUALITY_COLORS.get(req.to_quality, Color.WHITE))
 		_clear_selection()
 		_populate_grid()
+	else:
+		SignalBus.show_notification.emit("Cannot merge!", Color(1.0, 0.3, 0.3))
 
 
 func _update_card_visuals() -> void:
@@ -252,6 +266,14 @@ func _on_loadout_pressed() -> void:
 
 func _on_merge_all_pressed() -> void:
 	HapticManager.light_tap()
+	if _merge_item_id != "":
+		_execute_merge()
+		return
+
+	_do_merge_all()
+
+
+func _do_merge_all() -> void:
 	var merge_cfg: Variant = null
 	if GameResources.config:
 		merge_cfg = GameResources.config.equipment_merge_config
@@ -295,6 +317,33 @@ func _on_merge_all_pressed() -> void:
 
 	_clear_selection()
 	_populate_grid()
+
+
+func _can_merge_all() -> bool:
+	var merge_cfg: Variant = null
+	if GameResources.config:
+		merge_cfg = GameResources.config.equipment_merge_config
+	if not merge_cfg:
+		return false
+
+	var groups: Dictionary = {}
+	for entry: EquipmentManager.EquipmentEntry in EquipmentManager.inventory:
+		if entry.equipment_type == "bait":
+			continue
+		var key: String = entry.item_id + "_" + str(entry.quality)
+		if not groups.has(key):
+			groups[key] = []
+		groups[key].append(entry)
+
+	for key: String in groups:
+		var group: Array = groups[key]
+		if group.is_empty():
+			continue
+		var first: EquipmentManager.EquipmentEntry = group[0]
+		var req: Variant = merge_cfg.get_requirement_for_quality(first.quality)
+		if req and group.size() >= req.copies_required:
+			return true
+	return false
 
 
 func _get_display_name(item_id: String) -> String:

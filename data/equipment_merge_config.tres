@@ -8,28 +8,24 @@ script = ExtResource("2_merge_req")
 from_quality = 0
 to_quality = 1
 copies_required = 3
-coin_cost = 100
 
 [sub_resource type="Resource" id="merge_uncommon"]
 script = ExtResource("2_merge_req")
 from_quality = 1
 to_quality = 2
 copies_required = 3
-coin_cost = 300
 
 [sub_resource type="Resource" id="merge_rare"]
 script = ExtResource("2_merge_req")
 from_quality = 2
 to_quality = 3
 copies_required = 3
-coin_cost = 900
 
 [sub_resource type="Resource" id="merge_epic"]
 script = ExtResource("2_merge_req")
 from_quality = 3
 to_quality = 4
 copies_required = 2
-coin_cost = 2000
 
 [resource]
 script = ExtResource("1_script")
