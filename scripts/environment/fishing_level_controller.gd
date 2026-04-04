@@ -8,8 +8,10 @@ var original_position: Vector2
 var continuous_shake: float = 0.0
 var target_camera_y: float = 0.0
 var camera_follow_speed: float = 3.0
+var is_reeling_in: bool = false
 const SCREEN_HEIGHT: float = 640.0
 const CAMERA_BOTTOM_MARGIN: float = 200.0
+const CAMERA_TOP_MARGIN: float = 200.0
 
 
 func _ready() -> void:
@@ -19,6 +21,7 @@ func _ready() -> void:
 	SignalBus.fish_caught.connect(_on_fish_caught)
 	SignalBus.bite_occurred.connect(_on_bite_occurred)
 	SignalBus.hook_position_changed.connect(_on_hook_position_changed)
+	SignalBus.fishing_state_changed.connect(_on_fishing_state_changed)
 
 
 func shake(intensity: float, duration: float) -> void:
@@ -76,7 +79,15 @@ func _on_hook_position_changed(hook_global_pos: Vector2) -> void:
 	var viewport_bottom: float = camera.position.y + SCREEN_HEIGHT
 	if hook_y > viewport_bottom - CAMERA_BOTTOM_MARGIN:
 		target_camera_y = hook_y - SCREEN_HEIGHT + CAMERA_BOTTOM_MARGIN
+	if is_reeling_in:
+		var viewport_top: float = camera.position.y
+		if hook_y < viewport_top + CAMERA_TOP_MARGIN:
+			target_camera_y = hook_y - CAMERA_TOP_MARGIN
 	target_camera_y = maxf(target_camera_y, 0.0)
+
+
+func _on_fishing_state_changed(state: int) -> void:
+	is_reeling_in = state == Enums.FishingState.REELING_IN
 
 
 func reset_camera() -> void:

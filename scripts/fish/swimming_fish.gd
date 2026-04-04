@@ -85,6 +85,9 @@ func _physics_process(delta: float) -> void:
 	if is_caught:
 		return
 
+	if _is_curious and _current_fishing_state != Enums.FishingState.WAITING:
+		_is_curious = false
+
 	rotation = 0.0
 
 	if is_scattering:
@@ -157,7 +160,7 @@ func _check_curiosity(delta: float) -> void:
 	if _is_curious:
 		return
 
-	if _current_fishing_state == Enums.FishingState.FIGHTING or _current_fishing_state == Enums.FishingState.BITE_ALERT:
+	if _current_fishing_state == Enums.FishingState.FIGHTING or _current_fishing_state == Enums.FishingState.BITE_ALERT or _current_fishing_state == Enums.FishingState.REELING_IN:
 		return
 
 	if _count_curious_fish() >= 2:

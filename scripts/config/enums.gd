@@ -31,6 +31,7 @@ enum FishingState {
 	WAITING,
 	BITE_ALERT,
 	FIGHTING,
+	REELING_IN,
 	SUCCESS,
 	FAIL,
 }

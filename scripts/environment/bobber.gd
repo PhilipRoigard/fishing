@@ -78,6 +78,8 @@ func _on_fishing_state_changed(state: int) -> void:
 			_set_state(BobberState.BITE)
 		Enums.FishingState.FIGHTING:
 			_set_state(BobberState.FIGHT)
+		Enums.FishingState.REELING_IN:
+			_set_state(BobberState.HIDDEN)
 		_:
 			_set_state(BobberState.HIDDEN)
 

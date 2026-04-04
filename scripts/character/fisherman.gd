@@ -235,7 +235,7 @@ func _on_fishing_state_changed(state: Enums.FishingState) -> void:
 			_set_anim_state(AnimState.CAST_BEGIN)
 		Enums.FishingState.WAITING:
 			_set_anim_state(AnimState.FISHING_IDLE)
-		Enums.FishingState.FIGHTING:
+		Enums.FishingState.FIGHTING, Enums.FishingState.REELING_IN:
 			_set_anim_state(AnimState.REEL)
 
 

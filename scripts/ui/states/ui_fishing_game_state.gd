@@ -361,6 +361,8 @@ func _on_fishing_state_changed(state: int) -> void:
 			if bite_tap_label:
 				bite_tap_label.visible = false
 			_show_tutorial_hint("Wait for a fish to bite...")
+		Enums.FishingState.REELING_IN:
+			_hide_fight_ui()
 
 
 func _on_bite_occurred(_fish_id: String) -> void:

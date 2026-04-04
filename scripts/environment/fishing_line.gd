@@ -112,7 +112,7 @@ func _on_fishing_state_changed(state: Enums.FishingState) -> void:
 		Enums.FishingState.CASTING:
 			line_visible = false
 			visible = false
-		Enums.FishingState.WAITING, Enums.FishingState.BITE_ALERT, Enums.FishingState.FIGHTING:
+		Enums.FishingState.WAITING, Enums.FishingState.BITE_ALERT, Enums.FishingState.FIGHTING, Enums.FishingState.REELING_IN:
 			line_visible = true
 			visible = true
 		Enums.FishingState.IDLE, Enums.FishingState.SUCCESS, Enums.FishingState.FAIL:
