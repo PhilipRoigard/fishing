@@ -2,8 +2,9 @@ extends UIStateNode
 
 const FightProgressBarScript: GDScript = preload("res://scripts/ui/components/fight_progress_bar.gd")
 const FightTensionBarScript: GDScript = preload("res://scripts/ui/components/fight_tension_bar.gd")
-const ReelZoneScript: GDScript = preload("res://scripts/ui/components/reel_zone.gd")
 const VerticalChaseTrackScript: GDScript = preload("res://scripts/ui/components/vertical_chase_track.gd")
+const ConsumableSlotScript: GDScript = preload("res://scripts/ui/components/consumable_slot.gd")
+const FightEffectsScript: GDScript = preload("res://scripts/ui/components/fight_effects.gd")
 
 var depth_label: Label
 var bait_label: Label
@@ -18,8 +19,9 @@ var feedback_label: Label
 var fight_container: Control
 var progress_bar: Control
 var tension_bar: Control
-var reel_zone: Control
 var chase_track: Control
+var fight_effects: Control
+var tool_slots: Array[Control] = []
 
 var fish_name_label: Label
 var tutorial_label: Label
@@ -301,6 +303,89 @@ func _build_layout() -> void:
 	tension_bar.custom_minimum_size = Vector2(0, 14)
 	bars_panel.add_child(tension_bar)
 
+	var tools_row: HBoxContainer = HBoxContainer.new()
+	tools_row.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	tools_row.offset_top = -190
+	tools_row.offset_bottom = -130
+	tools_row.offset_left = 12
+	tools_row.offset_right = -80
+	tools_row.add_theme_constant_override("separation", 6)
+	tools_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	fight_container.add_child(tools_row)
+
+	tool_slots.clear()
+	var tool_configs: Array[Dictionary] = [
+		{"effect": Enums.ConsumableEffect.STUN, "count": 3, "label": "STUN", "color": Color(0.4, 0.8, 1.0)},
+		{"effect": Enums.ConsumableEffect.RESTRICT_RANGE, "count": 2, "label": "ANCHOR", "color": Color(0.2, 0.9, 0.6)},
+		{"effect": Enums.ConsumableEffect.LINE_SURGE, "count": 1, "label": "SURGE", "color": Color(1.0, 0.9, 0.2)},
+		{"effect": Enums.ConsumableEffect.SLACK_RELEASE, "count": 3, "label": "SLACK", "color": Color(0.5, 0.7, 1.0)},
+	]
+
+	for cfg: Dictionary in tool_configs:
+		var slot: Control = _create_tool_slot(cfg)
+		slot.effect_type = cfg["effect"]
+		slot.remaining_count = cfg["count"]
+		tools_row.add_child(slot)
+		slot.setup(cfg["effect"], cfg["count"])
+		_style_tool_slot(slot, cfg["color"], cfg["label"])
+		tool_slots.append(slot)
+
+	fight_effects = FightEffectsScript.new()
+	fight_container.add_child(fight_effects)
+
+
+
+func _create_tool_slot(cfg: Dictionary) -> Control:
+	var slot: Control = ConsumableSlotScript.new()
+	slot.slot_size = 56.0
+	slot.cooldown_duration = 3.0
+	slot.consumable_used.connect(_on_tool_used)
+	return slot
+
+
+func _style_tool_slot(slot: Control, color: Color, label_text: String) -> void:
+	var slot_label: Label = Label.new()
+	slot_label.text = label_text
+	slot_label.add_theme_font_size_override("font_size", 9)
+	slot_label.add_theme_color_override("font_color", color)
+	slot_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	slot_label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+	slot_label.set_anchors_preset(Control.PRESET_FULL_RECT)
+	slot_label.offset_top = 2
+	slot_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	slot.add_child(slot_label)
+
+	var bg_style: StyleBoxFlat = StyleBoxFlat.new()
+	bg_style.bg_color = Color(color.r, color.g, color.b, 0.15)
+	bg_style.border_color = Color(color.r, color.g, color.b, 0.4)
+	bg_style.set_border_width_all(2)
+	bg_style.set_corner_radius_all(6)
+	if slot.touch_button:
+		slot.touch_button.add_theme_stylebox_override("normal", bg_style)
+		var hover_style: StyleBoxFlat = bg_style.duplicate()
+		hover_style.bg_color = Color(color.r, color.g, color.b, 0.3)
+		slot.touch_button.add_theme_stylebox_override("hover", hover_style)
+		var pressed_style: StyleBoxFlat = bg_style.duplicate()
+		pressed_style.bg_color = Color(color.r, color.g, color.b, 0.5)
+		slot.touch_button.add_theme_stylebox_override("pressed", pressed_style)
+
+
+func _on_tool_used(effect: Enums.ConsumableEffect) -> void:
+	var duration: float = 0.0
+	if GameResources.config and GameResources.config.fishing_config:
+		var fc: FishingConfig = GameResources.config.fishing_config
+		match effect:
+			Enums.ConsumableEffect.STUN:
+				duration = fc.stun_lure_duration
+			Enums.ConsumableEffect.RESTRICT_RANGE:
+				duration = fc.depth_anchor_duration
+			Enums.ConsumableEffect.WIDEN_BRACKET:
+				duration = fc.net_drag_duration
+			Enums.ConsumableEffect.LINE_SURGE:
+				duration = 0.0
+			Enums.ConsumableEffect.SLACK_RELEASE:
+				duration = 0.0
+	SignalBus.consumable_used.emit(effect, duration)
 
 
 func _on_cast_strength_changed(strength: float) -> void:
