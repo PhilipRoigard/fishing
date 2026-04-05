@@ -3,13 +3,15 @@ extends Control
 signal reel_input_started
 signal reel_input_ended
 
-@export var active_color: Color = Color(0.2, 0.6, 1.0, 0.15)
-@export var idle_color: Color = Color(1.0, 1.0, 1.0, 0.05)
+@export var active_color: Color = Color(0.2, 0.6, 1.0, 0.3)
+@export var idle_color: Color = Color(0.3, 0.35, 0.5, 0.2)
 @export var pulse_speed: float = 2.0
+@export var compact_mode: bool = false
 
 var is_held: bool = false
 var pulse_time: float = 0.0
 var background: ColorRect
+var reel_label: Label
 
 
 func _ready() -> void:
@@ -18,11 +20,23 @@ func _ready() -> void:
 
 
 func _build_layout() -> void:
+	if compact_mode:
+		custom_minimum_size = Vector2(80, 80)
+
 	background = ColorRect.new()
 	background.set_anchors_preset(Control.PRESET_FULL_RECT)
 	background.color = idle_color
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(background)
+
+	if compact_mode:
+		reel_label = Label.new()
+		reel_label.text = "REEL"
+		reel_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		reel_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		reel_label.set_anchors_preset(Control.PRESET_FULL_RECT)
+		reel_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(reel_label)
 
 
 func _process(delta: float) -> void:

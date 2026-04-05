@@ -50,6 +50,29 @@ extends Resource
 @export var desperate_phase_threshold: float = 60.0
 @export var final_stand_phase_threshold: float = 85.0
 
+@export_group("Bracket Chase")
+@export var bracket_base_size: float = 0.25
+@export var fish_inside_progress_rate: float = 12.0
+@export var fish_outside_progress_decay: float = 8.0
+@export var fish_inside_tension_relief: float = 10.0
+@export var fish_outside_tension_rate: float = 15.0
+@export var tension_distance_multiplier: float = 2.0
+@export var fish_dash_chance: float = 0.2
+@export var fish_dash_speed_multiplier: float = 3.0
+@export var fish_dash_duration: float = 0.3
+@export var bracket_hook_size_bonus_per_level: float = 0.005
+
+@export_group("Tool Defaults")
+@export var net_drag_widen_amount: float = 0.4
+@export var net_drag_duration: float = 4.0
+@export var net_drag_progress_penalty: float = 0.5
+@export var line_surge_progress_amount: float = 10.0
+@export var line_surge_tension_spike: float = 20.0
+@export var depth_anchor_range: float = 0.4
+@export var depth_anchor_duration: float = 3.0
+@export var slack_release_progress_cost: float = 5.0
+@export var stun_lure_duration: float = 1.5
+
 @export_group("Consumable Defaults")
 @export var stun_duration_small: float = 2.0
 @export var stun_duration_large: float = 4.0

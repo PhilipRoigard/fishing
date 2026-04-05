@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/consumable_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "net_drag"
+display_name = "Net Drag"
+description = "Widens your capture bracket but halves progress gain. A defensive tool for erratic fish."
+effect_type = 6
+duration = 4.0
+magnitude = 0.4
+rarity = 1
+max_stack = 3

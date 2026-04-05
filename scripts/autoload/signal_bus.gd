@@ -48,6 +48,10 @@ signal fish_caught(fish_id: String)
 signal fish_escaped(fish_id: String)
 @warning_ignore("unused_signal")
 signal line_snapped
+@warning_ignore("unused_signal")
+signal bracket_position_changed(position: float, size: float)
+@warning_ignore("unused_signal")
+signal fish_track_position_changed(position: float)
 
 # --- Consumables ---
 @warning_ignore("unused_signal")

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/consumable_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "slack_release"
+display_name = "Slack Release"
+description = "Instantly drops all tension but costs a bit of progress. Panic button to avoid a line snap."
+effect_type = 9
+duration = 0.0
+magnitude = 5.0
+rarity = 0
+max_stack = 5

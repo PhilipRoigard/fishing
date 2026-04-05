@@ -3,6 +3,7 @@ extends UIStateNode
 const FightProgressBarScript: GDScript = preload("res://scripts/ui/components/fight_progress_bar.gd")
 const FightTensionBarScript: GDScript = preload("res://scripts/ui/components/fight_tension_bar.gd")
 const ReelZoneScript: GDScript = preload("res://scripts/ui/components/reel_zone.gd")
+const VerticalChaseTrackScript: GDScript = preload("res://scripts/ui/components/vertical_chase_track.gd")
 
 var depth_label: Label
 var bait_label: Label
@@ -14,10 +15,11 @@ var bite_tap_label: Label
 var screen_flash: ColorRect
 var feedback_label: Label
 
-var fight_container: VBoxContainer
+var fight_container: Control
 var progress_bar: Control
 var tension_bar: Control
 var reel_zone: Control
+var chase_track: Control
 
 var fish_name_label: Label
 var tutorial_label: Label
@@ -231,15 +233,10 @@ func _build_layout() -> void:
 	tutorial_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(tutorial_label)
 
-	fight_container = VBoxContainer.new()
-	fight_container.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	fight_container.offset_top = -240
-	fight_container.offset_bottom = -10
-	fight_container.offset_left = 12
-	fight_container.offset_right = -12
-	fight_container.add_theme_constant_override("separation", 8)
+	fight_container = Control.new()
+	fight_container.set_anchors_preset(Control.PRESET_FULL_RECT)
 	fight_container.visible = false
-	fight_container.mouse_filter = Control.MOUSE_FILTER_STOP
+	fight_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(fight_container)
 
 	fish_name_label = Label.new()
@@ -247,48 +244,63 @@ func _build_layout() -> void:
 	fish_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	fish_name_label.add_theme_font_size_override("font_size", 16)
 	fish_name_label.visible = false
+	fish_name_label.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	fish_name_label.offset_top = 70
+	fish_name_label.offset_bottom = 90
 	fight_container.add_child(fish_name_label)
 
+	chase_track = VerticalChaseTrackScript.new()
+	chase_track.set_anchors_preset(Control.PRESET_RIGHT_WIDE)
+	chase_track.offset_left = -70
+	chase_track.offset_top = 90
+	chase_track.offset_bottom = -10
+	chase_track.offset_right = -10
+	fight_container.add_child(chase_track)
+
+	var bars_panel: VBoxContainer = VBoxContainer.new()
+	bars_panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	bars_panel.offset_top = -120
+	bars_panel.offset_bottom = -10
+	bars_panel.offset_left = 12
+	bars_panel.offset_right = -80
+	bars_panel.add_theme_constant_override("separation", 4)
+	bars_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fight_container.add_child(bars_panel)
+
 	var progress_header: HBoxContainer = HBoxContainer.new()
-	fight_container.add_child(progress_header)
+	bars_panel.add_child(progress_header)
 	var progress_label: Label = Label.new()
 	progress_label.text = "Progress"
-	progress_label.add_theme_font_size_override("font_size", 13)
+	progress_label.add_theme_font_size_override("font_size", 12)
 	progress_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	progress_header.add_child(progress_label)
 	progress_value_label = Label.new()
 	progress_value_label.text = "30%"
-	progress_value_label.add_theme_font_size_override("font_size", 13)
+	progress_value_label.add_theme_font_size_override("font_size", 12)
 	progress_value_label.add_theme_color_override("font_color", Color(0.2, 0.8, 0.2))
 	progress_header.add_child(progress_value_label)
 
 	progress_bar = FightProgressBarScript.new()
-	progress_bar.custom_minimum_size = Vector2(0, 28)
-	fight_container.add_child(progress_bar)
+	progress_bar.custom_minimum_size = Vector2(0, 14)
+	bars_panel.add_child(progress_bar)
 
 	var tension_header: HBoxContainer = HBoxContainer.new()
-	fight_container.add_child(tension_header)
+	bars_panel.add_child(tension_header)
 	var tension_label: Label = Label.new()
 	tension_label.text = "Tension"
-	tension_label.add_theme_font_size_override("font_size", 13)
+	tension_label.add_theme_font_size_override("font_size", 12)
 	tension_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	tension_header.add_child(tension_label)
 	tension_value_label = Label.new()
 	tension_value_label.text = "0%"
-	tension_value_label.add_theme_font_size_override("font_size", 13)
+	tension_value_label.add_theme_font_size_override("font_size", 12)
 	tension_value_label.add_theme_color_override("font_color", Color(0.2, 0.8, 0.2))
 	tension_header.add_child(tension_value_label)
 
 	tension_bar = FightTensionBarScript.new()
-	tension_bar.custom_minimum_size = Vector2(0, 28)
-	fight_container.add_child(tension_bar)
+	tension_bar.custom_minimum_size = Vector2(0, 14)
+	bars_panel.add_child(tension_bar)
 
-	reel_zone = ReelZoneScript.new()
-	reel_zone.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	reel_zone.offset_top = -220
-	reel_zone.offset_bottom = 0
-	reel_zone.visible = false
-	add_child(reel_zone)
 
 
 func _on_cast_strength_changed(strength: float) -> void:
@@ -454,14 +466,12 @@ func _on_fight_started(fish_id: String) -> void:
 		bite_color_tween.kill()
 	if fight_container:
 		fight_container.visible = true
-	if reel_zone:
-		reel_zone.visible = true
 	if back_button:
 		back_button.visible = false
 	if cast_power_label:
-		cast_power_label.text = "Hold to reel!"
+		cast_power_label.text = ""
 	_show_fish_name(fish_id)
-	_show_tutorial_hint("Hold to reel, release to manage tension!")
+	_show_tutorial_hint("Hold to raise the bar, release to let it fall!")
 
 
 func _get_rarity_color(rarity: int) -> Color:
@@ -599,8 +609,6 @@ func _on_line_snapped() -> void:
 func _hide_fight_ui() -> void:
 	if fight_container:
 		fight_container.visible = false
-	if reel_zone:
-		reel_zone.visible = false
 	if back_button:
 		back_button.visible = true
 	if cast_power_label:

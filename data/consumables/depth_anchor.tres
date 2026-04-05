@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/consumable_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "depth_anchor"
+display_name = "Depth Anchor"
+description = "Restricts the fish to a small zone for a few seconds. Great against fish that cover the whole track."
+effect_type = 7
+duration = 3.0
+magnitude = 0.4
+rarity = 1
+max_stack = 3

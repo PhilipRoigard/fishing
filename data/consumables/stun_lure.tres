@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/consumable_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "stun_lure"
+display_name = "Stun Lure"
+description = "Freezes the fish in place for a short time. Best used when the fish darts away."
+effect_type = 0
+duration = 1.5
+magnitude = 1.0
+rarity = 0
+max_stack = 5

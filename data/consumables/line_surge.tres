@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/config/consumable_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "line_surge"
+display_name = "Line Surge"
+description = "Instantly yanks progress up but spikes tension hard. Use when tension is low to close out a fight."
+effect_type = 8
+duration = 0.0
+magnitude = 10.0
+rarity = 2
+max_stack = 2
