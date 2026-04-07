@@ -20,7 +20,7 @@ var fight_container: Control
 var progress_bar: Control
 var tension_bar: Control
 var chase_track: Control
-var fight_effects: Control
+var fight_effects: CanvasLayer
 var tool_slots: Array[Control] = []
 
 var fish_name_label: Label
@@ -331,7 +331,7 @@ func _build_layout() -> void:
 		tool_slots.append(slot)
 
 	fight_effects = FightEffectsScript.new()
-	fight_container.add_child(fight_effects)
+	add_child(fight_effects)
 
 
 

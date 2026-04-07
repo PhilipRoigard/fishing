@@ -38,6 +38,7 @@ var fish_normalized_position: float = 0.5
 var bracket_normalized_position: float = 0.5
 var bracket_normalized_size: float = 0.25
 var is_fish_inside: bool = false
+var is_fish_stunned: bool = false
 var is_range_restricted: bool = false
 var restricted_min: float = 0.0
 var restricted_max: float = 1.0
@@ -102,11 +103,17 @@ func _on_effect_started(effect: int) -> void:
 		restricted_min = clampf(fish_normalized_position - range_size * 0.5, 0.0, 1.0)
 		restricted_max = clampf(fish_normalized_position + range_size * 0.5, 0.0, 1.0)
 		queue_redraw()
+	elif effect == Enums.ConsumableEffect.STUN:
+		is_fish_stunned = true
+		queue_redraw()
 
 
 func _on_effect_ended(effect: int) -> void:
 	if effect == Enums.ConsumableEffect.RESTRICT_RANGE:
 		is_range_restricted = false
+		queue_redraw()
+	elif effect == Enums.ConsumableEffect.STUN:
+		is_fish_stunned = false
 		queue_redraw()
 
 
@@ -145,10 +152,22 @@ func _draw() -> void:
 			fish_y - tex_size.y * 0.5
 		)
 		var fish_tint: Color = Color.WHITE if is_fish_inside else Color(1.0, 0.7, 0.7)
+		if is_fish_stunned:
+			fish_tint = Color(0.5, 0.75, 1.0)
 		draw_texture_rect(fish_atlas_texture, Rect2(fish_pos, tex_size), false, fish_tint)
+		if is_fish_stunned:
+			var cx: float = fish_pos.x + tex_size.x * 0.5
+			var cy: float = fish_pos.y + tex_size.y * 0.5
+			var crystal_color: Color = Color(0.6, 0.9, 1.0, 0.7)
+			draw_circle(Vector2(cx - 12.0, cy - 10.0), 3.0, crystal_color)
+			draw_circle(Vector2(cx + 10.0, cy - 6.0), 2.5, crystal_color)
+			draw_circle(Vector2(cx - 6.0, cy + 10.0), 2.0, crystal_color)
+			draw_circle(Vector2(cx + 14.0, cy + 8.0), 3.5, crystal_color)
 	else:
 		var dot_size: float = 10.0
 		var dot_color: Color = Color.WHITE if is_fish_inside else Color(1.0, 0.5, 0.5)
+		if is_fish_stunned:
+			dot_color = Color(0.5, 0.75, 1.0)
 		draw_circle(Vector2(inner_x + inner_w * 0.5, fish_y), dot_size, dot_color)
 
 	var center_line_color: Color = Color(0.3, 0.35, 0.45, 0.15)
