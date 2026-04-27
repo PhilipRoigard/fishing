@@ -9,7 +9,7 @@ func _ready() -> void:
 	SignalBus.game_mode_changed.connect(_on_game_mode_changed)
 
 
-func _input(event: InputEvent) -> void:
+func _unhandled_input(event: InputEvent) -> void:
 	if not is_in_fishing_game:
 		return
 
@@ -19,6 +19,10 @@ func _input(event: InputEvent) -> void:
 		var mb: InputEventMouseButton = event as InputEventMouseButton
 		if mb.button_index == MOUSE_BUTTON_LEFT:
 			_handle_press(mb.pressed)
+	elif event is InputEventKey:
+		var key: InputEventKey = event as InputEventKey
+		if key.keycode == KEY_SPACE and not key.echo:
+			_handle_press(key.pressed)
 
 
 func _handle_press(pressed: bool) -> void:
