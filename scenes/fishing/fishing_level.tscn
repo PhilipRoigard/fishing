@@ -1,21 +1,22 @@
-[gd_scene load_steps=22 format=3 uid="uid://fishing_level"]
+[gd_scene format=4 uid="uid://c47hihsqy0p0f"]
 
-[ext_resource type="Script" path="res://scripts/environment/depth_background.gd" id="1_depth_bg"]
-[ext_resource type="Script" path="res://scripts/environment/fishing_line.gd" id="2_fishing_line"]
-[ext_resource type="Script" path="res://scripts/character/fisherman.gd" id="3_fisherman"]
-[ext_resource type="Script" path="res://scripts/environment/bobber.gd" id="14_bobber"]
-[ext_resource type="Script" path="res://scripts/environment/fishing_level_controller.gd" id="15_controller"]
-[ext_resource type="Script" path="res://scripts/environment/bite_radius_indicator.gd" id="16_bite_radius"]
-[ext_resource type="Texture2D" path="res://assets/sprites/character/naked_body_sprite_sheet.png" id="4_body"]
-[ext_resource type="Texture2D" path="res://assets/sprites/character/overalls_sprite_sheet.png" id="5_overalls"]
-[ext_resource type="Texture2D" path="res://assets/sprites/character/arms_sprite_sheet.png" id="6_arms"]
-[ext_resource type="Texture2D" path="res://assets/sprites/character/hat_01_sprite_sheet.png" id="7_hat"]
-[ext_resource type="Texture2D" path="res://assets/sprites/character/beard_01_sprite_sheet.png" id="8_beard"]
-[ext_resource type="Texture2D" path="res://assets/sprites/character/fishing_rod_sheet.png" id="9_rod"]
-[ext_resource type="Texture2D" path="res://assets/sprites/character/legs_sprite_sheet.png" id="10_legs"]
-[ext_resource type="Texture2D" path="res://assets/sprites/character/eyes_sprite_sheet.png" id="11_eyes"]
-[ext_resource type="Texture2D" path="res://assets/sprites/character/hair_01_sprite_sheet.png" id="12_hair"]
-[ext_resource type="Texture2D" path="res://assets/sprites/character/shaddow.png" id="13_shadow"]
+[ext_resource type="Script" uid="uid://chjiw768qjeg4" path="res://scripts/environment/depth_background.gd" id="1_depth_bg"]
+[ext_resource type="Script" uid="uid://7q1445npdd17" path="res://scripts/environment/fishing_line.gd" id="2_fishing_line"]
+[ext_resource type="Script" uid="uid://bwji1hmx686ay" path="res://scripts/character/fisherman.gd" id="3_fisherman"]
+[ext_resource type="Texture2D" uid="uid://ftpkcqnrexjv" path="res://assets/sprites/character/naked_body_sprite_sheet.png" id="4_body"]
+[ext_resource type="Texture2D" uid="uid://c47gvvannap04" path="res://assets/sprites/character/overalls_sprite_sheet.png" id="5_overalls"]
+[ext_resource type="Texture2D" uid="uid://dgbo6n20cd7q0" path="res://assets/sprites/character/arms_sprite_sheet.png" id="6_arms"]
+[ext_resource type="Texture2D" uid="uid://o5mm0saydw6y" path="res://assets/sprites/character/hat_01_sprite_sheet.png" id="7_hat"]
+[ext_resource type="Texture2D" uid="uid://d04w6hqnekquw" path="res://assets/sprites/character/beard_01_sprite_sheet.png" id="8_beard"]
+[ext_resource type="Texture2D" uid="uid://cnibricdm75bo" path="res://assets/sprites/character/fishing_rod_sheet.png" id="9_rod"]
+[ext_resource type="Texture2D" uid="uid://bhtk67u84ph11" path="res://assets/sprites/character/legs_sprite_sheet.png" id="10_legs"]
+[ext_resource type="Texture2D" uid="uid://cv6qcltary6db" path="res://assets/sprites/character/eyes_sprite_sheet.png" id="11_eyes"]
+[ext_resource type="Texture2D" uid="uid://b0brayr8t2bxl" path="res://assets/sprites/character/hair_01_sprite_sheet.png" id="12_hair"]
+[ext_resource type="Texture2D" uid="uid://b7ykfihacb8q8" path="res://assets/sprites/character/shaddow.png" id="13_shadow"]
+[ext_resource type="Script" uid="uid://cmkdkgv8kqwnd" path="res://scripts/environment/bobber.gd" id="14_bobber"]
+[ext_resource type="Script" uid="uid://b3dd26oy756r4" path="res://scripts/environment/fishing_level_controller.gd" id="15_controller"]
+[ext_resource type="Script" uid="uid://ds2aqufjxmtbo" path="res://scripts/environment/bite_radius_indicator.gd" id="16_bite_radius"]
+[ext_resource type="TileSet" uid="uid://ci8nocqea7d6j" path="res://tiles/wharf_tiles.tres" id="17_tilesrc"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hook"]
 radius = 6.0
@@ -24,23 +25,22 @@ radius = 6.0
 colors = PackedColorArray(0.85, 0.88, 0.92, 1, 0.6, 0.63, 0.68, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_hook"]
+gradient = SubResource("Gradient_hook")
 width = 4
 height = 8
-gradient = SubResource("Gradient_hook")
 fill_from = Vector2(0.5, 0)
 fill_to = Vector2(0.5, 1)
 
-[node name="FishingLevel" type="Node2D"]
+[node name="FishingLevel" type="Node2D" unique_id=2047367634]
 script = ExtResource("15_controller")
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="." unique_id=479317454]
 anchor_mode = 0
-position = Vector2(0, 0)
 
-[node name="DepthBackgroundLayer" type="CanvasLayer" parent="."]
+[node name="DepthBackgroundLayer" type="CanvasLayer" parent="." unique_id=85465127]
 layer = -10
 
-[node name="DepthBackground" type="ColorRect" parent="DepthBackgroundLayer"]
+[node name="DepthBackground" type="ColorRect" parent="DepthBackgroundLayer" unique_id=120892273]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -49,164 +49,173 @@ grow_vertical = 2
 color = Color(0.2, 0.5, 0.8, 1)
 script = ExtResource("1_depth_bg")
 
-[node name="FishLayer" type="Node2D" parent="."]
-z_index = 0
+[node name="WharfTilemapBg" type="Node2D" parent="." unique_id=332583251]
+scale = Vector2(2.5, 2.5)
 
-[node name="HookLayer" type="Node2D" parent="."]
+[node name="ground" type="TileMapLayer" parent="WharfTilemapBg" unique_id=549932876]
+tile_map_data = PackedByteArray("AAAFAAAAAQACAAUAAAAFAAEAAQACAAUAAAAGAAAAAQACAAUAAAAGAAEAAQACAAUAAAAHAAAAAQADAAUAAAAHAAEAAQABAAgAAAAHAAIAAQABAAMAAAAGAAIAAQABAAMAAAAFAAIAAQACAAUAAAAEAAIAAQACAAkAAAADAAIAAQACAAUAAAABAAIAAQABAAMAAAAAAAIAAQABAAMAAAABAAEAAQACAAUAAAACAAEAAQACAAUAAAABAAAAAQADAAkAAAACAAAAAQACAAUAAAADAAAAAQACAAUAAAAEAAAAAQACAAUAAAACAAIAAQABAAMAAAAAAAEAAQABAAkAAAAAAAAAAQACAAYAAAAIAAIAAQABAAMAAAAIAAEAAQACAAgAAAAIAAAAAQACAAUAAAA=")
+tile_set = ExtResource("17_tilesrc")
+
+[node name="water" type="TileMapLayer" parent="WharfTilemapBg" unique_id=967598398]
+tile_map_data = PackedByteArray("AAAIAAUAAQAIAAIAAAAAAAMAAwAHAAAAAAAAAAQAAQAIAAIAAAAAAAUAAQAIAAIAAAABAAMAAwAHAAAAAAABAAQAAQAIAAIAAAABAAUAAQAIAAIAAAACAAMAAwAHAAAAAAACAAQAAQAIAAIAAAACAAUAAQAIAAIAAAADAAMAAwAHAAAAAAADAAQAAQAIAAIAAAADAAUAAQAIAAIAAAAEAAMAAwAHAAAAAAAEAAQAAQAIAAIAAAAEAAUAAQAIAAIAAAAFAAMAAwAHAAAAAAAFAAQAAQAIAAIAAAAFAAUAAQAIAAIAAAAGAAMAAwAHAAAAAAAGAAQAAQAIAAIAAAAGAAUAAQAIAAIAAAAHAAMAAwAHAAAAAAAHAAQAAQAIAAIAAAAHAAUAAQAIAAIAAAAIAAMAAwAAAAEAAAAIAAQAAQAIAAIAAAA=")
+tile_set = ExtResource("17_tilesrc")
+
+[node name="FishLayer" type="Node2D" parent="." unique_id=624079543]
+
+[node name="HookLayer" type="Node2D" parent="." unique_id=64834142]
 z_index = 1
 
-[node name="FishingLine" type="Line2D" parent="HookLayer"]
+[node name="FishingLine" type="Line2D" parent="HookLayer" unique_id=2079373693]
 unique_name_in_owner = true
 width = 1.5
 default_color = Color(0.8, 0.85, 0.9, 0.9)
 script = ExtResource("2_fishing_line")
 
-[node name="Hook" type="Area2D" parent="HookLayer"]
+[node name="Hook" type="Area2D" parent="HookLayer" unique_id=2145557592]
 unique_name_in_owner = true
 position = Vector2(180, 400)
 collision_layer = 4
 collision_mask = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HookLayer/Hook"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HookLayer/Hook" unique_id=1883526597]
 shape = SubResource("CircleShape2D_hook")
 
-[node name="HookSprite" type="Sprite2D" parent="HookLayer/Hook"]
-texture = SubResource("GradientTexture2D_hook")
-position = Vector2(0, 4)
+[node name="HookSprite" type="Sprite2D" parent="HookLayer/Hook" unique_id=108690706]
 visible = false
+position = Vector2(0, 4)
+texture = SubResource("GradientTexture2D_hook")
 
-[node name="BiteRadiusIndicator" type="Node2D" parent="HookLayer/Hook"]
+[node name="BiteRadiusIndicator" type="Node2D" parent="HookLayer/Hook" unique_id=721141731]
 z_index = -1
 script = ExtResource("16_bite_radius")
 
-[node name="Bobber" type="Node2D" parent="HookLayer/Hook"]
+[node name="Bobber" type="Node2D" parent="HookLayer/Hook" unique_id=1119832386]
 script = ExtResource("14_bobber")
 
-[node name="WaterSurface" type="ColorRect" parent="."]
+[node name="WaterSurface" type="ColorRect" parent="." unique_id=866758919]
 z_index = 4
-offset_left = 0.0
 offset_top = 140.0
 offset_right = 360.0
 offset_bottom = 143.0
-color = Color(0.85, 0.92, 1.0, 0.3)
+color = Color(0.85, 0.92, 1, 0.3)
 
-[node name="WharfBackground" type="ColorRect" parent="."]
+[node name="WharfBackground" type="ColorRect" parent="." unique_id=1688466244]
 z_index = 2
-offset_right = 360.0
+offset_left = 100.0
+offset_right = 260.0
 offset_bottom = 140.0
 color = Color(0.45, 0.3, 0.18, 1)
 
-[node name="WoodGrain1" type="ColorRect" parent="WharfBackground"]
-offset_left = 0.0
+[node name="WoodGrain1" type="ColorRect" parent="WharfBackground" unique_id=1344022144]
+layout_mode = 0
 offset_top = 20.0
-offset_right = 360.0
+offset_right = 160.0
 offset_bottom = 22.0
 color = Color(0.4, 0.26, 0.14, 1)
 
-[node name="WoodGrain2" type="ColorRect" parent="WharfBackground"]
-offset_left = 0.0
+[node name="WoodGrain2" type="ColorRect" parent="WharfBackground" unique_id=1357482774]
+layout_mode = 0
 offset_top = 45.0
-offset_right = 360.0
+offset_right = 160.0
 offset_bottom = 47.0
 color = Color(0.42, 0.27, 0.15, 1)
 
-[node name="WoodGrain3" type="ColorRect" parent="WharfBackground"]
-offset_left = 0.0
+[node name="WoodGrain3" type="ColorRect" parent="WharfBackground" unique_id=435559191]
+layout_mode = 0
 offset_top = 70.0
-offset_right = 360.0
+offset_right = 160.0
 offset_bottom = 72.0
 color = Color(0.4, 0.25, 0.13, 1)
 
-[node name="WoodGrain4" type="ColorRect" parent="WharfBackground"]
-offset_left = 0.0
+[node name="WoodGrain4" type="ColorRect" parent="WharfBackground" unique_id=1102111600]
+layout_mode = 0
 offset_top = 95.0
-offset_right = 360.0
+offset_right = 160.0
 offset_bottom = 97.0
 color = Color(0.42, 0.28, 0.16, 1)
 
-[node name="WharfEdge" type="ColorRect" parent="WharfBackground"]
-offset_left = 0.0
+[node name="WharfEdge" type="ColorRect" parent="WharfBackground" unique_id=1192624816]
+layout_mode = 0
 offset_top = 130.0
-offset_right = 360.0
+offset_right = 160.0
 offset_bottom = 140.0
 color = Color(0.35, 0.22, 0.12, 1)
 
-[node name="WharfShadow" type="ColorRect" parent="WharfBackground"]
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 360.0
+[node name="WharfShadow" type="ColorRect" parent="WharfBackground" unique_id=285887201]
+layout_mode = 0
+offset_right = 160.0
 offset_bottom = 3.0
 color = Color(0.5, 0.35, 0.22, 1)
 
-[node name="Fisherman" type="Node2D" parent="."]
+[node name="Fisherman" type="Node2D" parent="." unique_id=1298920869]
 unique_name_in_owner = true
 z_index = 3
 position = Vector2(180, 85)
 scale = Vector2(2.5, 2.5)
 script = ExtResource("3_fisherman")
 
-[node name="Shadow" type="Sprite2D" parent="Fisherman"]
-texture = ExtResource("13_shadow")
-position = Vector2(0, 22)
-modulate = Color(0, 0, 0, 0.15)
+[node name="Shadow" type="Sprite2D" parent="Fisherman" unique_id=1034038808]
 visible = false
+modulate = Color(0, 0, 0, 0.15)
+position = Vector2(0, 22)
+texture = ExtResource("13_shadow")
 
-[node name="Legs" type="Sprite2D" parent="Fisherman"]
+[node name="Legs" type="Sprite2D" parent="Fisherman" unique_id=1415109986]
 texture = ExtResource("10_legs")
 hframes = 17
 vframes = 2
-frame_coords = Vector2i(0, 1)
+frame = 17
 
-[node name="Body" type="Sprite2D" parent="Fisherman"]
+[node name="Body" type="Sprite2D" parent="Fisherman" unique_id=935774358]
 texture = ExtResource("4_body")
 hframes = 17
 vframes = 3
-frame_coords = Vector2i(0, 2)
+frame = 34
 
-[node name="Overalls" type="Sprite2D" parent="Fisherman"]
+[node name="Overalls" type="Sprite2D" parent="Fisherman" unique_id=1051905347]
 texture = ExtResource("5_overalls")
 hframes = 17
 vframes = 3
-frame_coords = Vector2i(0, 2)
+frame = 34
 
-[node name="Arms" type="Sprite2D" parent="Fisherman"]
+[node name="Arms" type="Sprite2D" parent="Fisherman" unique_id=163797425]
 texture = ExtResource("6_arms")
 hframes = 17
 vframes = 4
-frame_coords = Vector2i(0, 3)
+frame = 51
 
-[node name="Eyes" type="Sprite2D" parent="Fisherman"]
+[node name="Eyes" type="Sprite2D" parent="Fisherman" unique_id=422650529]
 texture = ExtResource("11_eyes")
 hframes = 17
 vframes = 2
-frame_coords = Vector2i(0, 1)
+frame = 17
 
-[node name="Beard" type="Sprite2D" parent="Fisherman"]
+[node name="Beard" type="Sprite2D" parent="Fisherman" unique_id=548257628]
 texture = ExtResource("8_beard")
 hframes = 17
 vframes = 2
-frame_coords = Vector2i(0, 1)
+frame = 17
 
-[node name="Hair" type="Sprite2D" parent="Fisherman"]
+[node name="Hair" type="Sprite2D" parent="Fisherman" unique_id=2098668525]
 texture = ExtResource("12_hair")
 hframes = 17
 vframes = 3
-frame_coords = Vector2i(0, 2)
+frame = 34
 
-[node name="Hat" type="Sprite2D" parent="Fisherman"]
+[node name="Hat" type="Sprite2D" parent="Fisherman" unique_id=1709347595]
 texture = ExtResource("7_hat")
 hframes = 17
 vframes = 3
-frame_coords = Vector2i(0, 2)
+frame = 34
 
-[node name="FishingRod" type="Sprite2D" parent="Fisherman"]
+[node name="FishingRod" type="Sprite2D" parent="Fisherman" unique_id=788489420]
+visible = false
 texture = ExtResource("9_rod")
 hframes = 5
 vframes = 3
-frame_coords = Vector2i(0, 2)
-visible = false
+frame = 10
 
-[node name="AmbientParticles" type="GPUParticles2D" parent="."]
+[node name="AmbientParticles" type="GPUParticles2D" parent="." unique_id=163568674]
 position = Vector2(180, 400)
 amount = 30
 lifetime = 6.0
