@@ -9,6 +9,7 @@ const FightEffectsScript: GDScript = preload("res://scripts/ui/components/fight_
 var depth_label: Label
 var bait_label: Label
 var back_button: Button
+var abort_button: Button
 var cast_power_label: Label
 var cast_power_bar: ProgressBar
 var bite_flash_label: Label
@@ -110,13 +111,22 @@ func _cleanup_connections() -> void:
 
 
 func _build_layout() -> void:
-	var back_button: Button = Button.new()
+	back_button = Button.new()
 	back_button.text = "<"
 	back_button.custom_minimum_size = Vector2(36, 36)
 	back_button.position = Vector2(8, 8)
 	back_button.pressed.connect(_on_return_pressed)
 	back_button.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(back_button)
+
+	abort_button = Button.new()
+	abort_button.text = "X"
+	abort_button.custom_minimum_size = Vector2(36, 36)
+	abort_button.position = Vector2(8, 8)
+	abort_button.pressed.connect(_on_abort_pressed)
+	abort_button.mouse_filter = Control.MOUSE_FILTER_STOP
+	abort_button.visible = false
+	add_child(abort_button)
 
 	depth_label = Label.new()
 	depth_label.text = "Hold to cast!"
@@ -432,6 +442,10 @@ func _on_cast_landed(depth: float) -> void:
 func _on_fishing_state_changed(state: int) -> void:
 	match state:
 		Enums.FishingState.IDLE:
+			if back_button:
+				back_button.visible = true
+			if abort_button:
+				abort_button.visible = false
 			if depth_label:
 				depth_label.text = "Hold to cast!"
 			if cast_power_label:
@@ -448,9 +462,17 @@ func _on_fishing_state_changed(state: int) -> void:
 				fish_name_label.visible = false
 			_show_tutorial_hint("Hold anywhere to charge your cast!")
 		Enums.FishingState.CASTING:
+			if back_button:
+				back_button.visible = false
+			if abort_button:
+				abort_button.visible = true
 			if depth_label:
 				depth_label.text = "Charging cast..."
 		Enums.FishingState.WAITING:
+			if back_button:
+				back_button.visible = false
+			if abort_button:
+				abort_button.visible = true
 			if cast_power_label:
 				cast_power_label.text = "Waiting for bite..."
 			if bite_flash_label:
@@ -553,6 +575,8 @@ func _on_fight_started(fish_id: String) -> void:
 		fight_container.visible = true
 	if back_button:
 		back_button.visible = false
+	if abort_button:
+		abort_button.visible = true
 	if cast_power_label:
 		cast_power_label.text = ""
 	_show_fish_name(fish_id)
@@ -710,6 +734,12 @@ func _hide_fight_ui() -> void:
 		fish_name_label.visible = false
 	if tutorial_label:
 		tutorial_label.visible = false
+
+
+func _on_abort_pressed() -> void:
+	HapticManager.light_tap()
+	if Main.instance and Main.instance.fishing_system:
+		Main.instance.fishing_system.fishing_state_machine.change_state(&"idle")
 
 
 func _on_return_pressed() -> void:

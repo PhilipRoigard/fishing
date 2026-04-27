@@ -89,6 +89,8 @@ func _on_hook_position_changed(hook_global_pos: Vector2) -> void:
 
 func _on_fishing_state_changed(state: int) -> void:
 	is_reeling_in = state == Enums.FishingState.REELING_IN
+	if state == Enums.FishingState.IDLE:
+		reset_camera()
 
 
 func reset_camera() -> void:

@@ -17,10 +17,18 @@ func _ready() -> void:
 			fish_pool_selector = FishPoolSelector.new(GameResources.config.fish_database)
 	SignalBus.cast_landed.connect(_on_cast_landed)
 	SignalBus.fishing_session_ended.connect(_on_fishing_session_ended)
+	SignalBus.fishing_state_changed.connect(_on_fishing_state_changed)
 
 
 func _on_cast_landed(_depth: float) -> void:
 	_spawning_active = true
+
+
+func _on_fishing_state_changed(state: int) -> void:
+	if state == Enums.FishingState.IDLE:
+		_spawning_active = false
+		spawn_timer = 0.0
+		_clear_all_fish()
 
 
 func _on_fishing_session_ended() -> void:
