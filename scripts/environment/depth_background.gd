@@ -1,6 +1,6 @@
 extends ColorRect
 
-var surface_color: Color = Color(0.3, 0.75, 0.95)
+var surface_color: Color = Color(0.588, 0.851, 0.761)
 var mid_color: Color = Color(0.1, 0.35, 0.65)
 var deep_color: Color = Color(0.02, 0.04, 0.1)
 var abyss_color: Color = Color(0.01, 0.01, 0.03)
@@ -8,6 +8,7 @@ var abyss_color: Color = Color(0.01, 0.01, 0.03)
 @export var max_depth_for_gradient: float = 3000.0
 
 const WATER_START_Y: float = 140.0
+const SURFACE_FLAT_DEPTH: float = 350.0
 var _camera_y: float = 0.0
 
 
@@ -41,12 +42,17 @@ func _draw() -> void:
 		var band_color: Color
 		if world_y < WATER_START_Y:
 			band_color = Color(0.45, 0.3, 0.18)
-		elif depth_t < 0.3:
-			band_color = surface_color.lerp(mid_color, depth_t / 0.3)
-		elif depth_t < 0.7:
-			band_color = mid_color.lerp(deep_color, (depth_t - 0.3) / 0.4)
+		elif water_depth < SURFACE_FLAT_DEPTH:
+			band_color = surface_color
 		else:
-			band_color = deep_color.lerp(abyss_color, (depth_t - 0.7) / 0.3)
+			var gradient_depth: float = water_depth - SURFACE_FLAT_DEPTH
+			var gradient_t: float = clampf(gradient_depth / (max_depth_for_gradient - SURFACE_FLAT_DEPTH), 0.0, 1.0)
+			if gradient_t < 0.3:
+				band_color = surface_color.lerp(mid_color, gradient_t / 0.3)
+			elif gradient_t < 0.7:
+				band_color = mid_color.lerp(deep_color, (gradient_t - 0.3) / 0.4)
+			else:
+				band_color = deep_color.lerp(abyss_color, (gradient_t - 0.7) / 0.3)
 		draw_rect(Rect2(0, screen_y, rect_size.x, band_height + 1), band_color)
 
 

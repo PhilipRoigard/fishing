@@ -92,12 +92,6 @@ script = ExtResource("16_bite_radius")
 [node name="Bobber" type="Node2D" parent="HookLayer/Hook" unique_id=1119832386]
 script = ExtResource("14_bobber")
 
-[node name="WaterSurface" type="ColorRect" parent="." unique_id=866758919]
-z_index = 4
-offset_top = 140.0
-offset_right = 360.0
-offset_bottom = 143.0
-color = Color(0.85, 0.92, 1, 0.3)
 
 [node name="WharfBackground" type="ColorRect" parent="." unique_id=1688466244]
 z_index = 2
