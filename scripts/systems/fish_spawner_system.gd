@@ -6,7 +6,7 @@ var active_schools: Array[FishSchool] = []
 var spawn_config: SpawnConfig
 var school_config: SchoolConfig
 var fish_pool_selector: FishPoolSelector
-
+var _spawning_active: bool = false
 
 
 func _ready() -> void:
@@ -15,10 +15,29 @@ func _ready() -> void:
 		school_config = GameResources.config.school_config
 		if GameResources.config.fish_database:
 			fish_pool_selector = FishPoolSelector.new(GameResources.config.fish_database)
+	SignalBus.cast_landed.connect(_on_cast_landed)
+	SignalBus.fishing_session_ended.connect(_on_fishing_session_ended)
+
+
+func _on_cast_landed(_depth: float) -> void:
+	_spawning_active = true
+
+
+func _on_fishing_session_ended() -> void:
+	_spawning_active = false
+	spawn_timer = 0.0
+	_clear_all_fish()
+
+
+func _clear_all_fish() -> void:
+	for school: FishSchool in active_schools:
+		if is_instance_valid(school):
+			school.cleanup()
+	active_schools.clear()
 
 
 func _process(delta: float) -> void:
-	if not spawn_config or not fish_pool_selector:
+	if not spawn_config or not fish_pool_selector or not _spawning_active:
 		return
 
 	spawn_timer += delta

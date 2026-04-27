@@ -22,6 +22,7 @@ func _ready() -> void:
 	SignalBus.bite_occurred.connect(_on_bite_occurred)
 	SignalBus.hook_position_changed.connect(_on_hook_position_changed)
 	SignalBus.fishing_state_changed.connect(_on_fishing_state_changed)
+	SignalBus.fishing_session_ended.connect(reset_camera)
 
 
 func shake(intensity: float, duration: float) -> void:
